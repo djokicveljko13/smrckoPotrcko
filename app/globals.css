@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+/*
+ * Boje su uzorkovane iz logotipa (public/logo.png), ne izmišljene.
+ * Menjaš ih ovde na jednom mestu — sve ostalo koristi imena, ne hex.
+ */
+@theme inline {
+  --font-sans: var(--font-jakarta);
+  --font-display: var(--font-archivo);
+
+  --color-brand: #df352d;
+  --color-brand-dark: #b8241d;
+  --color-ink: #101010;
+  --color-field: #f1f1f3;
+}
+
+/*
+ * Namerno NEMA @media (prefers-color-scheme: dark).
+ * Aplikacija je bela po dogovoru — tamna tema bi se tukla sa logotipom.
+ */
+html {
+  color-scheme: light;
+}
+
+body {
+  background: #ffffff;
+  color: var(--color-ink);
+}
+
+/* Auto koji pravi krug posle slanja porudžbine — vidi FAZU B. */
+@keyframes potrcko-orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes potrcko-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
