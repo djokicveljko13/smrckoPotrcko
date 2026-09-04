@@ -1,9 +1,4 @@
-import type { OrderSource, OrderStatus, OrderZone } from "@/lib/types";
-
-export const ZONE_LABEL: Record<OrderZone, string> = {
-  grad: "U gradu",
-  van_grada: "Van grada",
-};
+import type { OrderSource, OrderStatus } from "@/lib/types";
 
 export const SOURCE_LABEL: Record<OrderSource, string> = {
   sajt: "Sa sajta",

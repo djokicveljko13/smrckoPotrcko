@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { HomeIcon } from "@/components/icons";
 import type { AddressSuggestion } from "@/lib/google/places";
-import { fieldClass, labelClass } from "@/lib/ui";
+import { fieldIconClass, fieldWithIconClass, labelClass } from "@/lib/ui";
 
 /*
  * Polje "Adresa dostave" sa predlozima iz /api/adrese.
@@ -79,32 +80,37 @@ export function AddressAutocomplete() {
   return (
     <div className="relative">
       <label htmlFor="address" className={labelClass}>
-        Adresa dostave
+        Gde donosimo?
       </label>
 
-      <input
-        id="address"
-        name="address"
-        required
-        maxLength={400}
-        autoComplete="off"
-        className={fieldClass}
-        placeholder="ulica i broj, sprat ako treba"
-        value={text}
-        onChange={(e) => {
-          setText(e.target.value);
-          setPlaceId(""); // tekst se promenio -> stari placeId više ne važi
-        }}
-        onFocus={() => setOpen(suggestions.length > 0)}
-        // Klik na predlog prvo obori fokus (onBlur), pa tek onda okine onClick.
-        // Kratko kašnjenje da onClick stigne pre nego što sakrijemo listu.
-        onBlur={() => setTimeout(() => setOpen(false), 120)}
-      />
+      <div className="relative mt-1.5">
+        <span className={fieldIconClass}>
+          <HomeIcon />
+        </span>
+        <input
+          id="address"
+          name="address"
+          required
+          maxLength={400}
+          autoComplete="off"
+          className={fieldWithIconClass}
+          placeholder="Ulica i broj, sprat / stan ako je potrebno"
+          value={text}
+          onChange={(e) => {
+            setText(e.target.value);
+            setPlaceId(""); // tekst se promenio -> stari placeId više ne važi
+          }}
+          onFocus={() => setOpen(suggestions.length > 0)}
+          // Klik na predlog prvo obori fokus (onBlur), pa tek onda okine onClick.
+          // Kratko kašnjenje da onClick stigne pre nego što sakrijemo listu.
+          onBlur={() => setTimeout(() => setOpen(false), 120)}
+        />
+      </div>
 
       <input type="hidden" name="place_id" value={placeId} />
 
       {open && suggestions.length > 0 ? (
-        <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl border-2 border-brand/30 bg-white shadow-lg">
+        <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-2xl border-2 border-zinc-200 bg-white shadow-lg">
           {suggestions.map((s) => (
             <li key={s.placeId}>
               <button

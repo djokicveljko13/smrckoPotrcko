@@ -12,6 +12,39 @@
   --color-brand-dark: #b8241d;
   --color-ink: #101010;
   --color-field: #f1f1f3;
+
+  /*
+   * Dve identične kopije teksta, pomeraj -50% = petlja bez skoka.
+   * 38s na trenutnu dužinu poruke ispadne ~57 px/s — brzina hoda pogledom.
+   * Ako se tekst u traci skrati ili produži, ovde se doteruje trajanje.
+   */
+  --animate-marquee: potrcko-marquee 38s linear infinite;
+
+  /*
+   * "both" je važan: pre nego što red dođe na svoj delay reč stoji na `from`
+   * (nevidljiva), a posle animacije ostaje na `to`. Bez toga bi sve reči
+   * bljesnule odjednom na početku.
+   */
+  --animate-paint-in: potrcko-paint-in 460ms ease-out both;
+
+  /*
+   * "both" je i ovde ključan: dok traje kašnjenje tekst stoji na `from`, dakle
+   * gore i neviljiv. Bez toga bi prvo stajao na svom mestu, pa tek onda odleteo
+   * gore da bi pao — a to je smešno.
+   *
+   * Trajanje pada je 760ms: kraće deluje kao da je tekst samo trepnuo, duže
+   * kao da lebdi. Ubrzanje i odskok su u samim keyframe-ovima, ne ovde.
+   */
+  --animate-slam-in: potrcko-slam-in 760ms both;
+
+  /*
+   * "backwards" (a ne "both"): pre svog reda element stoji sakriven, a POSLE
+   * animacije se pravilo skida. Da je "both", završni `transform` iz keyframe-a
+   * bi zauvek pobeđivao hover — badž se ne bi mogao podići mišem.
+   */
+  --animate-rise-in: potrcko-rise-in 520ms cubic-bezier(0.22, 1, 0.36, 1)
+    backwards;
+  --animate-soft-pulse: potrcko-soft-pulse 2.6s ease-in-out infinite;
 }
 
 /*
@@ -20,11 +53,47 @@
  */
 html {
   color-scheme: light;
+
+  /*
+   * Klik na "Poruči šta ti treba" vodi na #poruci. Bez ovoga browser skoči
+   * na sekciju u jednom kadru; sa ovim je klizanje, pa oko isprati da forma
+   * dolazi ODOZDO — to je ista stranica, a ne nova.
+   */
+  scroll-behavior: smooth;
+}
+
+/* Ko je u OS-u tražio manje animacija, dobija skok umesto klizanja. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
   background: #ffffff;
   color: var(--color-ink);
+}
+
+/*
+ * Prvi ekran: čista crvena iz logotipa.
+ *
+ * Nema šare — proba sa autićima je odbačena. Zadržan je samo blagi gradijent
+ * koji vrh malo posvetli, a dno zatamni: ravna boja preko celog ekrana izgleda
+ * kao neobojena površina, a ovako se vidi da ekran ima "gore" i "dole" i beli
+ * talas na dnu ima na šta da nalegne. Prelaz je toliko tih da se ne primeti
+ * kao gradijent, samo kao dubina.
+ *
+ * Zašto klasa u CSS-u a ne Tailwind klase u JSX-u: gradijent + osnovna boja su
+ * dva sloja koja idu zajedno; kao klasa se pamte kao jedna odluka.
+ */
+.hero-surface {
+  background-color: var(--color-brand);
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(120, 16, 12, 0) 45%,
+    rgba(120, 16, 12, 0.32)
+  );
 }
 
 /* Auto koji pravi krug posle slanja porudžbine — vidi FAZU B. */
@@ -43,5 +112,145 @@ body {
   }
   to {
     opacity: 1;
+  }
+}
+
+/*
+ * Tipografija hero sekcije — sada beli tekst na crvenoj šari.
+ *
+ * Šara nije ravna boja: ispod slova prolazi čas čista crvena, čas svetliji
+ * autić. Zato dve senke, dva posla: prva (`0 3px 0`, bez blur-a) je tamna
+ * ivica koja slovu daje debljinu — isti trik kao crna kontura u logotipu.
+ * Druga (blur 24px) je široka tamna mrlja koja utiša šaru iza teksta, pa
+ * slova ostaju čitka i kad naiđu na autić.
+ *
+ * `text-shadow` se NASLEĐUJE, ali se ne sabira: drugi red ima svoju vrednost,
+ * pa potpuno pregazi senku roditelja. Zato ne treba ništa da se resetuje.
+ */
+.hero-title {
+  color: #ffffff;
+  text-shadow:
+    0 3px 0 rgba(96, 12, 8, 0.4),
+    0 10px 24px rgba(60, 4, 0, 0.35);
+}
+
+/* Drugi red je poruka firme — ista bela, ali sa jačom senkom da iskoči. */
+.hero-title-accent {
+  text-shadow:
+    0 3px 0 rgba(84, 8, 4, 0.55),
+    0 12px 26px rgba(50, 2, 0, 0.45);
+}
+
+/*
+ * Opis: krupniji nego ranije (18px na telefonu, 22px na desktopu) jer je sada
+ * jedini tekst ispod naslova i mora da se čita iz daljine. Bela sa 96%
+ * neprozirnosti — taman toliko da ne otima pažnju naslovu, a da i dalje
+ * bude bela, ne siva.
+ */
+.hero-description {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow:
+    0 2px 3px rgba(60, 4, 0, 0.45),
+    0 8px 20px rgba(60, 4, 0, 0.3);
+}
+
+@media (min-width: 640px) {
+  .hero-description {
+    font-size: 1.375rem;
+  }
+}
+
+@keyframes potrcko-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Ikonica "dahne" — mala promena veličine, dovoljno da oko uhvati pokret. */
+@keyframes potrcko-soft-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.14);
+  }
+}
+
+/*
+ * Reč se "nanosi" s leva na desno, kao valjak po zidu.
+ * clip-path inset(gore desno dole levo): desna strana ide sa 100% (sve
+ * odsečeno) na 0% (ništa odsečeno). Ne animiramo širinu ni margine, pa se
+ * tekst ne pomera — samo se otkriva.
+ */
+@keyframes potrcko-paint-in {
+  from {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/*
+ * Tekst se "baci" na hero: padne odozgo, tresne o naslov iznad forme i
+ * malo se stisne pa vrati, kao guma kad udari o pod.
+ *
+ * Dva trika koja ovo dele od običnog "fade in odozgo":
+ *
+ * 1. `animation-timing-function` UNUTAR keyframe-a. Krivulja upisana na 0%
+ *    važi samo za deo do 55% — i to je krivulja koja UBRZAVA (pad pod
+ *    gravitacijom). Da smo je stavili na animaciju, isto usporavanje bi
+ *    važilo i za odskok, pa bi udarac izgubio oštrinu.
+ *
+ * 2. `transform-origin: bottom` uz scaleY. Kad se visina smanji na 90%, tekst
+ *    se skuplja ka svojoj donjoj ivici — kao da je tu pod o koji je udario.
+ *    Sa podrazumevanim centrom skupljao bi se i odozdo, i to izgleda kao da
+ *    se udaljava, a ne kao udarac.
+ *
+ * Početno scale(1.3) pomaže istoj iluziji: krupnije = bliže oku, pa se čita
+ * kao da tekst leti ka ekranu, a ne da klizi po njemu.
+ */
+@keyframes potrcko-slam-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -220px, 0) scale(1.3);
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  }
+  15% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1);
+  }
+  68% {
+    transform: translate3d(0, 0, 0) scale(1.06, 0.9);
+  }
+  84% {
+    transform: translate3d(0, 0, 0) scale(0.99, 1.03);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes potrcko-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
   }
 }

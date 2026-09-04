@@ -8,7 +8,13 @@ import {
 } from "@/app/actions/create-guest-order";
 import { AddressAutocomplete } from "@/components/address-autocomplete";
 import { DeliveryAnimation, ORBIT_MS } from "@/components/delivery-animation";
-import { fieldClass, labelClass, primaryButtonClass } from "@/lib/ui";
+import { PackageIcon, PhoneIcon, StoreIcon } from "@/components/icons";
+import {
+  fieldIconClass,
+  fieldWithIconClass,
+  labelClass,
+  primaryButtonClass,
+} from "@/lib/ui";
 
 export function GuestOrderForm() {
   const router = useRouter();
@@ -74,48 +80,63 @@ export function GuestOrderForm() {
       >
         <div>
           <label htmlFor="title" className={labelClass}>
-            Šta ti treba?
+            Šta da ti donesemo?
           </label>
-          <input
-            id="title"
-            name="title"
-            required
-            maxLength={500}
-            className={fieldClass}
-            placeholder="pizza"
-          />
+          <div className="relative mt-1.5">
+            <span className={fieldIconClass}>
+              <PackageIcon />
+            </span>
+            <input
+              id="title"
+              name="title"
+              required
+              maxLength={500}
+              className={fieldWithIconClass}
+              placeholder="Npr. 2 pice, lek iz apoteke, namirnice…"
+            />
+          </div>
         </div>
 
         <div>
           <label htmlFor="shop" className={labelClass}>
-            Iz koje radnje?
+            Odakle preuzimamo?
           </label>
-          <input
-            id="shop"
-            name="shop"
-            required
-            maxLength={300}
-            className={fieldClass}
-            placeholder="npr. Maxi kod pijace"
-          />
+          <div className="relative mt-1.5">
+            <span className={fieldIconClass}>
+              <StoreIcon />
+            </span>
+            <input
+              id="shop"
+              name="shop"
+              required
+              maxLength={300}
+              className={fieldWithIconClass}
+              placeholder="Npr. Maxi kod pijace, Lidl, apoteka…"
+            />
+          </div>
         </div>
 
         <AddressAutocomplete />
 
         <div>
           <label htmlFor="phone" className={labelClass}>
-            Tvoj telefon
+            Broj telefona
           </label>
-          <input
-            id="phone"
-            name="phone"
-            type="tel"
-            required
-            maxLength={40}
-            autoComplete="tel"
-            className={fieldClass}
-            placeholder="06x xxx xxxx"
-          />
+          <div className="relative mt-1.5">
+            <span className={fieldIconClass}>
+              <PhoneIcon />
+            </span>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              required
+              maxLength={40}
+              autoComplete="tel"
+              className={fieldWithIconClass}
+              placeholder="06x xxx xxxx"
+            />
+          </div>
         </div>
 
         {state?.status === "error" ? (
@@ -132,8 +153,13 @@ export function GuestOrderForm() {
           disabled={pending || sending}
           className={primaryButtonClass}
         >
-          {pending || sending ? "Šaljem…" : "Pošalji porudžbinu"}
+          {pending || sending ? "Šaljem…" : "Naruči dostavu"}
         </button>
+
+        <p className="text-center text-xs font-medium leading-snug text-zinc-500">
+          Ukoliko je potrebno, kurir će te pozvati radi potvrde porudžbine i
+          detalja dostave.
+        </p>
       </form>
     </>
   );

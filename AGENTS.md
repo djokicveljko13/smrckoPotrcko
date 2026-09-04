@@ -59,7 +59,7 @@ Google login i sačuvane adrese **nisu V1**.
 
 ## Porudžbina (tanka)
 
-Polja: **naziv** (šta treba), **radnja** (slobodan tekst, odakle), **adresa**, **telefon** (obavezan), **zona** (`grad` \| `van_grada`), **izvor** (`sajt` \| `telefon` — kako je porudžbina ušla), **cena_dostave** (fiksno: **grad 200 din**, **van grada / sela 250 din** — nema CMS-a, dve konstante u kodu; na hvala-stranici se prikaže pre broja), **status**, **javni broj** (npr. P-17), **kurir**, **vreme dodele**, **kurirski token** (dugačak, nije P-17).
+Polja: **naziv** (šta treba), **radnja** (slobodan tekst, odakle), **adresa** (bira se iz Places predloga), **telefon** (obavezan), **izvor** (`sajt` \| `telefon` — kako je porudžbina ušla), **cena_dostave** (računa server iz kilometraže: `30 + 80 × km`, naviše na 10 din; `NULL` ako Google zakaže — vlasnik je upiše ručno na tabli), **distance_m** (metri firma → kupac), **destination_place_id** (Google ID adrese), **status**, **javni broj** (npr. P-17), **kurir**, **vreme dodele**, **kurirski token** (dugačak, nije P-17). Kolona **zona** (`grad` \| `van_grada`) ostaje u bazi zbog starih redova, ali se više ne popunjava. Izvor istine za cenu: `docs/featureGoogleMaps.md`.
 
 Nema liste partnera, nema posebnog polja napomena u V1 (može ući u naziv).
 
@@ -67,14 +67,14 @@ Statusi: `nova` → `poslata_kuriru` → `krenuo` → `isporuceno`.
 
 ## Dva ulaza, jedna tabla (važno)
 
-Danas klijent živi od telefona. Sajt **neće** ugasiti pozive. Ako porudžbinu sa poziva ne upišemo u istu aplikaciju, vlasnik opet nema evidenciju — pa sajt nije rešio problem.
+Danas klijent živi od telefona. Sajt **neće** ugasiti pozive. Javni broj vlasnika za kupce: **066 59 355 35** (poziv, WhatsApp, Viber — dno početne). Ako porudžbinu sa poziva ne upišemo u istu aplikaciju, vlasnik opet nema evidenciju — pa sajt nije rešio problem.
 
 Zato postoje **dva ulaza u istu tabelu** `orders`, ne dva sistema:
 
 1. **Sajt** — kupac sam popuni javnu formu (`izvor = sajt`). Dobije hvala + broj. Vlasniku stigne mejl (nije pored ekrana).
 2. **Telefon** — kupac zove, kaže šta želi. Vlasnik na tabli otvori **„Nova porudžbina“** i upiše ista polja dok razgovara (`izvor = telefon`). Nema stranice hvala za kupca (već je na vezi). **Mejl vlasniku se ne šalje** — već je na tabli i na telefonu; dupli signal smeta.
 
-Od tog trenutka tok je **isti**: izbor kurira → WhatsApp → kurirski link → statusi. Kurir ne mora da zna da li je naručeno sa sajta ili pozivom.
+Od tog trenutka tok je **isti**: auto-dodela kurira → Telegram ponuda → kurirski link → statusi. Kurir ne mora da zna da li je naručeno sa sajta ili pozivom.
 
 Zašto ne posebna tabela „telefonske“: dupli kod, dupli izveštaji, lako da se zaboravi jedna lista. Jedan red = jedna vožnja, bez obzira kako je stigla.
 
@@ -84,13 +84,13 @@ Zašto ne posebna tabela „telefonske“: dupli kod, dupli izveštaji, lako da 
 
 1. Gost kuca formu (nema login).
 2. Insert u `orders` (`izvor = sajt`) + broj.
-3. Stranica: hvala, **cena dostave** (200 ili 250 prema zoni), pa broj. **Nema** live praćenja za kupca.
+3. Stranica: hvala, **cena dostave** (izračunata iz kilometraže; ako fali — „javljamo pozivom"), pa broj. **Nema** live praćenja za kupca.
 4. Mejl vlasniku.
 
 **B — kupac zove vlasnika**
 
 1. Vlasnik (ulogovan) na tabli: Nova porudžbina.
-2. Upiše naziv, radnju, zonu, adresu, telefon.
+2. Upiše naziv, radnju, adresu (isti Places izbor kao na sajtu), telefon.
 3. Insert u `orders` (`izvor = telefon`) + broj. Broj može da pročita kupcu na vezi ako zatreba.
 4. Bez mejla, bez javne hvala-stranice.
 
@@ -105,7 +105,8 @@ Vlasnik na tabli **gleda** i sme da ispravi; ne bira kurira ručno.
 ## Šta nije V1 (ne radi osim ako vlasnik ovog repoa kaže da klijent to sada traži)
 
 - Katalog partnera / proizvodi (kasniji **upsell**: naplata prodavnicama za izlistavanje) — nema tabele `partners` u V1
-- Google, tracking kupca, CMS cena u UI, CRUD kurira u UI (kurire za sad u bazu), zvuk, statistika, radno vreme koje zatvara formu
+- Google **login**, Google Maps prikaz na stranici, sačuvane adrese, tracking kupca, CMS cena u UI, CRUD kurira u UI (kurire za sad u bazu), zvuk, statistika, radno vreme koje zatvara formu
+  - **Ali:** Google **Routes API** (kilometraža) + **Places Autocomplete** (izbor adrese) za cenu dostave **JESU V1** — vidi `docs/featureGoogleMaps.md`. Ključ samo na serveru.
 - Plaćanje online **nikad**
 - Food of Šmrk / perionica
 
@@ -133,7 +134,7 @@ Vlasnik na tabli **gleda** i sme da ispravi; ne bira kurira ručno.
 ## Kako agent radi u ovom repo-u
 
 - Učenje je deo zadatka — vidi odeljak **Cilj učenja**.
-- Cene dostave su dogovorene (200 / 250). Ne nagađaj spisak kurira ni naselja.
+- Cena dostave = `30 + 80 × km`, naviše na 10 din (izvor istine `docs/featureGoogleMaps.md`). Ne nagađaj spisak kurira ni naselja.
 - Kad klijent promeni zahtev: ažuriraj **ovaj fajl**, pa implementiraj.
 - Ne širi scope „dok si već tu“ (partneri, Google, zvuk, CSV).
 - Posle UI izmene: proveri tok u browseru ako alati postoje.

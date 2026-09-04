@@ -1,60 +1,216 @@
 import Link from "next/link";
+import { AnnouncementBar } from "@/components/announcement-bar";
 import { BrandLogo } from "@/components/brand-logo";
+import { ContactStrip } from "@/components/contact-strip";
 import { GuestOrderForm } from "@/components/guest-order-form";
+import {
+  ArrowDownIcon,
+  BoltIcon,
+  CheckCircleIcon,
+  MapPinIcon,
+} from "@/components/icons";
+import { heroButtonClass } from "@/lib/ui";
 
 /*
- * min-h-dvh = visina vidljivog ekrana (dinamicki vh).
- * Stari 100vh na telefonu broji i traku browsera, pa stranica "curi" ispod.
- * dvh se skupa kad se ta traka pokaze — zato prvi ekran drzi logo + tekst +
- * celu formu. Na uskom ekranu i dalje sme da skroluje ako ne stane.
+ * Tri obećanja koja kupac traži pre nego što ostavi telefon: koliko čeka,
+ * dolazi li do njega i mora li da pravi nalog. Lista je podatak, ne tri
+ * prekucana <li> — dodaje se stavka, ne kopira blok koda.
  *
- * lg: dve kolone — levo prica, desno forma — da na racunaru sve stane
- * u jedan pogled, bez skrola.
+ * Sada svaka ima i rečenicu objašnjenja: naslov je obećanje, rečenica ispod
+ * je dokaz. "Brza dostava" bez dokaza je marketing, sa dokazom je informacija.
+ */
+const BADGES = [
+  {
+    Icon: BoltIcon,
+    title: "Brza dostava",
+    text: "Kurir kreće čim primimo porudžbinu, bez čekanja na potvrdu.",
+  },
+  {
+    Icon: MapPinIcon,
+    title: "Jagodina + 30 km",
+    text: "Ceo grad i okolna mesta u krugu od 30 kilometara.",
+  },
+  {
+    Icon: CheckCircleIcon,
+    title: "Bez registracije",
+    text: "Nema naloga ni lozinke. Plaćaš kuriru u kešu, na vratima.",
+  },
+];
+
+/*
+ * Ritam uvoda: naslov padne, pa se opis pojavi, pa dugme. Jedan pokret koji
+ * nosi ekran (pad naslova) i dva tiha ulaska za njim — ne tri trika.
+ *
+ * Naslov pada 760ms (--animate-slam-in), pa opis kreće malo pre kraja pada:
+ * blago preklapanje drži tempo, a puna tišina bi uvod pocepala na delove.
+ */
+const TITLE_DELAY_MS = 150;
+const DESCRIPTION_DELAY_MS = 700;
+const CTA_DELAY_MS = 1000;
+
+/*
+ * Beli talas na dnu crvenog ekrana.
+ *
+ * preserveAspectRatio="none" je ovde ključ: normalno SVG čuva odnos stranica,
+ * pa bi se talas na širokom ekranu ili odsekao ili ostavio prazninu. Sa "none"
+ * mu dozvoljavamo da se razvuče po širini koliko treba, a visinu drži CSS
+ * (h-16 / sm:h-28). Talas nema značenje za čitača ekrana — otud aria-hidden.
+ *
+ * -bottom-px (a ne bottom-0): kad browser skalira stranicu na npr. 110%,
+ * između SVG-a i ivice sekcije zna da ostane pola piksela crvene linije.
+ * Jedan piksel preklapanja to trajno rešava.
+ */
+function HeroWave() {
+  return (
+    <svg
+      className="pointer-events-none absolute inset-x-0 -bottom-px h-16 w-full sm:h-28"
+      viewBox="0 0 1440 120"
+      preserveAspectRatio="none"
+      aria-hidden
+    >
+      <path
+        fill="#ffffff"
+        d="M0 62C240 8 480 0 720 26s480 96 720 40v54H0z"
+      />
+    </svg>
+  );
+}
+
+/*
+ * Stranica su sada ČETIRI trake jedna ispod druge, ne jedan grid:
+ *
+ *   1. hero  — pun ekran (min-h-dvh), crvena šara, logo + poruka + dugme
+ *   2. #poruci — pun ekran, forma na sredini, obećanja ispod nje
+ *   3. kontakt — za one koji radije zovu
+ *   4. footer — pokretna traka sa porukom (ranije je stajala na vrhu)
+ *
+ * Zašto dva puna ekrana umesto svega odjednom: prvi ekran ima jedan posao —
+ * da za dve sekunde objasni šta radimo. Forma sa četiri polja pored toga
+ * cepa pažnju. Dugme "Poruči šta ti treba" je most: kupac sam odluči kada
+ * prelazi sa čitanja na kucanje.
  */
 export default function HomePage() {
   return (
-    <div className="mx-auto grid min-h-dvh w-full max-w-6xl grid-cols-1 content-start gap-5 px-4 py-4 sm:gap-6 sm:px-6 sm:py-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,28rem)] lg:content-center lg:items-center lg:gap-12 lg:py-8">
-      <header className="flex flex-col items-center text-center lg:items-start lg:text-left">
-        <BrandLogo className="w-40 sm:w-52 lg:w-72" priority />
+    <div className="flex min-h-dvh flex-col">
+      <section className="hero-surface relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-4 pb-24 pt-10 text-center sm:pb-36 sm:pt-12">
+        <BrandLogo className="w-60 sm:w-80 lg:w-[26rem]" priority onColor />
 
-        <h1 className="mt-4 font-display text-2xl font-black italic uppercase leading-[1.08] tracking-tight sm:mt-6 sm:text-3xl lg:text-4xl">
-          Naruči bilo šta.
+        {/* Ceo naslov pada kao jedan komad — vidi potrcko-slam-in u globals.css. */}
+        <h1
+          className="hero-title animate-slam-in mt-6 max-w-4xl origin-bottom font-display text-3xl font-black italic uppercase leading-[1.05] tracking-tight motion-reduce:animate-none sm:mt-8 sm:text-5xl lg:text-6xl"
+          style={{ animationDelay: `${TITLE_DELAY_MS}ms` }}
+        >
+          Treba ti nešto?
           <br />
-          <span className="text-brand">Mi trčimo umesto Vas.</span>
+          <span className="hero-title-accent">Mi trčimo umesto tebe.</span>
         </h1>
 
-       
-
-        <p className="mt-4 hidden text-sm font-semibold text-zinc-500 lg:block">
-          Plaćanje isključivo kešom kuriru.
-        </p>
-        <Link
-          href="/admin"
-          className="mt-2 hidden text-sm font-bold text-zinc-400 underline underline-offset-4 hover:text-brand lg:inline"
+        {/*
+          Opis se samo tiho podigne (animate-rise-in), ne pada. Dva pada
+          zaredom se takmiče; ovako pad naslova ostaje jedini pokret koji se
+          pamti, a opis mu se pridruži bez galame.
+        */}
+        <p
+          className="hero-description animate-rise-in mt-5 max-w-2xl motion-reduce:animate-none"
+          style={{ animationDelay: `${DESCRIPTION_DELAY_MS}ms` }}
         >
-          Tabla vlasnika
-        </Link>
-      </header>
+          Hrana, namirnice, apoteka ili bilo šta drugo. Reci nam šta ti treba i
+          donosimo na tvoju adresu.
+        </p>
 
-      <section className="rounded-3xl border-2 border-zinc-100 bg-white p-4 shadow-[0_10px_40px_-16px_rgba(16,16,16,0.25)] sm:p-6">
-        <h2 className="font-display text-xl font-black italic uppercase tracking-tight sm:text-2xl">
-          Pošalji porudžbinu
-        </h2>
-      
-        <GuestOrderForm />
+        {/*
+          Običan <a href="#poruci">, ne next/link i ne dugme sa JavaScriptom:
+          skok na deo iste stranice browser radi sam. next/link služi za
+          prelazak na DRUGU rutu (i unapred je skida), a ovde nema šta da se
+          skida — sekcija je već u HTML-u. Klizanje umesto skoka pali
+          `scroll-behavior: smooth` iz globals.css.
+
+          Dugme ulazi poslednje, tek kad je poruka sletela — ne pozivamo na
+          klik pre nego što je pročitano zašto bi se kliknulo.
+        */}
+        <a
+          href="#poruci"
+          className={`${heroButtonClass} animate-rise-in mt-8 motion-reduce:animate-none sm:mt-10`}
+          style={{ animationDelay: `${CTA_DELAY_MS}ms` }}
+        >
+          Poruči šta ti treba
+          <ArrowDownIcon className="h-5 w-5" />
+        </a>
+
+        <HeroWave />
       </section>
 
-      <footer className="flex items-center justify-between gap-4 border-t-2 border-zinc-100 pt-3 text-sm lg:hidden">
-        <p className="font-semibold text-zinc-500">
-          Plaćanje isključivo kešom kuriru.
-        </p>
+      <section
+        id="poruci"
+        className="flex min-h-dvh flex-col justify-center bg-white px-4 py-14 sm:px-6 sm:py-16"
+      >
+        <div className="mx-auto w-full max-w-xl">
+          {/* relative + z-10: bela kartica mora da stoji IZNAD crne trake. */}
+          <div className="relative z-10 rounded-3xl border border-zinc-200/80 bg-white p-5 shadow-[0_24px_60px_-30px_rgba(16,16,16,0.45)] sm:p-7">
+            <h2 className="font-display text-xl font-black italic uppercase tracking-tight sm:text-2xl">
+              Šta da ti donesemo?
+            </h2>
+            <p className="mt-1 text-sm font-medium text-zinc-500">
+              Popuni podatke i mi preuzimamo dalje.
+            </p>
+
+            <GuestOrderForm />
+          </div>
+
+          {/*
+            Crna traka koja viri ISPOD kartice, kao račun koji je izašao iz nje.
+
+            Kako: negativna gornja margina (-mt-6) uvuče traku pod karticu, a
+            veći gornji padding (pt-10) vrati sadržaj ispod njene ivice. Oko to
+            čita kao jedan predmet u dva sloja, a ne kao tri odvojene kartice.
+
+            Zašto crna a ne još jedna bela kartica: crni kosi natpis je već u
+            logotipu. Treća boja brenda ovde zatvara sekciju i pravi razliku
+            između "popuni" (belo) i "šta dobijaš" (crno).
+
+            divide-dashed: isprekidana linija između stavki, kao perforacija na
+            računu. Na telefonu deli po redovima (divide-y), od sm naviše po
+            kolonama (sm:divide-x).
+          */}
+          <ul className="relative -mt-6 grid divide-y divide-dashed divide-white/20 rounded-3xl bg-ink px-2 pb-5 pt-10 text-white sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:pb-6 sm:pt-11">
+            {BADGES.map(({ Icon, title, text }) => (
+              <li
+                key={title}
+                className="flex items-start gap-3 px-4 py-3.5 sm:flex-col sm:gap-2 sm:py-3"
+              >
+                <Icon className="mt-0.5 h-5 w-5 shrink-0 text-brand sm:mt-0 sm:h-6 sm:w-6" />
+                <div>
+                  <p className="font-display text-base font-black italic uppercase leading-none tracking-tight">
+                    {title}
+                  </p>
+                  {/*
+                    zinc-300, ne zinc-400: na crnoj podlozi tamnosiva slova su
+                    "tu negde" ali se ne čitaju. Ovo je i dalje tiše od belog
+                    naslova, a čita se bez naprezanja.
+                  */}
+                  <p className="mt-1.5 text-sm font-medium leading-snug text-zinc-300">
+                    {text}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <ContactStrip />
+
+      {/* Ulaz za vlasnika: namerno sitno i na dnu — kupcu ne treba. */}
+      <div className="bg-white pb-5 text-center">
         <Link
           href="/admin"
-          className="shrink-0 font-bold text-zinc-400 underline underline-offset-4 hover:text-brand"
+          className="text-xs font-bold text-zinc-400 underline underline-offset-4 hover:text-brand"
         >
           Tabla vlasnika
         </Link>
-      </footer>
+      </div>
+
+      <AnnouncementBar />
     </div>
   );
 }

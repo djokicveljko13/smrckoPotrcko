@@ -376,5 +376,12 @@ nasledi gotovu logiku.
       `app/actions/set-delivery-price.ts` (RPC `owner_set_delivery_price`).
       `admin/page.tsx` `ORDER_COLUMNS`. Most `deliveryPriceLabel(zona)` uklonjen.
       Mrtvi `assign-courier.ts` obrisan. `npx next build` prolazi.
-- [ ] 6 — Telefonski unos (odloživo)
-- [ ] 7 — `AGENTS.md` + `.env.example`
+- [ ] 6 — Telefonski unos (odloživo — forma „Nova porudžbina" na `/admin` ne
+      postoji u kodu, to je zaseban posao)
+- [x] 7 — `AGENTS.md` usklađen (cena po km, zona van forme, Telegram, Google
+      Routes/Places u scope). `.env.example` napomena o `NEXT_PUBLIC_SITE_URL` na
+      Vercelu. Migracija `20260903190000` izbacuje `zone` iz `courier_job_json`.
+      `ZONE_LABEL` (mrtav) uklonjen iz `lib/labels.ts`. `next build` prolazi.
+
+Deploy: produkcija na https://smrcko-potrcko.vercel.app, Telegram webhook
+postavljen, baza očišćena (brojač restartovan na P-1). Detalji u memoriji.

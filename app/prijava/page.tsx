@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/login-form";
+import { signupEnabled } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export default async function LoginPage() {
@@ -24,6 +25,19 @@ export default async function LoginPage() {
       </p>
 
       <LoginForm />
+
+      {/* Link postoji samo dok je OWNER_SIGNUP_CODE postavljen. Obrišeš kod
+          sa Vercela → link nestane sam, bez izmene koda. */}
+      {signupEnabled() ? (
+        <p className="mt-6 text-sm text-zinc-500">
+          <Link
+            href="/registracija"
+            className="underline underline-offset-2"
+          >
+            Nemaš nalog? Napravi ga
+          </Link>
+        </p>
+      ) : null}
 
       <p className="mt-8 text-sm text-zinc-500">
         <Link href="/" className="underline underline-offset-2">
