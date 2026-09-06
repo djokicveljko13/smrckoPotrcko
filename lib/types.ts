@@ -13,6 +13,18 @@ export type Courier = {
   on_shift: boolean;
 };
 
+/**
+ * Jedan izbor u padajućem meniju „Pošalji kuriru" na tabli.
+ * `busy` i `telegram_linked` računa stranica — komponenta samo prikazuje.
+ */
+export type AssignCourierOption = {
+  id: string;
+  name: string;
+  on_shift: boolean;
+  telegram_linked: boolean;
+  busy: boolean;
+};
+
 /** What the courier page is allowed to see about one ride. */
 export type CourierJob = {
   id: string;
@@ -50,4 +62,14 @@ export type BoardOrder = {
   assigned_at: string | null;
   created_at: string;
   courier: { name: string; phone: string } | null;
+};
+
+export type AdminCourier = {
+  id: string;
+  name: string;
+  phone: string;
+  on_shift: boolean;
+  is_active: boolean;
+  access_token: string;
+  telegram_linked: boolean;
 };

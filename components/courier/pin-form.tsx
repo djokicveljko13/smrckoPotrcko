@@ -34,8 +34,8 @@ export function CourierPinForm({
           name="pin"
           type="password"
           inputMode="numeric"
-          pattern="[0-9]{6}"
-          maxLength={6}
+          pattern="[0-9]{4,8}"
+          maxLength={8}
           required
           autoComplete="one-time-code"
           autoFocus

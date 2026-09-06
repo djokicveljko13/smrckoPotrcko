@@ -1,6 +1,7 @@
 import { googleMapsApiKey } from "@/lib/google/env";
 import { asObject, asText } from "@/lib/google/json";
 import { PICKUP } from "@/lib/pricing";
+import { toSerbianLatin } from "@/lib/serbian-latin";
 
 const ENDPOINT = "https://places.googleapis.com/v1/places:autocomplete";
 
@@ -44,7 +45,7 @@ export async function suggestAddresses(
             radius: 30_000.0,
           },
         },
-        languageCode: "sr",
+        languageCode: "sr-Latn",
       }),
       signal: AbortSignal.timeout(8_000),
     });
@@ -82,7 +83,7 @@ function parseSuggestions(data: unknown): AddressSuggestion[] {
     const label = asText(asObject(prediction.text)?.text);
 
     if (placeId && label) {
-      out.push({ placeId, text: label });
+      out.push({ placeId, text: toSerbianLatin(label) });
     }
   }
 

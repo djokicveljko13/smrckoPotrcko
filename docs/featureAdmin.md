@@ -69,8 +69,9 @@ kupaca. Iz toga slede dva tvrda pravila:
 | Ruta | `/registracija`, bez linka sa javnog sajta |
 | Link na `/prijava` | vidi se **samo** dok je kod postavljen |
 | PIN kurira | vlasnik ga sam upisuje, **4–8 cifara** (danas je baza zaključana na tačno 6) |
-| Kuriri iz UI | dodaj, promeni PIN, upali/ugasi, menjaj ime i telefon |
-| Brisanje kurira | **ne** — samo gašenje (`is_active`), da se ne pokida istorija porudžbina |
+| Kuriri iz UI | dodaj, promeni PIN, upali/ugasi, menjaj ime i telefon, obriši |
+| Brisanje kurira | **da** (odluka od 06.09.2026), uz `on delete set null` na `orders.courier_id` — stare vožnje ostaju, ime kurira se gubi. „Ugasi" ostaje preporučen potez; brisanje je za čišćenje. |
+| Brisanje kad ima živu vožnju | odbija se (`has_live_order`) — porudžbina bi ostala bez vlasnika i bez povratka u red |
 | Predaja linka | dugme „Kopiraj link" (pun `/k/{token}` URL) |
 | Ručna dodela | i porudžbine koje niko nije uzeo, **i** preotimanje od kurira koji ćuti |
 | Granica preotimanja | samo do statusa `poslata_kuriru`; `krenuo` se ne dira |
@@ -256,6 +257,9 @@ Van koda, u Supabase Dashboardu: Authentication → Providers → Email →
 - [ ] 2. Migracija: `is_active`, PIN 4–8, `owner_*` funkcije za kurire + grantovi
       (SQL u `supabase/migrations/`; treba da se pokrene u Supabase)
 - [ ] 3. UI `/admin/kuriri`: dodaj, izmeni, nov PIN, ugasi/upali, kopiraj link
+- [ ] 3b. Brisanje kurira: `20260906100000_owner_delete_courier.sql`
+      (`orders_courier_id_fkey` → `on delete set null`, `owner_delete_courier`)
+      + dugme sa potvrdom u dva klika
 - [ ] 4. Ručna dodela: `owner_offer_order_to_courier` + izbor kurira na kartici
       (SQL u `supabase/migrations/`; treba da se pokrene u Supabase)
 - [ ] 5. Ažuriranje `AGENTS.md` i `featureKurir.md`

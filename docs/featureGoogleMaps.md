@@ -5,6 +5,29 @@ hodu, prvo se menja ovaj fajl, pa onda kod.** Isto pravilo važi i za `AGENTS.md
 
 Status: izrada u toku. Odeljak „Redosled izrade" na dnu prati dokle smo stigli.
 
+## Važeći cenovnik (05.09.2026)
+
+Google i dalje daje razdaljinu **firma → kupac**. Server prvo računa osnovicu
+`ceil((30 + 80 × km) / 10) × 10`, a zatim jednom primenjuje sledeće razrede:
+
+| Zaokružena osnovica | Konačna cena dostave |
+|---|---|
+| Manje od 50 din | 180 din |
+| 50 do uključujući 150 din | 200 din |
+| Preko 150 do uključujući 220 din | 220 din |
+| Preko 220 do uključujući 250 din | 250 din |
+| Preko 250 din | 300 din, fiksno |
+
+Primeri: 150 → 200, 160 → 220, 200 → 220, 220 → 220, 230 → 250,
+250 → 250, 260 → 300, 900 → 300 din. Razredi se ne primenjuju ponovo na
+već dobijenu konačnu cenu i ne odnose se na vrednost robe.
+
+U `orders.delivery_price` čuva se konačna cena koju vide kupac, vlasnik i kurir.
+Stare porudžbine zadržavaju upisanu cenu. Kad Google ne vrati kilometražu,
+cena ostaje `NULL`, a vlasnik je unosi ručno kao i do sada.
+
+Provera granica: `node --test tests/pricing.test.mjs` (Node.js 24).
+
 ## Kako radimo — učenje je deo zadatka
 
 Veljko mora da razume **svaki** korak. Gotov kod bez razumevanja se ovde računa
@@ -22,23 +45,24 @@ Novi pojmovi koje treba objasniti pre upotrebe, po fazama:
 | 4 | šta je debounce; zašto `placeId` mora da se poništi kad kupac nastavi da kuca |
 | 5 | zašto se cena čita iz baze, a ne iz URL-a |
 
-## Zašto ovo radimo
+## Zašto smo uveli obračun po kilometrima
 
-Danas je cena dostave dve konstante u `lib/pricing.ts` (`grad: 200`,
-`van_grada: 250`), a kupac **sam** klikne zonu u formi. Dva problema:
+Pre obračuna po kilometrima cena je bila dve konstante u `lib/pricing.ts`
+(`grad: 200`, `van_grada: 250`), a kupac je **sam** birao zonu. Dva problema:
 
 1. Kupac na 12 km plaća isto kao kupac na 1 km — vožnja van grada jede kurira.
 2. Kupac sam bira zonu. Ništa ga ne sprečava da uvek klikne „U gradu".
 
-Klijent traži da cena prati stvarnu razdaljinu. Dogovorena formula:
+Za obračun iz stvarne razdaljine uvedena je formula, koja od 05.09.2026.
+predstavlja **osnovicu pre primene važećih cenovnih razreda**:
 
 ```
-cena = 30 + 80 × km,  zaokruženo naviše na 10 dinara
+osnovica = 30 + 80 × km, zaokruženo naviše na 10 dinara
 ```
 
-Primeri: 1.2 km → 130 din · 3.0 km → 270 din · 5.7 km → 490 din · 12 km → 990 din.
-Na 2.1 km ispada 198 → 200, pa cene za blizu ostaju iste kao dosad — mušterije ne
-osete skok.
+Primeri (km → osnovica → konačna cena): 1.2 km → 130 → 200 din;
+2.1 km → 200 → 220 din; 3.0 km → 270 → 300 din;
+5.7 km → 490 → 300 din; 12 km → 990 → 300 din.
 
 Polazna tačka je uvek ista: **Кнеза Милоша 24, Јагодина**.
 
@@ -99,7 +123,7 @@ po formi) ostajemo duboko unutar besplatnog.
 | Odluka | Izbor |
 |---|---|
 | Ruta | firma → kupac (radnja se ne uračunava) |
-| Formula | `30 + 80 × km`, naviše na 10 din |
+| Formula | `30 + 80 × km`, naviše na 10 din, zatim važeći cenovni razredi 180/200/220/250/300 din |
 | Unos adrese | Places Autocomplete, kupac bira iz liste |
 | Kad kupac vidi cenu | tek na `/hvala` posle slanja |
 | Google zakaže | porudžbina **prolazi** sa `delivery_price = NULL` |
@@ -130,7 +154,12 @@ export const PICKUP = { latitude: 43.978_143, longitude: 21.268_273 } as const;
 export function deliveryPriceFromMeters(meters: number): number {
   const km = meters / 1000;
   const raw = PRICE_BASE_DIN + PRICE_PER_KM_DIN * km;
-  return Math.ceil(raw / 10) * 10;
+  const rounded = Math.ceil(raw / 10) * 10;
+  if (rounded < 50) return 180;
+  if (rounded <= 150) return 200;
+  if (rounded <= 220) return 220;
+  if (rounded <= 250) return 250;
+  return 300;
 }
 
 export function deliveryPriceLabel(price: number): string { … }
@@ -321,8 +350,8 @@ nasledi gotovu logiku.
    Editoru red ima `delivery_price`, `distance_m`, `destination_place_id`, a
    `zone` je NULL.
 3. **Ručna provera formule:** uzmi `distance_m` iz reda i proveri
-   `ceil((30 + 80 × m/1000) / 10) × 10` — mora se poklopiti sa prikazanom cenom
-   do dinara.
+   `ceil((30 + 80 × m/1000) / 10) × 10`, zatim primeni važeći cenovni razred
+   sa vrha ovog dokumenta — konačni rezultat mora da odgovara prikazanoj ceni.
 4. **Fallback:** privremeno pokvari `GOOGLE_MAPS_API_KEY` u `.env.local` i
    pošalji porudžbinu. Mora da **prođe** sa cenom NULL, `/hvala` pokaže poruku bez
    iznosa, a na `/admin` kartica ima upozorenje i polje za unos. Upiši cenu ručno

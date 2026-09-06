@@ -1,5 +1,5 @@
 import { OrderCard } from "@/components/admin/order-card";
-import type { BoardOrder } from "@/lib/types";
+import type { AssignCourierOption, BoardOrder } from "@/lib/types";
 
 type Props = {
   title: string;
@@ -8,6 +8,8 @@ type Props = {
   empty: string;
   orders: BoardOrder[];
   delivered?: boolean;
+  /** Prosleđuje se karticama za ručnu dodelu; isporučena kolona ga ne dobija. */
+  couriers?: AssignCourierOption[];
 };
 
 export function OrderColumn({
@@ -17,6 +19,7 @@ export function OrderColumn({
   empty,
   orders,
   delivered = false,
+  couriers,
 }: Props) {
   return (
     <section
@@ -50,7 +53,11 @@ export function OrderColumn({
         <ul className="mt-4 space-y-3">
           {orders.map((order) => (
             <li key={order.id}>
-              <OrderCard order={order} delivered={delivered} />
+              <OrderCard
+                order={order}
+                delivered={delivered}
+                couriers={couriers}
+              />
             </li>
           ))}
         </ul>

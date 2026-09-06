@@ -8,7 +8,7 @@ import {
 } from "@/app/actions/create-guest-order";
 import { AddressAutocomplete } from "@/components/address-autocomplete";
 import { DeliveryAnimation, ORBIT_MS } from "@/components/delivery-animation";
-import { PackageIcon, PhoneIcon, StoreIcon } from "@/components/icons";
+import { PackageIcon, PhoneIcon } from "@/components/icons";
 import {
   fieldIconClass,
   fieldWithIconClass,
@@ -97,24 +97,12 @@ export function GuestOrderForm() {
           </div>
         </div>
 
-        <div>
-          <label htmlFor="shop" className={labelClass}>
-            Odakle preuzimamo?
-          </label>
-          <div className="relative mt-1.5">
-            <span className={fieldIconClass}>
-              <StoreIcon />
-            </span>
-            <input
-              id="shop"
-              name="shop"
-              required
-              maxLength={300}
-              className={fieldWithIconClass}
-              placeholder="Npr. Maxi kod pijace, Lidl, apoteka…"
-            />
-          </div>
-        </div>
+        <AddressAutocomplete
+          name="shop"
+          label="Odakle preuzimamo?"
+          placeholder="Ulica i broj ili naziv radnje"
+          maxLength={300}
+        />
 
         <AddressAutocomplete />
 

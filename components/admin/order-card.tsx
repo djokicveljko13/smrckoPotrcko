@@ -1,16 +1,26 @@
+import { AssignCourierForm } from "@/components/admin/assign-courier-form";
 import { SetPriceForm } from "@/components/admin/set-price-form";
 import { SOURCE_LABEL, STATUS_LABEL, formatBoardTime } from "@/lib/labels";
 import { deliveryPriceLabel, distanceLabel } from "@/lib/pricing";
-import type { BoardOrder } from "@/lib/types";
+import type { AssignCourierOption, BoardOrder } from "@/lib/types";
 
 type Props = {
   order: BoardOrder;
   /** Delivered cards stay readable but quiet. */
   delivered?: boolean;
+  /** Aktivni kuriri za rucnu dodelu; prazno na isporucenim karticama. */
+  couriers?: AssignCourierOption[];
 };
 
-export function OrderCard({ order, delivered = false }: Props) {
+export function OrderCard({ order, delivered = false, couriers }: Props) {
   const unassigned = order.status === "nova";
+
+  // Rucna dodela ima smisla dok kurir nije prihvatio. 'krenuo' se ne preotima,
+  // 'isporuceno' je gotovo — baza bi oba odbila sa 'not_offerable'.
+  const canAssign =
+    !delivered &&
+    couriers !== undefined &&
+    (order.status === "nova" || order.status === "poslata_kuriru");
 
   return (
     <article
@@ -105,6 +115,14 @@ export function OrderCard({ order, delivered = false }: Props) {
           </p>
           <SetPriceForm orderId={order.id} />
         </div>
+      ) : null}
+
+      {canAssign ? (
+        <AssignCourierForm
+          orderId={order.id}
+          couriers={couriers}
+          currentCourierId={order.courier_id}
+        />
       ) : null}
     </article>
   );

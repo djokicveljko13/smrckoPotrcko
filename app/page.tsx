@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HeroWave } from "@/components/hero-wave";
 import { AnnouncementBar } from "@/components/announcement-bar";
 import { BrandLogo } from "@/components/brand-logo";
 import { ContactStrip } from "@/components/contact-strip";
@@ -10,7 +11,7 @@ import {
   MapPinIcon,
 } from "@/components/icons";
 import { heroButtonClass } from "@/lib/ui";
-
+import { SiteNav } from "@/components/site-nav";
 /*
  * Tri obećanja koja kupac traži pre nego što ostavi telefon: koliko čeka,
  * dolazi li do njega i mora li da pravi nalog. Lista je podatak, ne tri
@@ -49,34 +50,6 @@ const DESCRIPTION_DELAY_MS = 700;
 const CTA_DELAY_MS = 1000;
 
 /*
- * Beli talas na dnu crvenog ekrana.
- *
- * preserveAspectRatio="none" je ovde ključ: normalno SVG čuva odnos stranica,
- * pa bi se talas na širokom ekranu ili odsekao ili ostavio prazninu. Sa "none"
- * mu dozvoljavamo da se razvuče po širini koliko treba, a visinu drži CSS
- * (h-16 / sm:h-28). Talas nema značenje za čitača ekrana — otud aria-hidden.
- *
- * -bottom-px (a ne bottom-0): kad browser skalira stranicu na npr. 110%,
- * između SVG-a i ivice sekcije zna da ostane pola piksela crvene linije.
- * Jedan piksel preklapanja to trajno rešava.
- */
-function HeroWave() {
-  return (
-    <svg
-      className="pointer-events-none absolute inset-x-0 -bottom-px h-16 w-full sm:h-28"
-      viewBox="0 0 1440 120"
-      preserveAspectRatio="none"
-      aria-hidden
-    >
-      <path
-        fill="#ffffff"
-        d="M0 62C240 8 480 0 720 26s480 96 720 40v54H0z"
-      />
-    </svg>
-  );
-}
-
-/*
  * Stranica su sada ČETIRI trake jedna ispod druge, ne jedan grid:
  *
  *   1. hero  — pun ekran (min-h-dvh), crvena šara, logo + poruka + dugme
@@ -91,8 +64,10 @@ function HeroWave() {
  */
 export default function HomePage() {
   return (
+  
     <div className="flex min-h-dvh flex-col">
-      <section className="hero-surface relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-4 pb-24 pt-10 text-center sm:pb-36 sm:pt-12">
+       <SiteNav />
+      <section className="hero-surface relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-4 pb-24 pt-24 text-center sm:pb-36 sm:pt-28">
         <BrandLogo className="w-60 sm:w-80 lg:w-[26rem]" priority onColor />
 
         {/* Ceo naslov pada kao jedan komad — vidi potrcko-slam-in u globals.css. */}

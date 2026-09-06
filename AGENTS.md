@@ -35,6 +35,20 @@ Služba dostave: kupac naruči **bilo šta** (nije katalog hrane), **sa sajta il
 
 Ostala dva sajta iz ponude (Food of Šmrk, perionica) **ne radimo**.
 
+## Saradnja — B2B upit
+
+- Javna stranica `/saradnja` namenjena je firmama kojima treba dostava.
+- Navigacija na `/` i `/saradnja` ima linkove „Poruči“ i „Saradnja“.
+- Navigacija nema logo; linkovi su desno, a logo ostaje u hero sekciji.
+- Linkovi navigacije koriste Archivo, 16 px, debljinu 800 radi bolje uočljivosti.
+- Navigacija je fiksirana preko hero sekcije: na vrhu providna sa belim slovima, posle 40 px skrola bela sa tamnim slovima i blagom senkom. Hero zadržava punu visinu ekrana i gornji razmak za navigaciju.
+- Firma ostavlja naziv firme, telefon i opcionu poruku.
+- Upit se šalje vlasniku na mejl preko Resend-a; ne čuva se u bazi.
+- Cena i uslovi saradnje dogovaraju se telefonom.
+- Nalozi i pristup aplikaciji za firme dodaju se naknadno.
+- Katalog partnera i tabela `partners` nisu deo ove izmene.
+- Plan izrade: `docs/saradnjaB2B.md`.
+
 ## Tech stack
 
 Jedna aplikacija, ne dva frontenda.
@@ -53,15 +67,41 @@ Env: `.env.local`, nikad na git. Anon ključ sme u klijent; service role **samo*
 |---------|--------------------|----------|
 | Kupac   | Nema (gost)        | Forma, vidi hvala + broj |
 | Vlasnik | Supabase Auth      | Tabla, unos porudžbine sa poziva, kuriri, dodela, mejl |
+
+Vlasnik **sam pravi svoj nalog** na `/registracija` (skrivena ruta, nema linka sa
+sajta). Kapija je tajni kod `OWNER_SIGNUP_CODE` iz env-a; kad se kod obriše, ruta
+se sama zatvara. Razlog za kapiju: RLS pravilo je „ulogovan = vlasnik", pa bi
+otvorena registracija dala svakome adrese i telefone kupaca.
 | Kurir   | PIN + tajni URL    | Telegram ponuda, prihvati/odbij, statusi |
 
 Google login i sačuvane adrese **nisu V1**.
 
 ## Porudžbina (tanka)
 
-Polja: **naziv** (šta treba), **radnja** (slobodan tekst, odakle), **adresa** (bira se iz Places predloga), **telefon** (obavezan), **izvor** (`sajt` \| `telefon` — kako je porudžbina ušla), **cena_dostave** (računa server iz kilometraže: `30 + 80 × km`, naviše na 10 din; `NULL` ako Google zakaže — vlasnik je upiše ručno na tabli), **distance_m** (metri firma → kupac), **destination_place_id** (Google ID adrese), **status**, **javni broj** (npr. P-17), **kurir**, **vreme dodele**, **kurirski token** (dugačak, nije P-17). Kolona **zona** (`grad` \| `van_grada`) ostaje u bazi zbog starih redova, ali se više ne popunjava. Izvor istine za cenu: `docs/featureGoogleMaps.md`.
+Polja: **naziv** (šta treba), **radnja** (slobodan tekst, odakle), **adresa** (bira se iz Places predloga), **telefon** (obavezan), **izvor** (`sajt` \| `telefon` — kako je porudžbina ušla), **cena_dostave** (server računa `30 + 80 × km`, naviše na 10 din, pa primenjuje cenovne razrede ispod; `NULL` ako Google zakaže — vlasnik je upiše ručno na tabli), **distance_m** (metri firma → kupac), **destination_place_id** (Google ID adrese), **status**, **javni broj** (npr. P-17), **kurir**, **vreme dodele**, **kurirski token** (dugačak, nije P-17). Kolona **zona** (`grad` \| `van_grada`) ostaje u bazi zbog starih redova, ali se više ne popunjava. Izvor istine za cenu: `docs/featureGoogleMaps.md`.
 
 Nema liste partnera, nema posebnog polja napomena u V1 (može ući u naziv).
+
+### Cenovni razredi dostave (05.09.2026)
+
+Prvo se izračuna osnovica `ceil((30 + 80 × km) / 10) × 10`, pa se jednom preslika u konačnu cenu:
+
+| Zaokružena osnovica | Konačna cena dostave |
+|---|---|
+| Manje od 50 din | 180 din |
+| Od 50 do uključujući 150 din | 200 din |
+| Preko 150 do uključujući 220 din | 220 din |
+| Preko 220 do uključujući 250 din | 250 din |
+| Preko 250 din | 300 din, fiksno i za veće udaljenosti |
+
+Razredi se odnose na obračun dostave, ne na vrednost kupljene robe. U bazu se upisuje konačna cena; ranije upisane porudžbine se ne preračunavaju. Ako kilometraža nedostaje, cena ostaje `NULL` radi ručnog unosa.
+
+### Predlozi adresa u javnoj formi (05.09.2026)
+
+- Oba polja, **„Odakle preuzimamo?”** (`shop`) i **„Gde donosimo?”** (`address`), nude Google Places predloge tokom kucanja.
+- Predlozi i tekst izabranih adresa prikazuju se na **srpskoj latinici**.
+- Mesto preuzimanja se i dalje čuva kao tekst u `shop`; za sada služi samo izboru adrese. Obračun ostaje firma → kupac, a `place_id` iz forme odnosi se samo na odredište.
+- Koristi se zajednička komponenta sa nezavisnim stanjem za svako polje; ručni unos ostaje moguć.
 
 Statusi: `nova` → `poslata_kuriru` → `krenuo` → `isporuceno`.
 
@@ -100,12 +140,19 @@ Zašto ne posebna tabela „telefonske“: dupli kod, dupli izveštaji, lako da 
 6. Baza sama izabere slobodnog kurira na smeni (`offer_order_to_next_courier`) i upiše `poslata_kuriru`.
 7. Server javi tom kuriru preko **Telegram bota**: tekst porudžbine + dugme ka `/k/{token}`. Kurir prihvati („krenuo") ili odbije — odbijena ide sledećem kuriru.
 
-Vlasnik na tabli **gleda** i sme da ispravi; ne bira kurira ručno.
+Auto-dodela ostaje podrazumevana. Vlasnik **sme i ručno** da pošalje porudžbinu
+kuriru kog izabere (dugme na kartici) — za slučaj kad su svi zauzeti pa
+porudžbina visi, ili kad kurir ćuti na ponudu. Preotima se samo do statusa
+`poslata_kuriru`; porudžbinu koju je kurir prihvatio (`krenuo`) ne diramo.
+Ručna dodela je obična ponuda: Telegram stiže, kurir sme da odbije.
 
 ## Šta nije V1 (ne radi osim ako vlasnik ovog repoa kaže da klijent to sada traži)
 
 - Katalog partnera / proizvodi (kasniji **upsell**: naplata prodavnicama za izlistavanje) — nema tabele `partners` u V1
-- Google **login**, Google Maps prikaz na stranici, sačuvane adrese, tracking kupca, CMS cena u UI, CRUD kurira u UI (kurire za sad u bazu), zvuk, statistika, radno vreme koje zatvara formu
+- Google **login**, Google Maps prikaz na stranici, sačuvane adrese, tracking kupca, CMS cena u UI, zvuk, statistika, radno vreme koje zatvara formu
+  - **Kuriri u UI su sada V1** (`/admin/kuriri`): vlasnik dodaje kurira, sam bira
+    njegov PIN (4–8 cifara), menja ime/telefon, gasi ga (`is_active`) ili briše,
+    i kopira mu `/k/{token}` link. Detalji: `docs/featureAdmin.md`.
   - **Ali:** Google **Routes API** (kilometraža) + **Places Autocomplete** (izbor adrese) za cenu dostave **JESU V1** — vidi `docs/featureGoogleMaps.md`. Ključ samo na serveru.
 - Plaćanje online **nikad**
 - Food of Šmrk / perionica
@@ -123,6 +170,8 @@ Vlasnik na tabli **gleda** i sme da ispravi; ne bira kurira ručno.
 8. Kurirski link + statusi
 9. Mejl vlasniku (samo `izvor = sajt`)
 10. Live tabla (Realtime), tek kad 4–8 razumeš
+11. Vlasnički deo (`docs/featureAdmin.md`): `/registracija` sa tajnim kodom,
+    `/admin/kuriri`, ručna dodela porudžbine kuriru
 
 ## Baza i bezbednost (kad dođemo do koda)
 
@@ -134,7 +183,7 @@ Vlasnik na tabli **gleda** i sme da ispravi; ne bira kurira ručno.
 ## Kako agent radi u ovom repo-u
 
 - Učenje je deo zadatka — vidi odeljak **Cilj učenja**.
-- Cena dostave = `30 + 80 × km`, naviše na 10 din (izvor istine `docs/featureGoogleMaps.md`). Ne nagađaj spisak kurira ni naselja.
+- Cena dostave: `30 + 80 × km`, naviše na 10 din, zatim cenovni razredi 180/200/220/250/300 din iz ovog fajla i `docs/featureGoogleMaps.md`. Ne nagađaj spisak kurira ni naselja.
 - Kad klijent promeni zahtev: ažuriraj **ovaj fajl**, pa implementiraj.
 - Ne širi scope „dok si već tu“ (partneri, Google, zvuk, CSV).
 - Posle UI izmene: proveri tok u browseru ako alati postoje.

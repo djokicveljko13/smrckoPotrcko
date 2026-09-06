@@ -19,6 +19,7 @@ const LOGIN_ERRORS: Record<string, string> = {
   locked: "Previše pogrešnih PIN-ova. Sačekaj 15 minuta ili zovi vlasnika.",
   no_pin: "PIN još nije postavljen. Traži od vlasnika.",
   bad_token: "Ovaj link nije važeći.",
+  inactive: "Ovaj nalog je ugašen. Zovi vlasnika.",
 };
 
 const ACTION_ERRORS: Record<string, string> = {
@@ -41,8 +42,8 @@ export async function courierLogin(
   }
 
   const pin = String(formData.get("pin") ?? "").trim();
-  if (!/^\d{6}$/.test(pin)) {
-    return { error: "PIN ima tačno 6 cifara." };
+  if (!/^\d{4,8}$/.test(pin)) {
+    return { error: "PIN ima 4 do 8 cifara." };
   }
 
   const supabase = await createSupabaseServerClient();
