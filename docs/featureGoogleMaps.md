@@ -3,7 +3,22 @@
 Ovaj fajl je izvor istine za obračun cene dostave. **Ako se pravilo promeni u
 hodu, prvo se menja ovaj fajl, pa onda kod.** Isto pravilo važi i za `AGENTS.md`.
 
-Status: izrada u toku. Odeljak „Redosled izrade" na dnu prati dokle smo stigli.
+Status: izrada u toku. Pravila od 07.09.2026. ispod zamenjuju stari tok slanja bez potvrde. Odeljci „Faza 1–7” dokumentuju prethodnu implementaciju, ne instrukcije da se ponavljaju migracije.
+
+## Cena i potvrda javne porudžbine (07.09.2026)
+
+- Oba polja zahtevaju izbor Google predloga (klik ili tastatura). Svaka izmena teksta poništava izbor. Originalni tekst i Google ID vezani su serverskim HMAC-SHA256 potpisom; server proverava oba izbora.
+- Opciono polje „Sprat, stan, ulaz” ima najviše 150 znakova; dopisuje se adresi na serveru, bez nove kolone.
+- „Poruči” samo proverava podatke i računa cenu. Popup prikazuje cenu dostave, opis, obe adrese i telefon. U delu za cenu stoje samo „Cena dostave” i iznos, bez napomena o robi i plaćanju.
+- Server vraća potpisanu ponudu sa proverenim unosom, cenom, metrima i rokom od 15 minuta. Čuva se samo u memoriji browsera. `ORDER_SIGNING_SECRET` je poseban serverski ključ u `.env.local` i Vercel okruženjima, nikad `NEXT_PUBLIC_`.
+- Tek „Potvrdi porudžbinu” proverava potpis i rok i zove postojeći `create_web_order`. Nema novog Routes poziva niti prihvatanja cene iz nepotpisanog polja. Dodela/Telegram ostaju iza upisa.
+- Animacija počinje tek pri potvrdi; `/hvala` prikazuje vraćen broj i istu cenu. Cena u URL-u služi samo prikazu, merodavna vrednost ostaje u bazi.
+- Greška Google-a ili nedostupna ruta blokiraju slanje; podaci ostaju i nude se ponovni pokušaj i poziv 066 59 355 35. Istekla ponuda zahteva novi obračun i novu potvrdu.
+- Nativni `<dialog>` prati postojeći dizajn. „Izmeni podatke”, Escape i pozadina ga zatvaraju, čuvaju formu i poništavaju ponudu. Fokus se vraća na „Poruči”. Unos je zaključan tokom obračuna, a zatvaranje i dupli klikovi tokom potvrde.
+- Obračun ostaje firma → kupac i postojeći cenovnik. `locationBias` daje prednost okolini Jagodine, ali nije stroga granica područja dostave.
+- Samo javni sajt, bez promena baze ili telefonskog unosa. Potpis nije trajna evidencija jednokratne upotrebe ponude.
+
+Provera ove faze: potpisi i rok, obe adrese, Google greška, bez upisa pre potvrde, ista cena u potvrdi i upisu, detalji stana, dvoklik, mobilni prikaz i tastatura. Testovi koriste zamene za Google, bazu i Telegram.
 
 ## Važeći cenovnik (05.09.2026)
 
@@ -24,7 +39,7 @@ već dobijenu konačnu cenu i ne odnose se na vrednost robe.
 
 U `orders.delivery_price` čuva se konačna cena koju vide kupac, vlasnik i kurir.
 Stare porudžbine zadržavaju upisanu cenu. Kad Google ne vrati kilometražu,
-cena ostaje `NULL`, a vlasnik je unosi ručno kao i do sada.
+nova javna porudžbina ne može da se potvrdi. Stari `NULL` redovi ostaju za ručni unos vlasnika.
 
 Provera granica: `node --test tests/pricing.test.mjs` (Node.js 24).
 
@@ -125,12 +140,12 @@ po formi) ostajemo duboko unutar besplatnog.
 | Ruta | firma → kupac (radnja se ne uračunava) |
 | Formula | `30 + 80 × km`, naviše na 10 din, zatim važeći cenovni razredi 180/200/220/250/300 din |
 | Unos adrese | Places Autocomplete, kupac bira iz liste |
-| Kad kupac vidi cenu | tek na `/hvala` posle slanja |
-| Google zakaže | porudžbina **prolazi** sa `delivery_price = NULL` |
+| Kad kupac vidi cenu | u popup-u pre potvrde, zatim opet na `/hvala` |
+| Google zakaže | javna porudžbina **ne prolazi**; ponovni pokušaj ili poziv |
 | Ručna izmena | samo kad cena nedostaje (nema popusta na izračunatu) |
 | Zona | briše se iz forme, kolona ostaje zbog starih redova |
 | Granica km | nema u V1 |
-| Cenu vide | kupac na `/hvala`, kurir (strana + Telegram/WhatsApp), vlasnik na tabli |
+| Cenu vide | kupac u popup-u i na `/hvala`, kurir (strana + Telegram), vlasnik na tabli |
 | Telefonski unos | isti obračun (Faza 6, odloživo) |
 
 **Preduslov:** Google Cloud projekat sa uključenom karticom, uključeni *Routes

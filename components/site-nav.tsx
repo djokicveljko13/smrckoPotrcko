@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react";
+import { BrandLogo } from "@/components/brand-logo";
 //usePathName nam govori na kojoj smo stranici
 //kada uradimo const pathname=usePathname(); dobija iz url koja je stranica u pitanju.
 const NAV_LINKS=[
@@ -12,6 +13,7 @@ const NAV_LINKS=[
 ]
 export function SiteNav(){
     const pathname=usePathname();
+    const showLogo = pathname === "/saradnja";
     const [scrolled, setScrolled] = useState(false);
 useEffect(() => {
   function handleScroll() {
@@ -34,7 +36,16 @@ useEffect(() => {
       : "bg-transparent text-white"
   }`}
 >
-  <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-end px-4">
+  <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-end gap-4 px-4">
+        {showLogo ? (
+          <Link
+            href="/"
+            aria-label="Šmrčko Potrčko — početna stranica"
+            className="mr-auto shrink-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
+          >
+            <BrandLogo className="h-auto w-24 sm:w-28" onColor={!scrolled} priority />
+          </Link>
+        ) : null}
         <nav aria-label="Glavna navigacija" className="flex items-center gap-6">
             {NAV_LINKS.map((link)=>(
                 <Link

@@ -1,5 +1,5 @@
 import { SiteNav } from "@/components/site-nav";
-import { HeroWave } from "@/components/hero-wave";
+import { HeroDivider } from "@/components/hero-divider";
 import { PartnershipForm } from "@/components/partnership-form";
 import { heroButtonClass } from "@/lib/ui";
 
@@ -54,7 +54,7 @@ export default function PartnershipPage() {
 <a href="#saradnja-forma" className={`${heroButtonClass} mt-8`}>
   Dogovorimo saradnju
 </a>
-        <HeroWave />
+        <HeroDivider />
       </section>
       <section className="px-4 py-16">
   <div className="mx-auto max-w-5xl">

@@ -71,7 +71,7 @@ kupaca. Iz toga slede dva tvrda pravila:
 | PIN kurira | vlasnik ga sam upisuje, **4–8 cifara** (danas je baza zaključana na tačno 6) |
 | Kuriri iz UI | dodaj, promeni PIN, upali/ugasi, menjaj ime i telefon, obriši |
 | Brisanje kurira | **da** (odluka od 06.09.2026), uz `on delete set null` na `orders.courier_id` — stare vožnje ostaju, ime kurira se gubi. „Ugasi" ostaje preporučen potez; brisanje je za čišćenje. |
-| Brisanje kad ima živu vožnju | odbija se (`has_live_order`) — porudžbina bi ostala bez vlasnika i bez povratka u red |
+| Brisanje kad ima živu vožnju | dozvoljeno — nezavršene porudžbine prelaze u `nova`, bez kurira i vremena dodele; vlasnik ih ponovo dodeljuje sa table. Migracija: `20260906120000_owner_delete_courier_requeue.sql`. |
 | Predaja linka | dugme „Kopiraj link" (pun `/k/{token}` URL) |
 | Ručna dodela | i porudžbine koje niko nije uzeo, **i** preotimanje od kurira koji ćuti |
 | Granica preotimanja | samo do statusa `poslata_kuriru`; `krenuo` se ne dira |

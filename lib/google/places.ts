@@ -6,24 +6,24 @@ import { toSerbianLatin } from "@/lib/serbian-latin";
 const ENDPOINT = "https://places.googleapis.com/v1/places:autocomplete";
 
 /** Jedan predlog adrese: ono što kupac vidi + ID koji šaljemo Routes-u. */
-export type AddressSuggestion = {
+type GoogleSuggestion = {
   placeId: string;
   text: string;
 };
 
 /**
- * Predlozi adresa dok kupac kuca. Prazna lista na svaki problem — forma i dalje
- * radi, kupac samo ne dobija pomoć pri kucanju.
+ * Prazna lista znači da nema rezultata; null znači da servis nije dostupan.
  *
  * `includedRegionCodes: ["rs"]` + `locationBias` krug ~30 km oko Jagodine: da se
- * ne nude adrese iz Beograda ili Niša za tekst „Nemanjina".
+ * prednost imaju lokalni rezultati (krug nije stroga granica pretrage).
  */
 export async function suggestAddresses(
   input: string,
-): Promise<AddressSuggestion[]> {
+): Promise<GoogleSuggestion[] | null> {
   const key = googleMapsApiKey();
   const query = input.trim();
-  if (!key || query.length < 3) return [];
+  if (!key) return null;
+  if (query.length < 3) return [];
 
   try {
     const response = await fetch(ENDPOINT, {
@@ -51,16 +51,15 @@ export async function suggestAddresses(
     });
 
     if (!response.ok) {
-      const detail = await response.text().catch(() => "");
-      console.error("Places autocomplete failed", response.status, detail);
-      return [];
+      console.error("Places autocomplete failed", response.status);
+      return null;
     }
 
     const data: unknown = await response.json();
     return parseSuggestions(data);
   } catch (error) {
-    console.error("suggestAddresses failed", error);
-    return [];
+    console.error("suggestAddresses failed", error instanceof Error ? error.name : "unknown");
+    return null;
   }
 }
 
@@ -68,12 +67,14 @@ export async function suggestAddresses(
  * Google oblik (proveravamo ga korak po korak, jer je JSON od tuđeg servera):
  *   { suggestions: [ { placePrediction: { placeId: "…", text: { text: "…" } } } ] }
  */
-function parseSuggestions(data: unknown): AddressSuggestion[] {
+function parseSuggestions(data: unknown): GoogleSuggestion[] | null {
   const root = asObject(data);
-  const list = root?.suggestions;
-  if (!Array.isArray(list)) return [];
+  if (!root) return null;
+  const list = root.suggestions;
+  if (list === undefined) return [];
+  if (!Array.isArray(list)) return null;
 
-  const out: AddressSuggestion[] = [];
+  const out: GoogleSuggestion[] = [];
 
   for (const item of list) {
     const prediction = asObject(asObject(item)?.placePrediction);

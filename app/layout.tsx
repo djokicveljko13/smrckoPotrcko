@@ -22,7 +22,7 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Šmrčko Potrčko — mi trčimo umesto Vas",
+  title: "Šmrčko Potrčko dostava",
   description:
     "Naruči bilo šta iz bilo koje radnje. Kurir donosi, plaćaš kešom na vrata.",
 };

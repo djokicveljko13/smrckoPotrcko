@@ -11,8 +11,7 @@ const ENDPOINT = "https://routes.googleapis.com/directions/v2:computeRoutes";
  * koordinate, pa nam ne trebaju ni Geocoding ni koordinate kupca.
  *
  * Vraća null na SVAKI problem (nema ključa, Google greška, nema rute, timeout).
- * Pozivalac tada upiše porudžbinu sa `delivery_price = NULL` — bolje porudžbina
- * bez cene nego izgubljena porudžbina.
+ * Javna forma tada blokira potvrdu i nudi ponovni pokušaj ili poziv vlasniku.
  */
 export async function computeDistanceMeters(
   placeId: string,

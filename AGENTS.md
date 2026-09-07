@@ -35,11 +35,17 @@ Služba dostave: kupac naruči **bilo šta** (nije katalog hrane), **sa sajta il
 
 Ostala dva sajta iz ponude (Food of Šmrk, perionica) **ne radimo**.
 
+## Izgled hero sekcije
+
+- Početna i `/saradnja` koriste zajednički završetak hero sekcije u obliku jasno vidljive pocepane ivice papira, bez dijagonale i linija brzine.
+- Ivica kombinuje veće nepravilne useke i sitnije neravnine, sa tankim svetlim slojem koji naglašava cepanje. Telefon ima jednostavniji crtež sa krupnim detaljima. Dekoracija je statična i povezuje hero sa izgledom porudžbenice.
+- Crvena pozadina, logo, sadržaj i postojeće animacije hero sekcije ostaju isti.
+
 ## Saradnja — B2B upit
 
 - Javna stranica `/saradnja` namenjena je firmama kojima treba dostava.
 - Navigacija na `/` i `/saradnja` ima linkove „Poruči“ i „Saradnja“.
-- Navigacija nema logo; linkovi su desno, a logo ostaje u hero sekciji.
+- Navigacija na `/saradnja` prikazuje `BrandLogo` levo, kao link ka `/`; linkovi „Poruči” i „Saradnja” ostaju desno. Obe stranice koriste isti centrirani kontejner `max-w-6xl` sa `px-4`, bez razvlačenja navigacije preko celog ekrana. Na početnoj nema logotipa u navigaciji, logo ostaje u hero sekciji.
 - Linkovi navigacije koriste Archivo, 16 px, debljinu 800 radi bolje uočljivosti.
 - Navigacija je fiksirana preko hero sekcije: na vrhu providna sa belim slovima, posle 40 px skrola bela sa tamnim slovima i blagom senkom. Hero zadržava punu visinu ekrana i gornji razmak za navigaciju.
 - Firma ostavlja naziv firme, telefon i opcionu poruku.
@@ -78,7 +84,7 @@ Google login i sačuvane adrese **nisu V1**.
 
 ## Porudžbina (tanka)
 
-Polja: **naziv** (šta treba), **radnja** (slobodan tekst, odakle), **adresa** (bira se iz Places predloga), **telefon** (obavezan), **izvor** (`sajt` \| `telefon` — kako je porudžbina ušla), **cena_dostave** (server računa `30 + 80 × km`, naviše na 10 din, pa primenjuje cenovne razrede ispod; `NULL` ako Google zakaže — vlasnik je upiše ručno na tabli), **distance_m** (metri firma → kupac), **destination_place_id** (Google ID adrese), **status**, **javni broj** (npr. P-17), **kurir**, **vreme dodele**, **kurirski token** (dugačak, nije P-17). Kolona **zona** (`grad` \| `van_grada`) ostaje u bazi zbog starih redova, ali se više ne popunjava. Izvor istine za cenu: `docs/featureGoogleMaps.md`.
+Polja: **naziv** (šta treba), **radnja** (na sajtu izbor Places predloga, čuva se kao tekst), **adresa** (bira se iz Places predloga), **telefon** (obavezan), **izvor** (`sajt` \| `telefon` — kako je porudžbina ušla), **cena_dostave** (server računa `30 + 80 × km`, naviše na 10 din, pa primenjuje cenovne razrede ispod; javna porudžbina ne prolazi bez cene, stari `NULL` redovi ostaju za ručni unos), **distance_m** (metri firma → kupac), **destination_place_id** (Google ID adrese), **status**, **javni broj** (npr. P-17), **kurir**, **vreme dodele**, **kurirski token** (dugačak, nije P-17). Kolona **zona** (`grad` \| `van_grada`) ostaje u bazi zbog starih redova, ali se više ne popunjava. Izvor istine za cenu: `docs/featureGoogleMaps.md`.
 
 Nema liste partnera, nema posebnog polja napomena u V1 (može ući u naziv).
 
@@ -94,14 +100,24 @@ Prvo se izračuna osnovica `ceil((30 + 80 × km) / 10) × 10`, pa se jednom pres
 | Preko 220 do uključujući 250 din | 250 din |
 | Preko 250 din | 300 din, fiksno i za veće udaljenosti |
 
-Razredi se odnose na obračun dostave, ne na vrednost kupljene robe. U bazu se upisuje konačna cena; ranije upisane porudžbine se ne preračunavaju. Ako kilometraža nedostaje, cena ostaje `NULL` radi ručnog unosa.
+Razredi se odnose na obračun dostave, ne na vrednost kupljene robe. U bazu se upisuje konačna cena; ranije upisane porudžbine se ne preračunavaju. Javna forma ne šalje porudžbinu ako kilometraža ili cena nedostaju. Ručni unos cene ostaje za stare redove sa `NULL`.
 
 ### Predlozi adresa u javnoj formi (05.09.2026)
 
 - Oba polja, **„Odakle preuzimamo?”** (`shop`) i **„Gde donosimo?”** (`address`), nude Google Places predloge tokom kucanja.
 - Predlozi i tekst izabranih adresa prikazuju se na **srpskoj latinici**.
 - Mesto preuzimanja se i dalje čuva kao tekst u `shop`; za sada služi samo izboru adrese. Obračun ostaje firma → kupac, a `place_id` iz forme odnosi se samo na odredište.
-- Koristi se zajednička komponenta sa nezavisnim stanjem za svako polje; ručni unos ostaje moguć.
+- Koristi se zajednička komponenta sa nezavisnim stanjem za svako polje; u javnoj formi oba izbora su obavezna. Promena teksta poništava izbor. Izbor radi klikom i tastaturom.
+
+### Cena i potvrda javne porudžbine (07.09.2026)
+
+- „Poruči” proverava formu i računa cenu, bez upisa i obaveštenja. Popup prikazuje cenu, opis, obe adrese i telefon. U delu za cenu stoje samo „Cena dostave” i iznos, bez napomena o robi i plaćanju.
+- Tek „Potvrdi porudžbinu” upisuje red, pokreće postojeću dodelu/Telegram i animaciju, pa vodi na `/hvala` sa brojem i istom cenom.
+- „Sprat, stan, ulaz” je opciono polje do 150 znakova; server ga dopisuje postojećoj adresi. Nema nove kolone.
+- Server potpisuje Google ID i tekst svakog predloga, pa proverava oba izbora. Potpisana ponuda vezuje proverene podatke, cenu, kilometražu i rok od 15 minuta; potvrda ne zove ponovo Google. Koristi se HMAC-SHA256 i serverski `ORDER_SIGNING_SECRET`.
+- Bez uspešnog obračuna nema slanja: sačuvaj unos, ponudi ponovni pokušaj i poziv 066 59 355 35. Istekla ponuda traži novi obračun i novu potvrdu.
+- Popup se zatvara dugmetom „Izmeni podatke”, Escape-om ili klikom na pozadinu; unos ostaje, prethodna ponuda se poništava. Tokom obračuna unos je zaključan, tokom potvrde i zatvaranje i dupli klikovi su blokirani.
+- Samo javna forma; nema novih tabela, statusa, migracija, geografskih ograničenja ni promene cenovnika. Potpis ne obezbeđuje trajnu evidenciju jednokratne upotrebe ponude.
 
 Statusi: `nova` → `poslata_kuriru` → `krenuo` → `isporuceno`.
 
@@ -122,9 +138,9 @@ Zašto ne posebna tabela „telefonske“: dupli kod, dupli izveštaji, lako da 
 
 **A — kupac na sajtu**
 
-1. Gost kuca formu (nema login).
-2. Insert u `orders` (`izvor = sajt`) + broj.
-3. Stranica: hvala, **cena dostave** (izračunata iz kilometraže; ako fali — „javljamo pozivom"), pa broj. **Nema** live praćenja za kupca.
+1. Gost popuni formu, izabere oba Google predloga i klikne „Poruči”. Server računa cenu bez upisa; popup prikazuje pregled.
+2. „Potvrdi porudžbinu” proverava potpisanu ponudu i upisuje `orders` (`izvor = sajt`) + broj.
+3. Stranica: hvala, ista **cena dostave**, pa broj. Bez obračunate cene nema nove javne porudžbine. **Nema** live praćenja za kupca.
 4. Mejl vlasniku.
 
 **B — kupac zove vlasnika**
@@ -174,6 +190,8 @@ Ručna dodela je obična ponuda: Telegram stiže, kurir sme da odbije.
     `/admin/kuriri`, ručna dodela porudžbine kuriru
 
 ## Baza i bezbednost (kad dođemo do koda)
+
+- Vlasnik može trajno da obriše kurira i sa aktivnom ponudom ili vožnjom. Njegove nezavršene porudžbine vraćaju se u `nova`, uz `courier_id = NULL` i `assigned_at = NULL`, za ponovnu dodelu sa table. Isporučene porudžbine ostaju isporučene, bez veze sa obrisanim kurirom. Brisanje i vraćanje porudžbina moraju biti jedna transakcija.
 
 - Javni insert porudžbine: da (samo sa sajta, `izvor = sajt`). Insert sa table: samo ulogovan vlasnik (`izvor = telefon`). Javni select svih porudžbina: **ne**.
 - Kurir `update` samo preko tokena (RPC ili server), ne „update bilo kog reda“.

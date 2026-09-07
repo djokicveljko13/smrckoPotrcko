@@ -1,73 +1,34 @@
-"use server";
+﻿"use server";
 
-import { computeDistanceMeters } from "@/lib/google/routes";
-import { deliveryPriceFromMeters } from "@/lib/pricing";
+import { confirmOrderQuote } from "@/lib/order-quote";
+import type { CreateGuestOrderState } from "@/lib/order-types";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendOfferForPublicNumber } from "@/lib/telegram";
 
-export type CreateGuestOrderState =
-  | { status: "ok"; ticket: string; price: number | null }
-  | { status: "error"; message: string }
-  | null;
-
-function readString(formData: FormData, key: string): string {
-  const value = formData.get(key);
-  return typeof value === "string" ? value.trim() : "";
-}
-
-export async function createGuestOrder(
-  _prev: CreateGuestOrderState,
-  formData: FormData,
-): Promise<CreateGuestOrderState> {
-  const title = readString(formData, "title");
-  const shop = readString(formData, "shop");
-  const address = readString(formData, "address");
-  const phone = readString(formData, "phone");
-  const placeId = readString(formData, "place_id");
-
-  if (!title || !shop || !address || !phone) {
-    return { status: "error", message: "Popuni sva polja." };
-  }
-
-
-
-  if (phone.length < 6) {
-    return { status: "error", message: "Telefon izgleda prekratak." };
-  }
-
-
-  let distanceM: number | null = null;
-  let price: number | null = null;
-
-  if (placeId) {
-    distanceM = await computeDistanceMeters(placeId);
-
-    if (distanceM !== null) {
-      price = deliveryPriceFromMeters(distanceM);
+export async function createGuestOrder(token: string): Promise<Exclude<CreateGuestOrderState, null>> {
+  try {
+    if (typeof token !== "string") {
+      return { status: "error", message: "Ponovo proveri cenu pre potvrde.", expired: true };
     }
+    return await confirmOrderQuote(token, async ({ order, price, distanceM }) => {
+      const admin = createSupabaseAdminClient();
+      const { data, error } = await admin.rpc("create_web_order", {
+        p_title: order.title,
+        p_shop: order.shop,
+        p_address: order.addressDetails ? `${order.address}; ${order.addressDetails}` : order.address,
+        p_phone: order.phone,
+        p_delivery_price: price,
+        p_distance_m: distanceM,
+        p_place_id: order.destinationPlaceId,
+      });
+      if (error || typeof data !== "string") {
+        console.error("create_web_order failed", error?.code ?? "invalid response");
+        return null;
+      }
+      return data;
+    }, sendOfferForPublicNumber);
+  } catch {
+    console.error("Order confirmation unavailable");
+    return { status: "error", message: "Slanje nije potvrđeno. Pozovi nas da proverimo porudžbinu pre ponovnog slanja." };
   }
-  const admin = createSupabaseAdminClient();
-
-  const { data, error } = await admin.rpc("create_web_order", {
-    p_title: title,
-    p_shop: shop,
-    p_address: address,
-    p_phone: phone,
-    p_delivery_price: price,
-    p_distance_m: distanceM,
-    p_place_id: placeId,
-  });
-
-  if (error || typeof data !== "string" || data.length === 0) {
-    console.error("create_web_order failed", error);
-    return {
-      status: "error",
-      message:
-        "Porudžbina nije upisana. Ako si baš sada dodao SQL funkciju, osveži stranicu i pokušaj opet.",
-    };
-  }
-
-  await sendOfferForPublicNumber(data);
-
-  return { status: "ok", ticket: data, price };
 }

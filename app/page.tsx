@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { HeroWave } from "@/components/hero-wave";
+import { HeroDivider } from "@/components/hero-divider";
 import { AnnouncementBar } from "@/components/announcement-bar";
 import { BrandLogo } from "@/components/brand-logo";
 import { ContactStrip } from "@/components/contact-strip";
@@ -112,7 +112,7 @@ export default function HomePage() {
           <ArrowDownIcon className="h-5 w-5" />
         </a>
 
-        <HeroWave />
+        <HeroDivider />
       </section>
 
       <section

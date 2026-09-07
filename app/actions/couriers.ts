@@ -18,8 +18,6 @@ const ERRORS: Record<string, string> = {
   bad_pin: "PIN mora imati 4 do 8 cifara.",
   unknown_courier: "Kurir nije pronađen. Osveži stranicu.",
   on_ride: "Kurir je na vožnji. Sačekaj da isporuči, pa ga ugasi.",
-  has_live_order:
-    "Kurir ima živu porudžbinu. Reši je (ili ga prvo ugasi), pa briši.",
 };
 
 /*
@@ -106,7 +104,7 @@ export async function setCourierActive(
 /*
  * Trajno brisanje. Stare porudzbine tog kurira ostaju, ali im courier_id
  * postaje NULL (strani kljuc je `on delete set null`) — ime vozaca se gubi.
- * Zato je "Ugasi" i dalje bolji potez za kurira koji je stvarno vozio.
+ * Nezavrsene porudzbine vracaju se u nova za ponovnu dodelu sa table.
  */
 export async function deleteCourier(
   courierId: string,
