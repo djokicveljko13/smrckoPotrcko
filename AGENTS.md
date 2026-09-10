@@ -41,6 +41,13 @@ Ostala dva sajta iz ponude (Food of Šmrk, perionica) **ne radimo**.
 - Ivica kombinuje veće nepravilne useke i sitnije neravnine, sa tankim svetlim slojem koji naglašava cepanje. Telefon ima jednostavniji crtež sa krupnim detaljima. Dekoracija je statična i povezuje hero sa izgledom porudžbenice.
 - Crvena pozadina, logo, sadržaj i postojeće animacije hero sekcije ostaju isti.
 
+## O nama (početna)
+
+- Sekcija `#o-nama` na početnoj, između forme (`#poruci`) i kontakt trake.
+- Ističe da je Šmrčko Potrčko **lokalni brend iz Jagodine**, ne lanac iz drugog grada.
+- Jedna kompozicija (naslov + kratak tekst + tri tačke), bez marketing kartica.
+- Crna (`ink`) podloga, bela tipografija, crveni naglasak — isti jezik kao traka obećanja ispod forme.
+
 ## Saradnja — B2B upit
 
 - Javna stranica `/saradnja` namenjena je firmama kojima treba dostava.

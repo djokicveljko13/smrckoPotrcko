@@ -3,6 +3,7 @@ import { HeroDivider } from "@/components/hero-divider";
 import { AnnouncementBar } from "@/components/announcement-bar";
 import { BrandLogo } from "@/components/brand-logo";
 import { ContactStrip } from "@/components/contact-strip";
+import { AboutSection } from "@/components/about-section";
 import { GuestOrderForm } from "@/components/guest-order-form";
 import {
   ArrowDownIcon,
@@ -50,12 +51,13 @@ const DESCRIPTION_DELAY_MS = 700;
 const CTA_DELAY_MS = 1000;
 
 /*
- * Stranica su sada ČETIRI trake jedna ispod druge, ne jedan grid:
+ * Stranica su sada PET traka jedna ispod druge, ne jedan grid:
  *
  *   1. hero  — pun ekran (min-h-dvh), crvena šara, logo + poruka + dugme
  *   2. #poruci — pun ekran, forma na sredini, obećanja ispod nje
- *   3. kontakt — za one koji radije zovu
- *   4. footer — pokretna traka sa porukom (ranije je stajala na vrhu)
+ *   3. #o-nama — lokalni brend, poverenje pre kontakta
+ *   4. kontakt — za one koji radije zovu
+ *   5. footer — pokretna traka sa porukom (ranije je stajala na vrhu)
  *
  * Zašto dva puna ekrana umesto svega odjednom: prvi ekran ima jedan posao —
  * da za dve sekunde objasni šta radimo. Forma sa četiri polja pored toga
@@ -172,6 +174,8 @@ export default function HomePage() {
           </ul>
         </div>
       </section>
+
+      <AboutSection />
 
       <ContactStrip />
 
