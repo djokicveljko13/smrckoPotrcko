@@ -8,7 +8,6 @@ import {
   validText,
 } from "@/lib/order-validation";
 import {
-  buildShoppingTitle,
   MAX_SHOPPING_NOTE,
   normalizeItems,
 } from "@/lib/shopping";
