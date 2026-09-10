@@ -95,6 +95,37 @@ export function CheckCircleIcon({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
+export function PlusIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg {...strokeProps} className={className} aria-hidden>
+      <path d="M12 5v14" />
+      <path d="M5 12h14" />
+    </svg>
+  );
+}
+
+export function TrashIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg {...strokeProps} className={className} aria-hidden>
+      <path d="M3 6h18" />
+      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+    </svg>
+  );
+}
+
+export function CartIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg {...strokeProps} className={className} aria-hidden>
+      <circle cx="9" cy="20" r="1" />
+      <circle cx="17" cy="20" r="1" />
+      <path d="M3 3h2l2.4 12.3A2 2 0 0 0 9.4 17h7.8a2 2 0 0 0 2-1.6L21 8H7" />
+    </svg>
+  );
+}
+
 /*
  * WhatsApp i Viber su tuđi logotipi, pa su pune (fill) putanje sa svojom
  * bojom — poznati oblik i boja su ono po čemu ih ljudi prepoznaju.

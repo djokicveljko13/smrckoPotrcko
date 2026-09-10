@@ -126,7 +126,7 @@ export async function sendOffer(
     const { data: order, error: orderError } = await admin
       .from("orders")
       .select(
-        "public_number, title, shop, address, phone, delivery_price, distance_m",
+        "id, public_number, title, shop, address, phone, delivery_price, distance_m, order_type, shopping_note",
       )
       .eq("courier_id", courierId)
       .eq("status", "poslata_kuriru")
@@ -151,6 +151,22 @@ export async function sendOffer(
       return;
     }
 
+    let items: { text: string }[] | null = null;
+    if (order.order_type === "kupovina" && typeof order.id === "string") {
+      const { data: rows, error: itemsError } = await admin
+        .from("shopping_items")
+        .select("text, sort_order")
+        .eq("order_id", order.id)
+        .order("sort_order", { ascending: true });
+      if (itemsError) {
+        console.error("sendOffer shopping items lookup failed", itemsError);
+      } else {
+        items = (rows ?? [])
+          .filter((row): row is { text: string; sort_order: number } => typeof row.text === "string")
+          .map((row) => ({ text: row.text }));
+      }
+    }
+
     // Cena i razdaljina smeju da budu null — Google je mogao da zakaže.
     // Zato NISU deo provere iznad; poruka sama zna šta da napiše kad fale.
     const text = buildCourierMessage({
@@ -161,6 +177,10 @@ export async function sendOffer(
       phone: order.phone,
       delivery_price: asNumberOrNull(order.delivery_price),
       distance_m: asNumberOrNull(order.distance_m),
+      order_type: order.order_type === "kupovina" ? "kupovina" : "dostava",
+      shopping_note:
+        typeof order.shopping_note === "string" ? order.shopping_note : null,
+      items,
     });
 
     const origin = siteUrl();

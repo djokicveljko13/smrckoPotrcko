@@ -1,33 +1,16 @@
 import { readOrderValue, signOrderValue } from "@/lib/order-signing";
 import { deliveryPriceFromMeters } from "@/lib/pricing";
+import {
+  asRecord,
+  readPlace,
+  readString,
+  validPhone,
+  validText,
+} from "@/lib/order-validation";
 import type { CreateGuestOrderState, OrderDetails, OrderField, OrderQuote, PrepareOrderResult } from "@/lib/order-types";
 
 export const QUOTE_TTL_MS = 15 * 60 * 1000;
 const CHOOSE_ADDRESS = "Izaberi adresu iz ponuđene liste.";
-
-function readString(formData: FormData, key: string): string {
-  const value = formData.get(key);
-  return typeof value === "string" ? value.trim() : "";
-}
-
-function asRecord(value: unknown): Record<string, unknown> | null {
-  return value !== null && typeof value === "object" && !Array.isArray(value)
-    ? value as Record<string, unknown> : null;
-}
-
-function validText(value: unknown, max: number, optional = false): value is string {
-  return typeof value === "string" && value.length <= max && (optional || value.trim().length > 0);
-}
-
-function validPhone(value: unknown): value is string {
-  return validText(value, 40) && /^[+\d\s()/-]+$/.test(value) && value.replace(/\D/g, "").length >= 6;
-}
-
-function readPlace(token: string, text: string, max: number) {
-  const place = asRecord(readOrderValue(token, "place"));
-  if (!place || !validText(place.placeId, 300) || !validText(place.text, max) || place.text !== text) return null;
-  return { placeId: place.placeId, text: place.text };
-}
 
 /** Nema baze ni Telegrama u ovoj funkciji: rezultat je samo privremena ponuda. */
 export async function prepareOrderQuote(

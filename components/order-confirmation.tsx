@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { DeliveryAnimation } from "@/components/delivery-animation";
+import { ModalShell } from "@/components/modal-shell";
 import { DISPLAY_PHONE, TEL_URL } from "@/lib/contact";
 import { deliveryPriceLabel } from "@/lib/pricing";
 import type { OrderQuote } from "@/lib/order-types";
@@ -19,23 +20,13 @@ type OrderConfirmationProps = {
 };
 
 export function OrderConfirmation({ quote, calculating, sending, error, invalidQuote, onClose, onConfirm, onReprice }: OrderConfirmationProps) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const backdropPointer = useRef(false);
   const [now, setNow] = useState(Date.now);
   const expired = invalidQuote || now >= quote.expiresAt;
   const locked = calculating || sending;
 
   useEffect(() => {
-    const dialog = dialogRef.current;
-    dialog?.showModal();
     headingRef.current?.focus();
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      dialog?.close();
-      document.body.style.overflow = previousOverflow;
-    };
   }, []);
 
   useEffect(() => {
@@ -43,17 +34,8 @@ export function OrderConfirmation({ quote, calculating, sending, error, invalidQ
     return () => clearTimeout(timer);
   }, [quote.expiresAt]);
 
-  function outside(event: React.PointerEvent<HTMLDialogElement> | React.MouseEvent<HTMLDialogElement>) {
-    const rect = event.currentTarget.getBoundingClientRect();
-    return event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;
-  }
-
   return (
-    <dialog ref={dialogRef} aria-labelledby="confirmation-title" aria-describedby="confirmation-price" aria-busy={locked}
-      className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto overscroll-contain rounded-3xl border-2 border-zinc-100 bg-white p-5 text-ink shadow-2xl backdrop:bg-ink/60 sm:p-7"
-      onCancel={(event) => { event.preventDefault(); if (!locked) onClose(); }}
-      onPointerDown={(event) => { backdropPointer.current = outside(event); }}
-      onClick={(event) => { if (!locked && backdropPointer.current && outside(event)) onClose(); backdropPointer.current = false; }}>
+    <ModalShell titleId="confirmation-title" descriptionId="confirmation-price" locked={locked} onClose={onClose}>
       {sending ? <DeliveryAnimation /> : null}
       <div inert={sending}>
         <p className="text-xs font-extrabold uppercase tracking-widest text-zinc-500">Još jedan korak</p>
@@ -86,6 +68,6 @@ export function OrderConfirmation({ quote, calculating, sending, error, invalidQ
           <button type="button" disabled={locked} onClick={onClose} className={`${secondaryButtonClass} w-full`}>Izmeni podatke</button>
         </div>
       </div>
-    </dialog>
+    </ModalShell>
   );
 }

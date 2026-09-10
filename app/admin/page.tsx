@@ -8,7 +8,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AssignCourierOption, BoardOrder } from "@/lib/types";
 
 const ORDER_COLUMNS =
-  "id, public_number, title, shop, address, phone, delivery_price, distance_m, source, status, courier_id, assigned_at, created_at, courier:couriers(name, phone)";
+  "id, public_number, title, shop, address, phone, delivery_price, distance_m, source, status, courier_id, assigned_at, created_at, order_type, shopping_note, shopping_items(text, sort_order), courier:couriers(name, phone)";
 
 function asCourierEmbed(value: unknown): BoardOrder["courier"] {
   if (!value || typeof value !== "object") return null;
@@ -17,6 +17,22 @@ function asCourierEmbed(value: unknown): BoardOrder["courier"] {
   const { name, phone } = row as { name?: unknown; phone?: unknown };
   if (typeof name !== "string" || typeof phone !== "string") return null;
   return { name, phone };
+}
+
+function asShoppingItems(value: unknown): BoardOrder["shopping_items"] {
+  if (!Array.isArray(value)) return null;
+  const items = value
+    .map((row) => {
+      if (!row || typeof row !== "object") return null;
+      const { text, sort_order } = row as { text?: unknown; sort_order?: unknown };
+      if (typeof text !== "string") return null;
+      return {
+        text,
+        sort_order: typeof sort_order === "number" ? sort_order : undefined,
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null);
+  return items.length > 0 ? items : [];
 }
 
 export default async function AdminPage() {
@@ -37,10 +53,17 @@ export default async function AdminPage() {
       .order("name", { ascending: true }),
   ]);
 
-  const orders: BoardOrder[] = (ordersResult.data ?? []).map((row) => ({
-    ...(row as Omit<BoardOrder, "courier">),
-    courier: asCourierEmbed((row as { courier?: unknown }).courier),
-  }));
+  const orders: BoardOrder[] = (ordersResult.data ?? []).map((row) => {
+    const raw = row as Omit<BoardOrder, "courier" | "shopping_items"> & {
+      courier?: unknown;
+      shopping_items?: unknown;
+    };
+    return {
+      ...raw,
+      courier: asCourierEmbed(raw.courier),
+      shopping_items: asShoppingItems(raw.shopping_items),
+    };
+  });
 
   const open = orders
     .filter((order) => order.status !== "isporuceno")
