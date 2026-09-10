@@ -1,4 +1,5 @@
 import { distanceLabel } from "@/lib/pricing";
+import type { OrderType, ShoppingItem } from "@/lib/types";
 
 /**
  * Tekst porudžbine koji kurir dobije preko Telegrama.
@@ -17,20 +18,48 @@ export type MessageOrder = {
   phone: string;
   delivery_price: number | null;
   distance_m: number | null;
+  order_type?: OrderType;
+  shopping_note?: string | null;
+  items?: ShoppingItem[] | string[] | null;
 };
 
+function itemText(entry: ShoppingItem | string): string {
+  return typeof entry === "string" ? entry : entry.text;
+}
+
 export function buildCourierMessage(order: MessageOrder): string {
+  const isShopping = order.order_type === "kupovina";
   const lines = [
     `Porudžbina ${order.public_number}`,
     "",
-    `Šta: ${order.title}`,
-    `Odakle: ${order.shop}`,
-    `Adresa: ${order.address}`,
-    `Telefon kupca: ${order.phone}`,
   ];
 
-  if (order.distance_m !== null) {
-    lines.push(`Razdaljina: ${distanceLabel(order.distance_m)}`);
+  if (isShopping) {
+    lines.push("Vrsta: KUPOVINA", `Market: ${order.shop}`, "");
+    const items = order.items ?? [];
+    if (items.length > 0) {
+      lines.push("Lista:");
+      for (const entry of items) {
+        lines.push(`• ${itemText(entry)}`);
+      }
+      lines.push("");
+    } else {
+      lines.push(`Šta: ${order.title}`, "");
+    }
+    if (order.shopping_note) {
+      lines.push(`Napomena: ${order.shopping_note}`, "");
+    }
+    lines.push(`Adresa: ${order.address}`, `Telefon kupca: ${order.phone}`);
+  } else {
+    lines.push(
+      `Šta: ${order.title}`,
+      `Odakle: ${order.shop}`,
+      `Adresa: ${order.address}`,
+      `Telefon kupca: ${order.phone}`,
+    );
+    if (order.distance_m !== null && order.distance_m !== undefined) {
+      lines.push(`Razdaljina: ${distanceLabel(order.distance_m)}`);
+    }
   }
 
   lines.push(

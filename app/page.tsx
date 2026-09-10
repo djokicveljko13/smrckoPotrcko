@@ -4,6 +4,7 @@ import { AnnouncementBar } from "@/components/announcement-bar";
 import { BrandLogo } from "@/components/brand-logo";
 import { ContactStrip } from "@/components/contact-strip";
 import { GuestOrderForm } from "@/components/guest-order-form";
+import { ServiceCards } from "@/components/service-cards";
 import {
   ArrowDownIcon,
   BoltIcon,
@@ -120,6 +121,8 @@ export default function HomePage() {
         className="flex min-h-dvh flex-col justify-center bg-white px-4 py-14 sm:px-6 sm:py-16"
       >
         <div className="mx-auto w-full max-w-xl">
+          <ServiceCards />
+
           {/* relative + z-10: bela kartica mora da stoji IZNAD crne trake. */}
           <div className="relative z-10 rounded-3xl border border-zinc-200/80 bg-white p-5 shadow-[0_24px_60px_-30px_rgba(16,16,16,0.45)] sm:p-7">
             <h2 className="font-display text-xl font-black italic uppercase tracking-tight sm:text-2xl">

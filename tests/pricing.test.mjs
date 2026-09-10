@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { deliveryPriceFromMeters } from "../lib/pricing.ts";
+import { loadTypeScript } from "./load-typescript.mjs";
+
+const { deliveryPriceFromMeters, findShoppingStore } = loadTypeScript("lib/pricing.ts");
 
 // Ulazi su metri iz Routes API-ja. Očekivanja su iz dogovorenog cenovnika.
 const cases = [
@@ -28,3 +30,9 @@ for (const { meters, rounded, expected } of cases) {
     assert.equal(deliveryPriceFromMeters(meters), expected);
   });
 }
+
+test("shopping store prices are fixed by chain", () => {
+  assert.equal(findShoppingStore("maxi")?.price, 500);
+  assert.equal(findShoppingStore("lidl")?.price, 1000);
+  assert.equal(findShoppingStore("unknown"), null);
+});

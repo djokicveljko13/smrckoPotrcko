@@ -45,3 +45,24 @@ export function deliveryPriceLabel(price: number): string {
 export function distanceLabel(meters: number): string {
   return `${(meters / 1000).toFixed(1)} km`;
 }
+
+/**
+ * Kupovina iz marketa ima fiksnu cenu dogovorenu po lancu — kilometraža se
+ * ne računa. Lidl je duplo skuplji (dogovor sa klijentom, 07.09.2026).
+ *
+ * `as const` daje TypeScript-u tačan skup id-jeva, pa ShoppingStore ne može
+ * da odluta od ove liste.
+ */
+export const SHOPPING_STORES = [
+  { id: "maxi", label: "Maxi", price: 500, logo: "/prodavnice/maxi.svg" },
+  { id: "roda", label: "Roda", price: 500, logo: "/prodavnice/roda.svg" },
+  { id: "idea", label: "IDEA", price: 500, logo: "/prodavnice/idea.svg" },
+  { id: "lidl", label: "Lidl", price: 1000, logo: "/prodavnice/lidl.svg" },
+] as const;
+
+export type ShoppingStore = (typeof SHOPPING_STORES)[number]["id"];
+
+/** Nepoznat id vraća null — forma je mogla biti falsifikovana. */
+export function findShoppingStore(id: unknown) {
+  return SHOPPING_STORES.find((s) => s.id === id) ?? null;
+}

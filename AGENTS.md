@@ -33,19 +33,21 @@ Kako agent mora da radi:
 
 Služba dostave: kupac naruči **bilo šta** (nije katalog hrane), **sa sajta ili telefonom vlasniku**. Ista porudžbina završi na tabli. Kurira bira **baza automatski** i javlja mu preko **Telegrama**; kurir prihvati ili odbije i označi status. Plaćanje je **uvek keš, van aplikacije, zauvek**.
 
+Druga usluga: **kupovina iz marketa** (`/kupovina`) — lista stavki, fiksna cena po lancu. Detalji: odeljak **Kupovina** i `docs/featureNamirnice.md`.
+
 Ostala dva sajta iz ponude (Food of Šmrk, perionica) **ne radimo**.
 
 ## Izgled hero sekcije
 
-- Početna i `/saradnja` koriste zajednički završetak hero sekcije u obliku jasno vidljive pocepane ivice papira, bez dijagonale i linija brzine.
+- Početna, `/saradnja` i `/kupovina` koriste zajednički završetak hero sekcije u obliku jasno vidljive pocepane ivice papira, bez dijagonale i linija brzine.
 - Ivica kombinuje veće nepravilne useke i sitnije neravnine, sa tankim svetlim slojem koji naglašava cepanje. Telefon ima jednostavniji crtež sa krupnim detaljima. Dekoracija je statična i povezuje hero sa izgledom porudžbenice.
 - Crvena pozadina, logo, sadržaj i postojeće animacije hero sekcije ostaju isti.
 
 ## Saradnja — B2B upit
 
 - Javna stranica `/saradnja` namenjena je firmama kojima treba dostava.
-- Navigacija na `/` i `/saradnja` ima linkove „Poruči“ i „Saradnja“.
-- Navigacija na `/saradnja` prikazuje `BrandLogo` levo, kao link ka `/`; linkovi „Poruči” i „Saradnja” ostaju desno. Obe stranice koriste isti centrirani kontejner `max-w-6xl` sa `px-4`, bez razvlačenja navigacije preko celog ekrana. Na početnoj nema logotipa u navigaciji, logo ostaje u hero sekciji.
+- Navigacija na `/` , `/kupovina` i `/saradnja` ima linkove „Poruči“, „Kupovina“ i „Saradnja“.
+- Navigacija na `/saradnja` i `/kupovina` prikazuje `BrandLogo` levo, kao link ka `/`; linkovi ostaju desno. Stranice koriste isti centrirani kontejner `max-w-6xl` sa `px-4`, bez razvlačenja navigacije preko celog ekrana. Na početnoj nema logotipa u navigaciji, logo ostaje u hero sekciji.
 - Linkovi navigacije koriste Archivo, 16 px, debljinu 800 radi bolje uočljivosti.
 - Navigacija je fiksirana preko hero sekcije: na vrhu providna sa belim slovima, posle 40 px skrola bela sa tamnim slovima i blagom senkom. Hero zadržava punu visinu ekrana i gornji razmak za navigaciju.
 - Firma ostavlja naziv firme, telefon i opcionu poruku.
@@ -54,6 +56,20 @@ Ostala dva sajta iz ponude (Food of Šmrk, perionica) **ne radimo**.
 - Nalozi i pristup aplikaciji za firme dodaju se naknadno.
 - Katalog partnera i tabela `partners` nisu deo ove izmene.
 - Plan izrade: `docs/saradnjaB2B.md`.
+
+## Kupovina — Potrčko ide u kupovinu
+
+Druga usluga pored klasične dostave: kurir **ode u market i kupi** sa liste, ne preuzima gotov paket.
+
+- Javna ruta `/kupovina` + dve kartice na početnoj („Donesi mi nešto” / „Potrčko ide u kupovinu”).
+- Navigacija ima link „Kupovina”; na `/kupovina` (kao na `/saradnja`) stoji `BrandLogo` levo.
+- Obavezan izbor lanca: **Maxi / Roda / IDEA = 500 din**, **Lidl = 1000 din**. Cena je fiksna po lancu — **nema** Google Routes / kilometraže.
+- Browser šalje samo `store` id; server cenu izvodi iz `SHOPPING_STORES` u `lib/pricing.ts` i potpisuje HMAC-om (`purpose: "shopping"`).
+- Lista stavki (1–30 × max 120 znakova) u tabeli `shopping_items`; `orders.order_type = 'kupovina'`, opciona `shopping_note`.
+- `title` = sažetak liste, `shop` = naziv lanca — da tabla, Telegram i `/k/{token}` rade bez posebnog UI-ja dok se lista ne doda.
+- Upis samo preko RPC `create_shopping_order` (`service_role`), ista auto-dodela i Telegram.
+- Telefonski unos kupovine na tabli i čekiranje stavki kod kurira **nisu** sada.
+- Plan izrade: `docs/featureNamirnice.md`.
 
 ## Tech stack
 

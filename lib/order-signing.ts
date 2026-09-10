@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-type Purpose = "place" | "quote";
+type Purpose = "place" | "quote" | "shopping";
 
 function signingSecret(): string {
   const secret = process.env.ORDER_SIGNING_SECRET?.trim();

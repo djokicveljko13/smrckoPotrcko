@@ -1,10 +1,18 @@
 export type OrderZone = "grad" | "van_grada";
 export type OrderSource = "sajt" | "telefon";
+export type OrderType = "dostava" | "kupovina";
 export type OrderStatus =
   | "nova"
   | "poslata_kuriru"
   | "krenuo"
   | "isporuceno";
+
+export type ShoppingItem = {
+  id?: string;
+  text: string;
+  checked?: boolean;
+  sort_order?: number;
+};
 
 export type Courier = {
   id: string;
@@ -37,6 +45,9 @@ export type CourierJob = {
   distance_m: number | null;
   status: OrderStatus;
   offered_at: string | null;
+  order_type?: OrderType;
+  shopping_note?: string | null;
+  items?: ShoppingItem[];
 };
 
 export type CourierDashboardData = {
@@ -62,6 +73,9 @@ export type BoardOrder = {
   assigned_at: string | null;
   created_at: string;
   courier: { name: string; phone: string } | null;
+  order_type?: OrderType;
+  shopping_note?: string | null;
+  shopping_items?: ShoppingItem[] | null;
 };
 
 export type AdminCourier = {

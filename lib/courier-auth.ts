@@ -145,6 +145,22 @@ function numberOrNull(value: unknown): number | null {
   return null;
 }
 
+function parseShoppingItems(value: unknown): CourierJob["items"] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((entry) => {
+      if (!entry || typeof entry !== "object") return null;
+      const row = entry as Record<string, unknown>;
+      if (typeof row.text !== "string" || !row.text.trim()) return null;
+      return {
+        id: typeof row.id === "string" ? row.id : undefined,
+        text: row.text,
+        checked: row.checked === true,
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null);
+}
+
 function parseJob(value: unknown): CourierJob | null {
   if (!value || typeof value !== "object") return null;
   const row = value as Record<string, unknown>;
@@ -164,6 +180,11 @@ function parseJob(value: unknown): CourierJob | null {
     return null;
   }
 
+  const orderType =
+    row.order_type === "kupovina" || row.order_type === "dostava"
+      ? row.order_type
+      : undefined;
+
   return {
     id: row.id,
     public_number: row.public_number,
@@ -175,6 +196,10 @@ function parseJob(value: unknown): CourierJob | null {
     distance_m: numberOrNull(row.distance_m),
     status: status as OrderStatus,
     offered_at: typeof row.offered_at === "string" ? row.offered_at : null,
+    order_type: orderType,
+    shopping_note:
+      typeof row.shopping_note === "string" ? row.shopping_note : null,
+    items: parseShoppingItems(row.items),
   };
 }
 

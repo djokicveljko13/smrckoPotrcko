@@ -58,11 +58,38 @@ export function OrderCard({ order, delivered = false, couriers }: Props) {
       </div>
 
       <p className="mt-2 font-semibold text-ink">{order.title}</p>
+      {order.order_type === "kupovina" ? (
+        <p className="mt-1 inline-flex rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-bold text-brand-dark">
+          Kupovina
+        </p>
+      ) : null}
       <dl className="mt-2 space-y-1 text-sm">
         <div>
-          <dt className="inline text-zinc-500">Odakle: </dt>
+          <dt className="inline text-zinc-500">
+            {order.order_type === "kupovina" ? "Market: " : "Odakle: "}
+          </dt>
           <dd className="inline">{order.shop}</dd>
         </div>
+        {order.order_type === "kupovina" && order.shopping_items && order.shopping_items.length > 0 ? (
+          <div>
+            <dt className="text-zinc-500">Lista:</dt>
+            <dd className="mt-1">
+              <ol className="list-decimal space-y-0.5 pl-5 font-medium text-ink">
+                {[...order.shopping_items]
+                  .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+                  .map((item, index) => (
+                    <li key={`${index}-${item.text}`}>{item.text}</li>
+                  ))}
+              </ol>
+            </dd>
+          </div>
+        ) : null}
+        {order.order_type === "kupovina" && order.shopping_note ? (
+          <div>
+            <dt className="inline text-zinc-500">Napomena: </dt>
+            <dd className="inline whitespace-pre-wrap">{order.shopping_note}</dd>
+          </div>
+        ) : null}
         <div>
           <dt className="inline text-zinc-500">Adresa: </dt>
           <dd className="inline">{order.address}</dd>
@@ -78,7 +105,7 @@ export function OrderCard({ order, delivered = false, couriers }: Props) {
             </a>
           </dd>
         </div>
-        {order.distance_m !== null ? (
+        {order.distance_m !== null && order.order_type !== "kupovina" ? (
           <div>
             <dt className="inline text-zinc-500">Razdaljina: </dt>
             <dd className="inline">{distanceLabel(order.distance_m)}</dd>
