@@ -34,13 +34,20 @@ export function AddressAutocomplete({
   const [invalid, setInvalid] = useState(false);
   const [retry, setRetry] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const requestRef = useRef<AbortController | null>(null);
   const revision = useRef(0);
   const focused = useRef(false);
+  const picking = useRef(false);
+  const blurTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     inputRef.current?.setCustomValidity(selection ? "" : CHOOSE_ADDRESS);
   }, [selection]);
+
+  useEffect(() => () => {
+    if (blurTimer.current) clearTimeout(blurTimer.current);
+  }, []);
 
   useEffect(() => {
     if (selection || text.trim().length < 3) return;
@@ -82,9 +89,19 @@ export function AddressAutocomplete({
     };
   }, [text, selection, retry, maxLength]);
 
+  function clearBlurTimer() {
+    if (blurTimer.current) {
+      clearTimeout(blurTimer.current);
+      blurTimer.current = null;
+    }
+  }
+
   function pick(suggestion: AddressSuggestion) {
+    clearBlurTimer();
+    picking.current = false;
     revision.current += 1;
     requestRef.current?.abort();
+    focused.current = true;
     setText(suggestion.text);
     setSelection(suggestion);
     setSuggestions([]);
@@ -93,20 +110,52 @@ export function AddressAutocomplete({
     setStatus("idle");
     setInvalid(false);
     inputRef.current?.setCustomValidity("");
-    inputRef.current?.focus();
+    inputRef.current?.focus({ preventScroll: true });
     onSelect?.(true);
+  }
+
+  /**
+   * Zašto touchstart/mousedown, ne click:
+   * Na iPhone-u redosled je touchstart → blur (lista nestane) → click.
+   * Click onda pada u prazno. Ovi eventi idu PRE blur-a.
+   */
+  function chooseSuggestion(
+    event: { preventDefault(): void; stopPropagation(): void },
+    suggestion: AddressSuggestion,
+  ) {
+    event.preventDefault();
+    event.stopPropagation();
+    picking.current = true;
+    pick(suggestion);
   }
 
   const message = invalid ? CHOOSE_ADDRESS : error;
   const listId = `${name}-suggestions`;
+  const showHint =
+    !selection &&
+    !message &&
+    text.trim().length >= 3 &&
+    status === "ready" &&
+    suggestions.length > 0;
+
   return (
-    <div className="relative" onBlur={(event) => {
-      if (!event.currentTarget.contains(event.relatedTarget)) {
-        focused.current = false;
-        setOpen(false);
-        if (text && !selection) setInvalid(true);
-      }
-    }}>
+    <div
+      ref={rootRef}
+      className="relative"
+      onBlur={(event) => {
+        if (picking.current) return;
+        const next = event.relatedTarget;
+        if (next instanceof Node && event.currentTarget.contains(next)) return;
+        clearBlurTimer();
+        blurTimer.current = setTimeout(() => {
+          if (picking.current) return;
+          if (rootRef.current?.contains(document.activeElement)) return;
+          focused.current = false;
+          setOpen(false);
+          if (text && !selection) setInvalid(true);
+        }, 250);
+      }}
+    >
       <label htmlFor={name} className={labelClass}>{label}</label>
       <div className="relative mt-1.5">
         <span className={fieldIconClass}>{name === "shop" ? <StoreIcon /> : <HomeIcon />}</span>
@@ -142,6 +191,7 @@ export function AddressAutocomplete({
             onSelect?.(false);
           }}
           onFocus={() => {
+            clearBlurTimer();
             focused.current = true;
             setOpen(suggestions.length > 0);
           }}
@@ -164,29 +214,62 @@ export function AddressAutocomplete({
       </div>
       <input type="hidden" name={`${name}_selection`} value={selection?.proof ?? ""} />
       {open && suggestions.length > 0 ? (
-        <ul id={listId} role="listbox" aria-label={label}
-          className="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-2xl border-2 border-zinc-200 bg-white shadow-lg">
+        <ul
+          id={listId}
+          role="listbox"
+          aria-label={label}
+          className="absolute z-30 mt-1 max-h-60 w-full overflow-y-auto rounded-2xl border-2 border-zinc-200 bg-white shadow-lg"
+        >
           {suggestions.map((suggestion, index) => (
-            <li key={suggestion.placeId} id={`${listId}-${index}`} role="option"
-              aria-selected={index === activeIndex}
-              onPointerDown={(event) => event.preventDefault()}
-              onClick={() => pick(suggestion)}
-              className={`cursor-pointer px-4 py-3 text-sm font-medium text-ink hover:bg-brand/10 ${index === activeIndex ? "bg-brand/10" : ""}`}>
-              {suggestion.text}
+            <li key={suggestion.placeId} role="presentation">
+              <button
+                type="button"
+                id={`${listId}-${index}`}
+                role="option"
+                aria-selected={index === activeIndex}
+                tabIndex={-1}
+                onTouchStart={(event) => chooseSuggestion(event, suggestion)}
+                onMouseDown={(event) => {
+                  if (event.button !== 0) return;
+                  chooseSuggestion(event, suggestion);
+                }}
+                className={`block w-full cursor-pointer px-4 py-3.5 text-left text-sm font-medium text-ink [touch-action:manipulation] hover:bg-brand/10 ${
+                  index === activeIndex ? "bg-brand/10" : ""
+                }`}
+              >
+                {suggestion.text}
+              </button>
             </li>
           ))}
         </ul>
       ) : null}
       <div id={`${name}-feedback`} aria-live="polite" className="mt-1 text-xs font-medium">
         {message ? <p className="text-brand-dark">{message}</p> : null}
+        {showHint ? (
+          <p className="text-zinc-600">Tapni predlog sa liste — samo kucanje nije dovoljno.</p>
+        ) : null}
         {status === "loading" ? <p className="text-zinc-500">Tražim adrese…</p> : null}
         {status === "ready" && suggestions.length === 0 ? (
-          <p className="text-zinc-600">Nema predloga. Probaj naziv ulice i mesto ili pozovi <a href={TEL_URL} className="underline">{DISPLAY_PHONE}</a>.</p>
+          <p className="text-zinc-600">
+            Nema predloga. Probaj naziv ulice i mesto ili pozovi{" "}
+            <a href={TEL_URL} className="underline">{DISPLAY_PHONE}</a>.
+          </p>
         ) : null}
         {status === "error" ? (
-          <p className="text-brand-dark">Predlozi trenutno nisu dostupni. <button type="button" className="font-bold underline"
-            onClick={() => { setStatus("loading"); setRetry((value) => value + 1); }}>Pokušaj ponovo</button>
-            {" ili pozovi "}<a href={TEL_URL} className="underline">{DISPLAY_PHONE}</a>.
+          <p className="text-brand-dark">
+            Predlozi trenutno nisu dostupni.{" "}
+            <button
+              type="button"
+              className="font-bold underline"
+              onClick={() => {
+                setStatus("loading");
+                setRetry((value) => value + 1);
+              }}
+            >
+              Pokušaj ponovo
+            </button>
+            {" ili pozovi "}
+            <a href={TEL_URL} className="underline">{DISPLAY_PHONE}</a>.
           </p>
         ) : null}
       </div>
