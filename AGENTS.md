@@ -41,7 +41,7 @@ Ostala dva sajta iz ponude (Food of Šmrk, perionica) **ne radimo**.
 
 - Početna, `/saradnja` i `/kupovina` koriste zajednički završetak hero sekcije u obliku jasno vidljive pocepane ivice papira, bez dijagonale i linija brzine.
 - Ivica kombinuje veće nepravilne useke i sitnije neravnine, sa tankim svetlim slojem koji naglašava cepanje. Telefon ima jednostavniji crtež sa krupnim detaljima. Dekoracija je statična i povezuje hero sa izgledom porudžbenice.
-- Crvena pozadina, logo, sadržaj i postojeće animacije hero sekcije ostaju isti.
+- Crvena pozadina i pocepana ivica su iste na sve tri strane. Sadržaj i animacije hero-a su isti na početnoj i `/saradnja`; `/kupovina` ima svoj raspored (vidi odeljak **Kupovina**).
 
 ## Saradnja — B2B upit
 
@@ -52,6 +52,9 @@ Ostala dva sajta iz ponude (Food of Šmrk, perionica) **ne radimo**.
 - Navigacija je fiksirana preko hero sekcije: na vrhu providna sa belim slovima, posle 40 px skrola bela sa tamnim slovima i blagom senkom. Hero zadržava punu visinu ekrana i gornji razmak za navigaciju.
 - Firma ostavlja naziv firme, telefon i opcionu poruku.
 - Upit se šalje vlasniku na mejl preko Resend-a; ne čuva se u bazi.
+- Primalac upita za saradnju je `potrckosmrcko@gmail.com`, podešen preko `PARTNERSHIP_EMAIL_TO`.
+- Slanje za saradnju koristi serverski `fetch` i `RESEND_API_KEY`, `EMAIL_FROM`, `PARTNERSHIP_EMAIL_TO`. Bez konfiguracije ili uspešnog odgovora Resend-a prikazuje se greška, i lokalno; unos ostaje sačuvan. Tokom slanja dugme je zaključano, a uspeh se prikazuje u formi. Ova faza ne uključuje mejlove za porudžbine.
+- Za početni Resend test pošiljalac podrazumevano koristi `Šmrčko Potrčko <onboarding@resend.dev>`. Agent priprema lokalnu konfiguraciju; vlasnik unosi samo API ključ nakon što jednom navede adresu svog Resend naloga za primaoca. Adresa primaoca se ne može izvesti iz API ključa i ne nagađa se.
 - Cena i uslovi saradnje dogovaraju se telefonom.
 - Nalozi i pristup aplikaciji za firme dodaju se naknadno.
 - Katalog partnera i tabela `partners` nisu deo ove izmene.
@@ -63,6 +66,11 @@ Druga usluga pored klasične dostave: kurir **ode u market i kupi** sa liste, ne
 
 - Javna ruta `/kupovina` + dve kartice na početnoj („Donesi mi nešto” / „Potrčko ide u kupovinu”).
 - Navigacija ima link „Kupovina”; na `/kupovina` (kao na `/saradnja`) stoji `BrandLogo` levo.
+- Hero `/kupovina` je u dve kolone: levo kosi naslov „POTRČKO IDE U KUPOVINU”, podnaslov „Ti napiši listu, mi donosimo.” i dugme „Napravi listu” koje skroluje na formu (`#kupovina-forma`); desno statična ilustracija bloka „Moja lista” (papir sa krpicom, prazni kvadratići i linije, doodle korpa i kesa). Ilustracija je kodirana HTML/CSS + mali inline SVG, bez slikovnih fajlova; na telefonu ide ispod teksta. Crvena pozadina i pocepana ivica ostaju.
+- Ukrasi oko `ShoppingListArt` prate referencu: tanka, bledoružičasta ručno crtana kolica levo i nakrivljena kesa sa zelenilom, flašom i bagetom desno; diskretne crtice oko papira. Oba crteža su potpuno vidljiva izvan papira, sa malim razmakom; na telefonu se smanjuju uz rezervisan prostor sa strane. SVG bez ispune, sa zaobljenim potezima i providnošću na celom crtežu.
+- Logotipi lanaca stoje u `public/prodavnice/` (`maxi.jpg`, `roda.jpg`, `idea.jpg`, `lidl.webp`); putanje su u `SHOPPING_STORES` (`lib/pricing.ts`). `StorePicker` na grešku učitavanja pada na tekstualni naziv.
+- Dugme za slanje liste je zaključano dok sva obavezna polja nisu popunjena: izabran lanac, bar jedna stavka na listi, adresa izabrana iz predloga, telefon. Dugme prosto ne reaguje dok forma nije kompletna — ne otvara popup da bi reklo šta fali.
+- Prikaz cene (u formi i u popup potvrdi) pokazuje samo naslov „Cena dostave”, iznos i naziv lanca. Bez „plaćanje keš” i drugih napomena o plaćanju.
 - Obavezan izbor lanca: **Maxi / Roda / IDEA = 500 din**, **Lidl = 1000 din**. Cena je fiksna po lancu — **nema** Google Routes / kilometraže.
 - Browser šalje samo `store` id; server cenu izvodi iz `SHOPPING_STORES` u `lib/pricing.ts` i potpisuje HMAC-om (`purpose: "shopping"`).
 - Lista stavki (1–30 × max 120 znakova) u tabeli `shopping_items`; `orders.order_type = 'kupovina'`, opciona `shopping_note`.
@@ -90,10 +98,15 @@ Env: `.env.local`, nikad na git. Anon ključ sme u klijent; service role **samo*
 | Kupac   | Nema (gost)        | Forma, vidi hvala + broj |
 | Vlasnik | Supabase Auth      | Tabla, unos porudžbine sa poziva, kuriri, dodela, mejl |
 
-Vlasnik **sam pravi svoj nalog** na `/registracija` (skrivena ruta, nema linka sa
-sajta). Kapija je tajni kod `OWNER_SIGNUP_CODE` iz env-a; kad se kod obriše, ruta
-se sama zatvara. Razlog za kapiju: RLS pravilo je „ulogovan = vlasnik", pa bi
-otvorena registracija dala svakome adrese i telefone kupaca.
+Vlasničke naloge **ručno pravi Veljko kroz Supabase Authentication → Users**.
+Samostalna registracija je uklonjena: `/registracija` vraća 404, aplikacija nema
+akciju za pravljenje naloga i `OWNER_SIGNUP_CODE` se više ne koristi. Na početnoj
+nema linka „Tabla vlasnika”, a na `/prijava` nema „Nemaš nalog? Napravi ga”.
+U Supabase Auth podešavanjima mora biti isključeno „Allow new users to sign up”
+(i anonimna prijava), jer RLS pravilo ostaje „ulogovan = vlasnik”.
+`/prijava` ostaje ulaz za postojeće naloge; skrivenost URL-a nije zaštita od
+pogađanja lozinki. Prijava ne otkriva da li nalog postoji, a prekoračenje Supabase
+ograničenja pokušaja prikazuje poruku da se sačeka. CAPTCHA/MFA nisu još uvedeni.
 | Kurir   | PIN + tajni URL    | Telegram ponuda, prihvati/odbij, statusi |
 
 Google login i sačuvane adrese **nisu V1**.
@@ -127,6 +140,7 @@ Razredi se odnose na obračun dostave, ne na vrednost kupljene robe. U bazu se u
 
 ### Cena i potvrda javne porudžbine (07.09.2026)
 
+- Dugme „Poruči” na početnoj je onemogućeno dok nisu popunjeni opis i telefon i izabrana oba Google predloga (preuzimanje i odredište), isto kao kod kupovine. Samo razmaci ne računaju se kao unos; promena teksta adrese poništava izbor i ponovo zaključava dugme. Nepotpuna forma ne pokreće obračun ni popup, ni klikom ni Enterom. „Sprat, stan, ulaz” ostaje opciono.
 - „Poruči” proverava formu i računa cenu, bez upisa i obaveštenja. Popup prikazuje cenu, opis, obe adrese i telefon. U delu za cenu stoje samo „Cena dostave” i iznos, bez napomena o robi i plaćanju.
 - Tek „Potvrdi porudžbinu” upisuje red, pokreće postojeću dodelu/Telegram i animaciju, pa vodi na `/hvala` sa brojem i istom cenom.
 - „Sprat, stan, ulaz” je opciono polje do 150 znakova; server ga dopisuje postojećoj adresi. Nema nove kolone.
@@ -202,7 +216,7 @@ Ručna dodela je obična ponuda: Telegram stiže, kurir sme da odbije.
 8. Kurirski link + statusi
 9. Mejl vlasniku (samo `izvor = sajt`)
 10. Live tabla (Realtime), tek kad 4–8 razumeš
-11. Vlasnički deo (`docs/featureAdmin.md`): `/registracija` sa tajnim kodom,
+11. Vlasnički deo (`docs/featureAdmin.md`): ručno pravljenje naloga u Supabase-u,
     `/admin/kuriri`, ručna dodela porudžbine kuriru
 
 ## Baza i bezbednost (kad dođemo do koda)

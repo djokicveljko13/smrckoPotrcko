@@ -14,6 +14,10 @@ import { fieldClass, fieldIconClass, fieldWithIconClass, labelClass, primaryButt
 
 export function GuestOrderForm() {
   const router = useRouter();
+  const [title, setTitle] = useState("");
+  const [phone, setPhone] = useState("");
+  const [shopChosen, setShopChosen] = useState(false);
+  const [addressChosen, setAddressChosen] = useState(false);
   const [prepared, setPrepared] = useState<Extract<PrepareOrderResult, { status: "ok" }> | null>(null);
   const [prepareError, setPrepareError] = useState<Extract<PrepareOrderResult, { status: "error" }> | null>(null);
   const [state, setState] = useState<CreateGuestOrderState>(null);
@@ -24,6 +28,8 @@ export function GuestOrderForm() {
   const revision = useRef(0);
   const startedAt = useRef(0);
   const sending = phase === "confirming" || phase === "success";
+  // Tekst adrese nije dovoljan: oba mesta moraju biti izabrana iz predloga.
+  const canQuote = title.trim() !== "" && phone.trim() !== "" && shopChosen && addressChosen;
 
   useEffect(() => () => { revision.current += 1; }, []);
 
@@ -101,7 +107,7 @@ export function GuestOrderForm() {
     <>
       <form onSubmit={(event) => {
         event.preventDefault();
-        if (!busy.current) void prepare(new FormData(event.currentTarget));
+        if (!busy.current && canQuote) void prepare(new FormData(event.currentTarget));
       }} className="mt-4 sm:mt-5" aria-busy={phase !== "idle"}>
         <fieldset disabled={phase !== "idle"} className="space-y-3 sm:space-y-4">
           <div>
@@ -109,13 +115,14 @@ export function GuestOrderForm() {
             <div className="relative mt-1.5">
               <span className={fieldIconClass}><PackageIcon /></span>
               <input id="title" name="title" required maxLength={500} className={fieldWithIconClass}
+                value={title} onChange={(event) => setTitle(event.target.value)}
                 aria-invalid={Boolean(fields?.title)} aria-describedby={fields?.title ? "title-error" : undefined}
                 placeholder="Npr. 2 pice, lek iz apoteke, namirnice…" />
             </div>
             {fields?.title ? <p id="title-error" className="mt-1 text-xs text-brand-dark">{fields.title}</p> : null}
           </div>
-          <AddressAutocomplete name="shop" label="Odakle preuzimamo?" placeholder="Ulica i broj ili naziv radnje" maxLength={300} error={fields?.shop} />
-          <AddressAutocomplete error={fields?.address} />
+          <AddressAutocomplete name="shop" label="Odakle preuzimamo?" placeholder="Ulica i broj ili naziv radnje" maxLength={300} error={fields?.shop} onSelect={setShopChosen} />
+          <AddressAutocomplete error={fields?.address} onSelect={setAddressChosen} />
           <div>
             <label htmlFor="address_details" className={labelClass}>Sprat, stan, ulaz <span className="font-medium text-zinc-500">(opciono)</span></label>
             <input id="address_details" name="address_details" maxLength={150} className={fieldClass}
@@ -128,6 +135,7 @@ export function GuestOrderForm() {
             <div className="relative mt-1.5">
               <span className={fieldIconClass}><PhoneIcon /></span>
               <input id="phone" name="phone" type="tel" required maxLength={40} autoComplete="tel" className={fieldWithIconClass}
+                value={phone} onChange={(event) => setPhone(event.target.value)}
                 aria-invalid={Boolean(fields?.phone)} aria-describedby={fields?.phone ? "phone-error" : undefined} placeholder="06x xxx xxxx" />
             </div>
             {fields?.phone ? <p id="phone-error" className="mt-1 text-xs text-brand-dark">{fields.phone}</p> : null}
@@ -137,7 +145,7 @@ export function GuestOrderForm() {
               {prepareError.message} <a href={TEL_URL} className="underline">{DISPLAY_PHONE}</a>
             </p>
           ) : null}
-          <button ref={submitRef} type="submit" disabled={phase !== "idle"} className={primaryButtonClass}>
+          <button ref={submitRef} type="submit" disabled={phase !== "idle" || !canQuote} className={primaryButtonClass}>
             {phase === "quoting" ? "Računam cenu…" : sending ? "Šaljem…" : "Poruči"}
           </button>
           <p className="text-center text-xs font-medium leading-snug text-zinc-500">Prvo proveri cenu dostave, pa potvrdi porudžbinu.</p>

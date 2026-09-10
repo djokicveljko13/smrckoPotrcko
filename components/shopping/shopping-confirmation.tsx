@@ -71,7 +71,7 @@ export function ShoppingConfirmation({
             {deliveryPriceLabel(quote.price)}
           </p>
           <p className="mt-1 text-sm font-medium text-zinc-600">
-            {quote.storeLabel} · plaćanje keš
+            {quote.storeLabel}
           </p>
         </div>
 

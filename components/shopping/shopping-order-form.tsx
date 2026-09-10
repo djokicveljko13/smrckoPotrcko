@@ -33,6 +33,8 @@ export function ShoppingOrderForm() {
   const router = useRouter();
   const [store, setStore] = useState<ShoppingStore | null>(null);
   const [items, setItems] = useState<PaperItem[]>(() => [newPaperItem()]);
+  const [phone, setPhone] = useState("");
+  const [addressChosen, setAddressChosen] = useState(false);
   const [prepared, setPrepared] = useState<Extract<PrepareShoppingResult, { status: "ok" }> | null>(null);
   const [prepareError, setPrepareError] = useState<Extract<PrepareShoppingResult, { status: "error" }> | null>(null);
   const [state, setState] = useState<CreateShoppingOrderState>(null);
@@ -44,6 +46,17 @@ export function ShoppingOrderForm() {
   const startedAt = useRef(0);
   const sending = phase === "confirming" || phase === "success";
   const selectedStore = findShoppingStore(store);
+
+  /*
+   * Dugme radi tek kad su sva obavezna polja tu: izabran market, bar jedna
+   * stavka sa tekstom, adresa izabrana iz predloga (ne samo ukucana) i telefon.
+   * Server ionako proverava sve — ovo je samo da dugme ne vodi u prazno.
+   */
+  const canQuote =
+    store !== null &&
+    items.some((item) => item.text.trim() !== "") &&
+    addressChosen &&
+    phone.trim() !== "";
 
   useEffect(() => () => {
     revision.current += 1;
@@ -137,7 +150,7 @@ export function ShoppingOrderForm() {
       <form
         onSubmit={(event) => {
           event.preventDefault();
-          if (!busy.current) void prepare(new FormData(event.currentTarget));
+          if (!busy.current && canQuote) void prepare(new FormData(event.currentTarget));
         }}
         className="space-y-6"
         aria-busy={phase !== "idle"}
@@ -188,6 +201,7 @@ export function ShoppingOrderForm() {
                 placeholder="Ulica i broj"
                 maxLength={400}
                 error={fields?.address}
+                onSelect={setAddressChosen}
               />
               <div>
                 <label htmlFor="shopping_address_details" className={labelClass}>
@@ -224,6 +238,8 @@ export function ShoppingOrderForm() {
                     className={fieldWithIconClass}
                     aria-invalid={Boolean(fields?.phone)}
                     placeholder="06x xxx xxxx"
+                    value={phone}
+                    onChange={(event) => setPhone(event.target.value)}
                   />
                 </div>
                 {fields?.phone ? (
@@ -240,7 +256,7 @@ export function ShoppingOrderForm() {
                     {deliveryPriceLabel(selectedStore.price)}
                   </p>
                   <p className="mt-1 text-sm font-medium text-zinc-600">
-                    {selectedStore.label} · plaćanje keš
+                    {selectedStore.label}
                   </p>
                 </>
               ) : (
@@ -265,7 +281,7 @@ export function ShoppingOrderForm() {
             <button
               ref={submitRef}
               type="submit"
-              disabled={phase !== "idle"}
+              disabled={phase !== "idle" || !canQuote}
               className={`${primaryButtonClass} mt-5`}
             >
               {phase === "quoting"

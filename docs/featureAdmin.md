@@ -1,4 +1,32 @@
-# Admin: samostalna registracija vlasnika, kuriri iz UI, ručna dodela
+# Admin: ručno pravljenje naloga, kuriri iz UI, ručna dodela
+
+## Aktuelno pravilo pristupa (10.09.2026)
+
+Samostalna registracija iz starog plana ispod je ukinuta. `/registracija` vraća
+404; `signUp`, forma registracije i `OWNER_SIGNUP_CODE` su uklonjeni iz aplikacije.
+Na početnoj nema „Tabla vlasnika”, a prijava nema link za pravljenje naloga.
+Postojeći vlasnik ulazi preko `/prijava`; novi nalog pravi Veljko kroz
+Supabase Dashboard → Authentication → Users → Add user → Create new user.
+Ne upisivati korisnika običnim SQL INSERT-om u aplikacione tabele.
+
+Obavezno u Authentication → Sign In / Providers isključiti **Allow new users to
+sign up** i ostaviti anonimne prijave isključene. To je podešavanje Supabase
+servisa; uklanjanje forme u repou ga samo po sebi ne menja. Svi prijavljeni
+korisnici i dalje imaju vlasnička prava, pa se ovde prave samo vlasnički nalozi.
+
+Sakrivanje URL-a ne zaustavlja pogađanje lozinki. Supabase Auth ograničava broj
+zahteva; stvarna podešavanja se proveravaju u Authentication → Rate Limits.
+Kod prepoznaje odgovor 429 i prikazuje poruku da treba sačekati. Druge greške
+ne otkrivaju da li postoji nalog sa određenom adresom. Za dodatnu zaštitu može
+se povezati CAPTCHA (Turnstile/hCaptcha), a za zaštitu i pri ukradenoj lozinci
+MFA; te integracije nisu deo ove izmene.
+
+Izvori: [Supabase konfiguracija](https://supabase.com/docs/guides/auth/general-configuration),
+[ograničenja zahteva](https://supabase.com/docs/guides/auth/rate-limits),
+[CAPTCHA](https://supabase.com/docs/guides/auth/auth-captcha).
+
+Ostatak dokumenta je istorijski plan; raniji odeljci o samostalnoj registraciji
+i tajnom kodu više ne važe.
 
 Ovaj fajl je izvor istine za vlasnički deo aplikacije. **Ako se pravilo promeni u
 hodu, prvo se menja ovaj fajl, pa onda kod.** Isto pravilo važi i za `AGENTS.md`.

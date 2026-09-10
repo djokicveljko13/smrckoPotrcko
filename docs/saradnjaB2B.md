@@ -1,5 +1,10 @@
 # Stranica „Saradnja" — B2B ulaz za firme
 
+> Slanje preko Resend-a je implementirano. Aktuelna podešavanja i ponašanje:
+> [featureSaradnja.md](featureSaradnja.md). Stariji plan ispod opisuje početnu
+> izradu; lokalna simulacija uspeha bez ključa nije uvedena. Nedostajuća
+> konfiguracija uvek prikazuje grešku, a unos se čuva do uspešnog slanja.
+
 ## Kontekst
 
 Danas sajt ima jednu publiku: **fizičko lice koje naruči jednu vožnju**. Klijent

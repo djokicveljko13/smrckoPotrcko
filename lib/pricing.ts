@@ -54,10 +54,10 @@ export function distanceLabel(meters: number): string {
  * da odluta od ove liste.
  */
 export const SHOPPING_STORES = [
-  { id: "maxi", label: "Maxi", price: 500, logo: "/prodavnice/maxi.svg" },
-  { id: "roda", label: "Roda", price: 500, logo: "/prodavnice/roda.svg" },
-  { id: "idea", label: "IDEA", price: 500, logo: "/prodavnice/idea.svg" },
-  { id: "lidl", label: "Lidl", price: 1000, logo: "/prodavnice/lidl.svg" },
+  { id: "maxi", label: "Maxi", price: 500, logo: "/prodavnice/maxi.jpg" },
+  { id: "roda", label: "Roda", price: 500, logo: "/prodavnice/roda.jpg" },
+  { id: "idea", label: "IDEA", price: 500, logo: "/prodavnice/idea.jpg" },
+  { id: "lidl", label: "Lidl", price: 1000, logo: "/prodavnice/lidl.webp" },
 ] as const;
 
 export type ShoppingStore = (typeof SHOPPING_STORES)[number]["id"];

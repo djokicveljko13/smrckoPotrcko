@@ -86,6 +86,16 @@ export function ArrowDownIcon({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
+/** Strelica udesno na CTA dugmetu — poziv na akciju „kreni". */
+export function ArrowRightIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg {...strokeProps} className={className} aria-hidden>
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  );
+}
+
 export function CheckCircleIcon({ className = "h-5 w-5" }: IconProps) {
   return (
     <svg {...strokeProps} className={className} aria-hidden>

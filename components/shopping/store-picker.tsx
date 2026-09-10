@@ -19,7 +19,7 @@ export function StorePicker({ value, onChange, error, disabled }: StorePickerPro
   return (
     <fieldset disabled={disabled} className="min-w-0">
       <legend className="font-display text-lg font-black italic uppercase tracking-tight sm:text-xl">
-        Gde kupujemo?
+        Odakle donosimo?
       </legend>
       <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {SHOPPING_STORES.map((store) => (

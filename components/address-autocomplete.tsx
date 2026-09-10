@@ -12,6 +12,7 @@ type AddressAutocompleteProps = {
   placeholder?: string;
   maxLength?: number;
   error?: string;
+  onSelect?: (selected: boolean) => void;
 };
 
 const CHOOSE_ADDRESS = "Izaberi adresu iz ponuđene liste.";
@@ -22,6 +23,7 @@ export function AddressAutocomplete({
   placeholder = "Ulica i broj",
   maxLength = 400,
   error,
+  onSelect,
 }: AddressAutocompleteProps) {
   const [text, setText] = useState("");
   const [selection, setSelection] = useState<AddressSuggestion | null>(null);
@@ -92,6 +94,7 @@ export function AddressAutocomplete({
     setInvalid(false);
     inputRef.current?.setCustomValidity("");
     inputRef.current?.focus();
+    onSelect?.(true);
   }
 
   const message = invalid ? CHOOSE_ADDRESS : error;
@@ -136,6 +139,7 @@ export function AddressAutocomplete({
             setInvalid(false);
             setStatus(event.target.value.trim().length >= 3 ? "loading" : "idle");
             event.target.setCustomValidity(CHOOSE_ADDRESS);
+            onSelect?.(false);
           }}
           onFocus={() => {
             focused.current = true;

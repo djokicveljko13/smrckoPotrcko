@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Archivo, Plus_Jakarta_Sans } from "next/font/google";
+import { Archivo, Caveat, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
 /*
- * Dva pisma, svako sa svojim poslom:
+ * Tri pisma, svako sa svojim poslom:
  * - Archivo (težak, italic) za naslove — rimuje se sa kosim slovima iz logotipa.
  * - Plus Jakarta Sans za tekst i dugmad — moderan, okrugao, čita se na telefonu.
+ * - Caveat za rukopisne detalje (npr. „Moja lista" na ilustraciji /kupovina).
  * latin-ext je OBAVEZAN, inače š, č, ć, ž i đ ispadnu iz pisma.
  */
 const archivo = Archivo({
@@ -21,6 +22,12 @@ const jakarta = Plus_Jakarta_Sans({
   weight: ["400", "500", "600", "700", "800"],
 });
 
+const caveat = Caveat({
+  variable: "--font-caveat",
+  subsets: ["latin", "latin-ext"],
+  weight: ["500", "700"],
+});
+
 export const metadata: Metadata = {
   title: "Šmrčko Potrčko dostava",
   description:
@@ -31,7 +38,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="sr"
-      className={`${archivo.variable} ${jakarta.variable} h-full antialiased`}
+      className={`${archivo.variable} ${jakarta.variable} ${caveat.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white font-sans text-ink">
         {children}

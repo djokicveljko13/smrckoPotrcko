@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { HeroDivider } from "@/components/hero-divider";
 import { AnnouncementBar } from "@/components/announcement-bar";
 import { BrandLogo } from "@/components/brand-logo";
@@ -177,16 +176,6 @@ export default function HomePage() {
       </section>
 
       <ContactStrip />
-
-      {/* Ulaz za vlasnika: namerno sitno i na dnu — kupcu ne treba. */}
-      <div className="bg-white pb-5 text-center">
-        <Link
-          href="/admin"
-          className="text-xs font-bold text-zinc-400 underline underline-offset-4 hover:text-brand"
-        >
-          Tabla vlasnika
-        </Link>
-      </div>
 
       <AnnouncementBar />
     </div>
