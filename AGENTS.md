@@ -56,7 +56,7 @@ Ostala dva sajta iz ponude (Food of Šmrk, perionica) **ne radimo**.
 - Primalac upita za saradnju je `potrckosmrcko@gmail.com`, podešen preko `PARTNERSHIP_EMAIL_TO`.
 - Slanje za saradnju koristi serverski `fetch` i `RESEND_API_KEY`, `EMAIL_FROM`, `PARTNERSHIP_EMAIL_TO`. Bez konfiguracije ili uspešnog odgovora Resend-a prikazuje se greška, i lokalno; unos ostaje sačuvan. Tokom slanja dugme je zaključano, a uspeh se prikazuje u formi. Ova faza ne uključuje mejlove za porudžbine.
 - Za početni Resend test pošiljalac podrazumevano koristi `Šmrčko Potrčko <onboarding@resend.dev>`. Agent priprema lokalnu konfiguraciju; vlasnik unosi samo API ključ nakon što jednom navede adresu svog Resend naloga za primaoca. Adresa primaoca se ne može izvesti iz API ključa i ne nagađa se.
-- Hero na `/saradnja` govori firmama: dostava za pravna lica u Jagodini i okolini, danas-za-odmah / danas-za-danas ili ugovor, dugoročna saradnja, poziv na `DISPLAY_PHONE`. Nije katalog pekara/restorana.
+- Hero na `/saradnja` govori firmama: dostava za pravna lica u Jagodini i okolini, danas-za-odmah / danas-za-danas ili ugovor, dugoročna saradnja, poziv na `DISPLAY_PHONE`. B2B tekst koristi persiranje velikim slovom (`Vam`, `Vaše`). Nije katalog pekara/restorana.
 - Cena i uslovi saradnje dogovaraju se telefonom.
 - Nalozi i pristup aplikaciji za firme dodaju se naknadno.
 - Katalog partnera i tabela `partners` nisu deo ove izmene.

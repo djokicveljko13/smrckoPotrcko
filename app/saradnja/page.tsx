@@ -57,7 +57,7 @@ export default function PartnershipPage() {
           </p>
           <p>
             Nudimo zaključivanje ugovora o dugoročnoj saradnji uz povoljnije
-            uslove za firme. Stojimo vam na raspolaganju za sve vaše poslovne
+            uslove za firme. Stojimo Vam na raspolaganju za sve Vaše poslovne
             potrebe.
           </p>
           <p>
