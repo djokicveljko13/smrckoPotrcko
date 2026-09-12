@@ -1,12 +1,11 @@
-import { DISPLAY_PHONE } from "@/lib/contact";
+import { DISPLAY_PHONE, WORKING_HOURS_LABEL } from "@/lib/contact";
 
 /*
- * Broj se ne prekucava — dolazi iz lib/contact.ts, isto mesto odakle ga čita
- * kontakt na dnu. Da se broj promeni, menja se na jednom mestu.
+ * Broj i radno vreme se ne prekucavaju — dolaze iz lib/contact.ts.
  */
 const ANNOUNCEMENT =
   `Brza dostava u Jagodini i do 30 km oko grada • Naruči bilo šta • ` +
-  `Mi trčimo umesto tebe • Poruči online ili pozovi ${DISPLAY_PHONE}`;
+  `Radimo ${WORKING_HOURS_LABEL} • Poruči online ili pozovi ${DISPLAY_PHONE}`;
 
 /*
  * Jedna polovina trake: poruka dva puta, da na širokom ekranu nema praznine.

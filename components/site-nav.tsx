@@ -8,12 +8,13 @@ import { BrandLogo } from "@/components/brand-logo";
 const NAV_LINKS = [
   { href: "/", label: "Poruči" },
   { href: "/kupovina", label: "Kupovina" },
+  { href: "/cena", label: "Cena" },
   { href: "/saradnja", label: "Saradnja" },
 ];
 
 export function SiteNav() {
   const pathname = usePathname();
-  const showLogo = pathname === "/saradnja" || pathname === "/kupovina";
+  const showLogo = pathname === "/saradnja" || pathname === "/kupovina" || pathname === "/cena";
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export function SiteNav() {
           : "bg-transparent text-white"
       }`}
     >
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-end gap-4 px-4">
+      <div className="mx-auto flex min-h-16 w-full max-w-6xl flex-wrap items-center justify-end gap-x-3 gap-y-1 px-4 py-1.5 sm:gap-x-6">
         {showLogo ? (
           <Link
             href="/"
@@ -46,12 +47,12 @@ export function SiteNav() {
             <BrandLogo className="h-auto w-24 sm:w-28" onColor={!scrolled} priority />
           </Link>
         ) : null}
-        <nav aria-label="Glavna navigacija" className="flex items-center gap-6">
+        <nav aria-label="Glavna navigacija" className="flex items-center gap-4 sm:gap-6">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`border-b-2 py-2 font-display text-base font-extrabold ${
+              className={`border-b-2 py-2 text-center font-display text-base font-extrabold leading-tight ${
                 pathname === link.href
                   ? scrolled
                     ? "border-brand"
@@ -60,6 +61,11 @@ export function SiteNav() {
               }`}
             >
               {link.label}
+              {link.href === "/saradnja" ? (
+                <span className="mt-0.5 block text-xs font-extrabold leading-none tracking-normal">
+                  (za privatna lica)
+                </span>
+              ) : null}
             </Link>
           ))}
         </nav>

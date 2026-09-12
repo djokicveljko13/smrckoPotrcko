@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { DeliveryAnimation } from "@/components/delivery-animation";
 import { ModalShell } from "@/components/modal-shell";
 import { DISPLAY_PHONE, TEL_URL } from "@/lib/contact";
+import { ADDRESS_DETAILS_LABEL } from "@/lib/labels";
 import { deliveryPriceLabel } from "@/lib/pricing";
 import type { ShoppingQuote } from "@/lib/shopping-quote";
 import { primaryButtonClass, secondaryButtonClass } from "@/lib/ui";
@@ -101,7 +102,7 @@ export function ShoppingConfirmation({
           </div>
           {quote.addressDetails ? (
             <div>
-              <dt className="text-xs font-bold text-zinc-500">Sprat, stan, ulaz</dt>
+              <dt className="text-xs font-bold text-zinc-500">{ADDRESS_DETAILS_LABEL}</dt>
               <dd className="mt-0.5 font-semibold">{quote.addressDetails}</dd>
             </div>
           ) : null}

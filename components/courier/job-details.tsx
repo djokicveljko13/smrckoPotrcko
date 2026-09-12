@@ -33,7 +33,7 @@ export function CourierJobDetails({ job }: { job: CourierJob }) {
             </dd>
           </div>
         ) : null}
-        {isShopping && job.shopping_note ? (
+        {job.shopping_note ? (
           <div>
             <dt className="inline text-zinc-500">Napomena: </dt>
             <dd className="inline whitespace-pre-wrap">{job.shopping_note}</dd>

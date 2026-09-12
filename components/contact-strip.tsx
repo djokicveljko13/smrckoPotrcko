@@ -1,9 +1,12 @@
-import { PhoneIcon, ViberIcon, WhatsAppIcon } from "@/components/icons";
+import { FacebookIcon, InstagramIcon, PhoneIcon, ViberIcon, WhatsAppIcon } from "@/components/icons";
 import {
   DISPLAY_PHONE,
+  FACEBOOK_URL,
+  INSTAGRAM_URL,
   TEL_URL,
   VIBER_URL,
   WHATSAPP_URL,
+  WORKING_HOURS_LABEL,
 } from "@/lib/contact";
 import { secondaryButtonClass } from "@/lib/ui";
 
@@ -36,6 +39,9 @@ export function ContactStrip() {
         >
           {DISPLAY_PHONE}
         </a>
+        <p className="mt-1 text-sm font-bold text-ink">
+          Radimo svaki dan {WORKING_HOURS_LABEL}
+        </p>
         <p className="mt-1 text-sm font-semibold text-zinc-500">
           Dostupni smo i na WhatsApp-u i Viber-u.
         </p>
@@ -56,6 +62,26 @@ export function ContactStrip() {
           <a href={VIBER_URL} className={actionClass}>
             <ViberIcon />
             Viber
+          </a>
+        </div>
+        <div className="mt-2 flex w-full max-w-lg gap-2">
+          <a
+            href={FACEBOOK_URL}
+            className={actionClass}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FacebookIcon />
+            Facebook
+          </a>
+          <a
+            href={INSTAGRAM_URL}
+            className={actionClass}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <InstagramIcon />
+            Instagram
           </a>
         </div>
       </div>

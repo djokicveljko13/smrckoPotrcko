@@ -1,5 +1,8 @@
 import type { OrderSource, OrderStatus } from "@/lib/types";
 
+/** Opciono polje u javnim formama — redosled kako ga kupac čita na zgradi. */
+export const ADDRESS_DETAILS_LABEL = "Ulaz, sprat, stan";
+
 export const SOURCE_LABEL: Record<OrderSource, string> = {
   sajt: "Sa sajta",
   telefon: "Sa telefona",

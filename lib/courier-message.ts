@@ -57,6 +57,9 @@ export function buildCourierMessage(order: MessageOrder): string {
       `Adresa: ${order.address}`,
       `Telefon kupca: ${order.phone}`,
     );
+    if (order.shopping_note) {
+      lines.push(`Napomena: ${order.shopping_note}`);
+    }
     if (order.distance_m !== null && order.distance_m !== undefined) {
       lines.push(`Razdaljina: ${distanceLabel(order.distance_m)}`);
     }

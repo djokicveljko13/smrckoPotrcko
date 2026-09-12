@@ -8,7 +8,7 @@ Status: izrada u toku. Pravila od 07.09.2026. ispod zamenjuju stari tok slanja b
 ## Cena i potvrda javne porudžbine (07.09.2026)
 
 - Oba polja zahtevaju izbor Google predloga (klik ili tastatura). Svaka izmena teksta poništava izbor. Originalni tekst i Google ID vezani su serverskim HMAC-SHA256 potpisom; server proverava oba izbora.
-- Opciono polje „Sprat, stan, ulaz” ima najviše 150 znakova; dopisuje se adresi na serveru, bez nove kolone.
+- Opciono polje „Ulaz, sprat, stan” ima najviše 150 znakova; dopisuje se adresi na serveru, bez nove kolone. Padajuća lista predloga mora da se skroluje na telefonu — izbor je tap, ne početak dodira, da se poslednji predlog ne seče.
 - „Poruči” samo proverava podatke i računa cenu. Popup prikazuje cenu dostave, opis, obe adrese i telefon. U delu za cenu stoje samo „Cena dostave” i iznos, bez napomena o robi i plaćanju.
 - Server vraća potpisanu ponudu sa proverenim unosom, cenom, metrima i rokom od 15 minuta. Čuva se samo u memoriji browsera. `ORDER_SIGNING_SECRET` je poseban serverski ključ u `.env.local` i Vercel okruženjima, nikad `NEXT_PUBLIC_`.
 - Tek „Potvrdi porudžbinu” proverava potpis i rok i zove postojeći `create_web_order`. Nema novog Routes poziva niti prihvatanja cene iz nepotpisanog polja. Dodela/Telegram ostaju iza upisa.
@@ -16,6 +16,7 @@ Status: izrada u toku. Pravila od 07.09.2026. ispod zamenjuju stari tok slanja b
 - Greška Google-a ili nedostupna ruta blokiraju slanje; podaci ostaju i nude se ponovni pokušaj i poziv 066 59 355 35. Istekla ponuda zahteva novi obračun i novu potvrdu.
 - Nativni `<dialog>` prati postojeći dizajn. „Izmeni podatke”, Escape i pozadina ga zatvaraju, čuvaju formu i poništavaju ponudu. Fokus se vraća na „Poruči”. Unos je zaključan tokom obračuna, a zatvaranje i dupli klikovi tokom potvrde.
 - Obračun ostaje firma → kupac i postojeći cenovnik. `locationBias` daje prednost okolini Jagodine, ali nije stroga granica područja dostave.
+- Javni `/cena` koristi isti Places izbor i isti Routes + formulu, bez upisa porudžbine. „Odakle” se bira iz liste kao na formi, ali kilometraža i dalje ide samo do odredišta.
 - Samo javni sajt, bez promena baze ili telefonskog unosa. Potpis nije trajna evidencija jednokratne upotrebe ponude.
 
 Provera ove faze: potpisi i rok, obe adrese, Google greška, bez upisa pre potvrde, ista cena u potvrdi i upisu, detalji stana, dvoklik, mobilni prikaz i tastatura. Testovi koriste zamene za Google, bazu i Telegram.
@@ -139,7 +140,7 @@ po formi) ostajemo duboko unutar besplatnog.
 | Ruta | firma → kupac (radnja se ne uračunava) |
 | Formula | `start + 80 × km` (start 100/200/300/400 po razdaljini); kupovina fiksna po lancu |
 | Unos adrese | Places Autocomplete, kupac bira iz liste |
-| Kad kupac vidi cenu | u popup-u pre potvrde, zatim opet na `/hvala` |
+| Kad kupac vidi cenu | u popup-u pre potvrde, na `/hvala`, i na javnom `/cena` (samo adrese, bez upisa) |
 | Google zakaže | javna porudžbina **ne prolazi**; ponovni pokušaj ili poziv |
 | Ručna izmena | samo kad cena nedostaje (nema popusta na izračunatu) |
 | Zona | briše se iz forme, kolona ostaje zbog starih redova |
@@ -331,20 +332,10 @@ vlasnik — kupac može da prepravi URL, ali time ništa ne menja.
   `revalidatePath("/admin")`. Isti obrazac kao `app/actions/assign-courier.ts`.
 - **`app/admin/page.tsx`** linija 11 — dodaj nove kolone u `select`.
 
-## Faza 6 — Telefonski unos (nova funkcionalnost, može da se odloži)
+## Faza 6 — Telefonski unos
 
-⚠️ **Ovo je više od izmene cene.** Forma „Nova porudžbina" na tabli **ne postoji**
-u kodu — `source: "telefon"` živi samo kao tip u `lib/types.ts:2` i PG enum. To je
-faza 5 iz `AGENTS.md` i nije napisana.
-
-Ako se radi sada: `components/admin/new-order-form.tsx` +
-`app/actions/create-phone-order.ts`, koji koriste **istu** `AddressAutocomplete`
-komponentu i istu `computeDistanceMeters` + `deliveryPriceFromMeters` logiku,
-samo sa `source = 'telefon'`, bez mejla i bez `/hvala`. Vlasnik pročita cenu kupcu
-na vezi.
-
-Ako se odlaže: faze 1-5 su celovite i ništa se ne baca — telefonski unos kasnije
-nasledi gotovu logiku.
+Urađeno 12.09.2026: `/admin/nova`, `create_phone_order` (izvor `telefon`),
+ista `prepareGuestOrder` + potvrda cene, bez `/hvala` i bez mejla.
 
 ## Faza 7 — Dokumentacija i env
 

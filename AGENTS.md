@@ -39,22 +39,24 @@ Ostala dva sajta iz ponude (Food of Šmrk, perionica) **ne radimo**.
 
 ## Izgled hero sekcije
 
-- Početna, `/saradnja` i `/kupovina` koriste zajednički završetak hero sekcije u obliku jasno vidljive pocepane ivice papira, bez dijagonale i linija brzine.
+- Početna, `/saradnja`, `/kupovina` i `/cena` koriste zajednički završetak hero sekcije u obliku jasno vidljive pocepane ivice papira, bez dijagonale i linija brzine.
 - Ivica kombinuje veće nepravilne useke i sitnije neravnine, sa tankim svetlim slojem koji naglašava cepanje. Telefon ima jednostavniji crtež sa krupnim detaljima. Dekoracija je statična i povezuje hero sa izgledom porudžbenice.
-- Crvena pozadina i pocepana ivica su iste na sve tri strane. Sadržaj i animacije hero-a su isti na početnoj i `/saradnja`; `/kupovina` ima svoj raspored (vidi odeljak **Kupovina**).
+- Crvena pozadina i pocepana ivica su iste na sve četiri strane. Sadržaj i animacije hero-a su isti na početnoj i `/saradnja`; `/kupovina` i `/cena` imaju svoj raspored (vidi odeljke **Kupovina** i **Kalkulator cene**).
 
 ## Saradnja — B2B upit
 
 - Javna stranica `/saradnja` namenjena je firmama kojima treba dostava.
-- Navigacija na `/` , `/kupovina` i `/saradnja` ima linkove „Poruči“, „Kupovina“ i „Saradnja“.
-- Navigacija na `/saradnja` i `/kupovina` prikazuje `BrandLogo` levo, kao link ka `/`; linkovi ostaju desno. Stranice koriste isti centrirani kontejner `max-w-6xl` sa `px-4`, bez razvlačenja navigacije preko celog ekrana. Na početnoj nema logotipa u navigaciji, logo ostaje u hero sekciji.
+- Navigacija na `/` , `/kupovina`, `/cena` i `/saradnja` ima linkove „Poruči“, „Kupovina“, „Cena“ i „Saradnja“. Uz „Saradnja” stoji sitnije „(za privatna lica)”.
+- Navigacija na `/saradnja`, `/kupovina` i `/cena` prikazuje `BrandLogo` levo, kao link ka `/`; linkovi ostaju desno. Stranice koriste isti centrirani kontejner `max-w-6xl` sa `px-4`, bez razvlačenja navigacije preko celog ekrana. Na početnoj nema logotipa u navigaciji, logo ostaje u hero sekciji.
 - Linkovi navigacije koriste Archivo, 16 px, debljinu 800 radi bolje uočljivosti.
 - Navigacija je fiksirana preko hero sekcije: na vrhu providna sa belim slovima, posle 40 px skrola bela sa tamnim slovima i blagom senkom. Hero zadržava punu visinu ekrana i gornji razmak za navigaciju.
+- Javne stranice imaju fiksno belo kružno dugme sa crvenim okvirom u donjem levom uglu: beli/crveni telefon, `tel:` ka `DISPLAY_PHONE`. Ostaje vidljivo tokom skrola i nestaje kad `<footer>` uđe u ekran. Nema ga na `/admin`, `/prijava`, `/k/…`.
 - Firma ostavlja naziv firme, telefon i opcionu poruku.
 - Upit se šalje vlasniku na mejl preko Resend-a; ne čuva se u bazi.
 - Primalac upita za saradnju je `potrckosmrcko@gmail.com`, podešen preko `PARTNERSHIP_EMAIL_TO`.
 - Slanje za saradnju koristi serverski `fetch` i `RESEND_API_KEY`, `EMAIL_FROM`, `PARTNERSHIP_EMAIL_TO`. Bez konfiguracije ili uspešnog odgovora Resend-a prikazuje se greška, i lokalno; unos ostaje sačuvan. Tokom slanja dugme je zaključano, a uspeh se prikazuje u formi. Ova faza ne uključuje mejlove za porudžbine.
 - Za početni Resend test pošiljalac podrazumevano koristi `Šmrčko Potrčko <onboarding@resend.dev>`. Agent priprema lokalnu konfiguraciju; vlasnik unosi samo API ključ nakon što jednom navede adresu svog Resend naloga za primaoca. Adresa primaoca se ne može izvesti iz API ključa i ne nagađa se.
+- Hero na `/saradnja` govori firmama: dostava za pravna lica u Jagodini i okolini, danas-za-odmah / danas-za-danas ili ugovor, dugoročna saradnja, poziv na `DISPLAY_PHONE`. Nije katalog pekara/restorana.
 - Cena i uslovi saradnje dogovaraju se telefonom.
 - Nalozi i pristup aplikaciji za firme dodaju se naknadno.
 - Katalog partnera i tabela `partners` nisu deo ove izmene.
@@ -66,7 +68,7 @@ Druga usluga pored klasične dostave: kurir **ode u market i kupi** sa liste, ne
 
 - Javna ruta `/kupovina` + dve kartice na početnoj („Donesi mi nešto” / „Potrčko ide u kupovinu”).
 - Navigacija ima link „Kupovina”; na `/kupovina` (kao na `/saradnja`) stoji `BrandLogo` levo.
-- Hero `/kupovina` je u dve kolone: levo kosi naslov „POTRČKO IDE U KUPOVINU”, podnaslov „Ti napiši listu, mi donosimo.” i dugme „Napravi listu” koje skroluje na formu (`#kupovina-forma`); desno statična ilustracija bloka „Moja lista” (papir sa krpicom, prazni kvadratići i linije, doodle korpa i kesa). Ilustracija je kodirana HTML/CSS + mali inline SVG, bez slikovnih fajlova; na telefonu ide ispod teksta. Crvena pozadina i pocepana ivica ostaju.
+- Hero `/kupovina` je u dve kolone: levo kosi naslov „POTRČKO IDE U KUPOVINU”, podnaslov „Ti napiši listu, mi donosimo.” i dugme „Napravi listu” koje skroluje na formu (`#kupovina-forma`); desno statična ilustracija bloka „Moja lista” (papir sa krpicom i primerima: Imlek Moja kravica mleko 1.5 l, Persil prašak, Coca cola zero 1l, Chipsy čips). Ilustracija je kodirana HTML/CSS + mali inline SVG, bez slikovnih fajlova; na telefonu ide ispod teksta. Crvena pozadina i pocepana ivica ostaju.
 - Ukrasi oko `ShoppingListArt` prate referencu: tanka, bledoružičasta ručno crtana kolica levo i nakrivljena kesa sa zelenilom, flašom i bagetom desno; diskretne crtice oko papira. Oba crteža su potpuno vidljiva izvan papira, sa malim razmakom; na telefonu se smanjuju uz rezervisan prostor sa strane. SVG bez ispune, sa zaobljenim potezima i providnošću na celom crtežu.
 - Logotipi lanaca stoje u `public/prodavnice/` (`maxi.jpg`, `roda.jpg`, `idea.jpg`, `lidl.webp`); putanje su u `SHOPPING_STORES` (`lib/pricing.ts`). `StorePicker` na grešku učitavanja pada na tekstualni naziv.
 - Dugme za slanje liste je zaključano dok sva obavezna polja nisu popunjena: izabran lanac, bar jedna stavka na listi, adresa izabrana iz predloga, telefon. Dugme prosto ne reaguje dok forma nije kompletna — ne otvara popup da bi reklo šta fali.
@@ -79,6 +81,16 @@ Druga usluga pored klasične dostave: kurir **ode u market i kupi** sa liste, ne
 - Telefonski unos kupovine na tabli i čekiranje stavki kod kurira **nisu** sada.
 - Plan izrade: `docs/featureNamirnice.md`.
 
+## Kalkulator cene
+
+Javna stranica `/cena` (tab „Cena”) da kupac vidi cenu **pre** porudžbine, bez telefona i bez upisa u bazu. Besplatna Google kvota (10.000 Places + 10.000 Routes mesečno) to pokriva — kalkulator samo troši iste SKU-ove kao forma.
+
+- Hero: naslov „Izračunaj cenu dostave”, podnaslov „Piši odakle i dokle. Cena je ista kao kad poručiš.”, dugme skroluje na formu (`#cena-forma`). Crvena pozadina i pocepana ivica kao na ostalim javnim stranama. Na `/cena` stoji `BrandLogo` levo. Iznad polja nema dodatnog naslova ni uvoda.
+- Samo dva polja: **„Odakle preuzimamo?”** i **„Gde donosimo?”**, isti Places izbor kao na početnoj. Dugme „Izračunaj cenu” je zaključano dok oba predloga nisu izabrana.
+- Server proverava oba potpisana predloga, pa zove isti `computeDistanceMeters` (firma → odredište) i istu `deliveryPriceFromMeters`. Polje „odakle” ne menja kilometražu — kao na porudžbini. Nema HMAC ponude, nema popup-a, nema upisa, nema mejla ni Telegrama.
+- Prikaz: samo „Cena dostave”, iznos, i dve izabrane adrese. Bez napomena o plaćanju. „Poruči ovu dostavu” vodi na `/#poruci` i unapred popuni ista dva Places izbora (sessionStorage u ovom tabu). Kupovina (`/kupovina`) ovde nije — tamo je fiksna cena po lancu.
+- Google greška: unos ostaje, ponovni pokušaj ili poziv `DISPLAY_PHONE`.
+
 ## Tech stack
 
 Jedna aplikacija, ne dva frontenda.
@@ -90,6 +102,8 @@ Jedna aplikacija, ne dva frontenda.
 - **Telegram bot** — javlja kuriru novu ponudu. WhatsApp je **izbačen** (ne koristi se)
 
 Env: `.env.local`, nikad na git. Anon ključ sme u klijent; service role **samo** na serveru.
+
+Javni broj: **066 59 355 35**. Radno vreme **08:00–23:00** (svaki dan) stoji u kontakt traci ispod broja i u crvenoj traci na dnu. Forma se **ne** zatvara van termina. Ispod Pozovi / WhatsApp / Viber stoje linkovi ka [Facebook](https://www.facebook.com/p/Potrcko-Smrcko-61555618102564/) i [Instagram](https://www.instagram.com/smrckopotrcko/).
 
 ## Ko sme šta
 
@@ -115,7 +129,7 @@ Google login i sačuvane adrese **nisu V1**.
 
 Polja: **naziv** (šta treba), **radnja** (na sajtu izbor Places predloga, čuva se kao tekst), **adresa** (bira se iz Places predloga), **telefon** (obavezan), **izvor** (`sajt` \| `telefon` — kako je porudžbina ušla), **cena_dostave** (server računa `start + 80 × km` po razredima ispod; javna porudžbina ne prolazi bez cene, stari `NULL` redovi ostaju za ručni unos), **distance_m** (metri firma → kupac), **destination_place_id** (Google ID adrese), **status**, **javni broj** (npr. P-17), **kurir**, **vreme dodele**, **kurirski token** (dugačak, nije P-17). Kolona **zona** (`grad` \| `van_grada`) ostaje u bazi zbog starih redova, ali se više ne popunjava. Izvor istine za cenu: `docs/featureGoogleMaps.md`.
 
-Nema liste partnera, nema posebnog polja napomena u V1 (može ući u naziv).
+Nema liste partnera. Opciono polje **napomena za Potrčka** (do 500 znakova) stoji na javnoj formi, unosu sa table i kupovini; čuva se u `shopping_note` i ide kuriru (Telegram, `/k/{token}`, tabla).
 
 ### Cena dostave (12.09.2026)
 
@@ -139,10 +153,10 @@ Primeri: 1,6 km → 100 + 128 = 228 din; 5 km → 200 + 400 = 600 din; 10 km →
 
 ### Cena i potvrda javne porudžbine (07.09.2026)
 
-- Dugme „Poruči” na početnoj je onemogućeno dok nisu popunjeni opis i telefon i izabrana oba Google predloga (preuzimanje i odredište), isto kao kod kupovine. Samo razmaci ne računaju se kao unos; promena teksta adrese poništava izbor i ponovo zaključava dugme. Nepotpuna forma ne pokreće obračun ni popup, ni klikom ni Enterom. „Sprat, stan, ulaz” ostaje opciono.
+- Dugme „Poruči” na početnoj je onemogućeno dok nisu popunjeni opis i telefon i izabrana oba Google predloga (preuzimanje i odredište), isto kao kod kupovine. Samo razmaci ne računaju se kao unos; promena teksta adrese poništava izbor i ponovo zaključava dugme. Nepotpuna forma ne pokreće obračun ni popup, ni klikom ni Enterom. „Ulaz, sprat, stan” ostaje opciono.
 - „Poruči” proverava formu i računa cenu, bez upisa i obaveštenja. Popup prikazuje cenu, opis, obe adrese i telefon. U delu za cenu stoje samo „Cena dostave” i iznos, bez napomena o robi i plaćanju.
 - Tek „Potvrdi porudžbinu” upisuje red, pokreće postojeću dodelu/Telegram i animaciju, pa vodi na `/hvala` sa brojem i istom cenom.
-- „Sprat, stan, ulaz” je opciono polje do 150 znakova; server ga dopisuje postojećoj adresi. Nema nove kolone.
+- „Ulaz, sprat, stan” je opciono polje do 150 znakova; server ga dopisuje postojećoj adresi. Nema nove kolone.
 - Server potpisuje Google ID i tekst svakog predloga, pa proverava oba izbora. Potpisana ponuda vezuje proverene podatke, cenu, kilometražu i rok od 15 minuta; potvrda ne zove ponovo Google. Koristi se HMAC-SHA256 i serverski `ORDER_SIGNING_SECRET`.
 - Bez uspešnog obračuna nema slanja: sačuvaj unos, ponudi ponovni pokušaj i poziv 066 59 355 35. Istekla ponuda traži novi obračun i novu potvrdu.
 - Popup se zatvara dugmetom „Izmeni podatke”, Escape-om ili klikom na pozadinu; unos ostaje, prethodna ponuda se poništava. Tokom obračuna unos je zaključan, tokom potvrde i zatvaranje i dupli klikovi su blokirani.
@@ -157,7 +171,7 @@ Danas klijent živi od telefona. Sajt **neće** ugasiti pozive. Javni broj vlasn
 Zato postoje **dva ulaza u istu tabelu** `orders`, ne dva sistema:
 
 1. **Sajt** — kupac sam popuni javnu formu (`izvor = sajt`). Dobije hvala + broj. Vlasniku stigne mejl (nije pored ekrana).
-2. **Telefon** — kupac zove, kaže šta želi. Vlasnik na tabli otvori **„Nova porudžbina“** i upiše ista polja dok razgovara (`izvor = telefon`). Nema stranice hvala za kupca (već je na vezi). **Mejl vlasniku se ne šalje** — već je na tabli i na telefonu; dupli signal smeta.
+2. **Telefon** — kupac zove, kaže šta želi. Vlasnik na tabli otvori **„Unesi porudžbinu“** (`/admin/nova`) i upiše ista polja dok razgovara (`izvor = telefon`). Nema stranice hvala za kupca (već je na vezi). **Mejl vlasniku se ne šalje** — već je na tabli i na telefonu; dupli signal smeta.
 
 Od tog trenutka tok je **isti**: auto-dodela kurira → Telegram ponuda → kurirski link → statusi. Kurir ne mora da zna da li je naručeno sa sajta ili pozivom.
 
@@ -174,10 +188,10 @@ Zašto ne posebna tabela „telefonske“: dupli kod, dupli izveštaji, lako da 
 
 **B — kupac zove vlasnika**
 
-1. Vlasnik (ulogovan) na tabli: Nova porudžbina.
-2. Upiše naziv, radnju, adresu (isti Places izbor kao na sajtu), telefon.
+1. Vlasnik (ulogovan) otvori **Unesi porudžbinu** (`/admin/nova`).
+2. Upiše naziv, radnju, adresu (isti Places izbor kao na sajtu), telefon kupca. Server računa cenu; vlasnik vidi pregled pa potvrdi.
 3. Insert u `orders` (`izvor = telefon`) + broj. Broj može da pročita kupcu na vezi ako zatreba.
-4. Bez mejla, bez javne hvala-stranice.
+4. Bez mejla, bez javne hvala-stranice. Ostaje na `/admin/nova` sa brojem, pa može odmah sledeći poziv.
 
 **Zajednički nastavak (A i B)**
 
@@ -209,7 +223,7 @@ Ručna dodela je obična ponuda: Telegram stiže, kurir sme da odbije.
 2. Tabele `orders`, `couriers` + RLS
 3. Forma + hvala + broj
 4. Login + tabla sa F5
-5. **Unos sa poziva** na tabli (ista polja, `izvor = telefon`, bez mejla)
+5. **Unos sa poziva** na tabli (`/admin/nova`, ista polja, `izvor = telefon`, bez mejla)
 6. Lista kurira + smena + izbor
 7. Auto-dodela kurira + Telegram ponuda (zamenilo `wa.me`)
 8. Kurirski link + statusi

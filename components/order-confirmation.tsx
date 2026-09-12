@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { DeliveryAnimation } from "@/components/delivery-animation";
 import { ModalShell } from "@/components/modal-shell";
 import { DISPLAY_PHONE, TEL_URL } from "@/lib/contact";
+import { ADDRESS_DETAILS_LABEL } from "@/lib/labels";
 import { deliveryPriceLabel } from "@/lib/pricing";
 import type { OrderQuote } from "@/lib/order-types";
 import { primaryButtonClass, secondaryButtonClass } from "@/lib/ui";
@@ -49,7 +50,8 @@ export function OrderConfirmation({ quote, calculating, sending, error, invalidQ
             ["Šta donosimo", quote.order.title],
             ["Odakle preuzimamo", quote.order.shop],
             ["Gde donosimo", quote.order.address],
-            ...(quote.order.addressDetails ? [["Sprat, stan, ulaz", quote.order.addressDetails]] : []),
+            ...(quote.order.addressDetails ? [[ADDRESS_DETAILS_LABEL, quote.order.addressDetails]] : []),
+            ...(quote.order.note ? [["Napomena za Potrčka", quote.order.note]] : []),
             ["Broj telefona", quote.order.phone],
           ].map(([label, value]) => (
             <div key={label}><dt className="text-xs font-bold text-zinc-500">{label}</dt><dd className="mt-0.5 whitespace-pre-wrap font-semibold">{value}</dd></div>

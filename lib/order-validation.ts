@@ -21,6 +21,9 @@ export function validPhone(value: unknown): value is string {
   return validText(value, 40) && /^[+\d\s()/-]+$/.test(value) && value.replace(/\D/g, "").length >= 6;
 }
 
+/** Ista granica kao napomena na kupovini. */
+export const MAX_ORDER_NOTE = 500;
+
 export function readPlace(token: string, text: string, max: number) {
   const place = asRecord(readOrderValue(token, "place"));
   if (!place || !validText(place.placeId, 300) || !validText(place.text, max) || place.text !== text) {

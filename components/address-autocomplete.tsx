@@ -12,6 +12,7 @@ type AddressAutocompleteProps = {
   placeholder?: string;
   maxLength?: number;
   error?: string;
+  initial?: { text: string; proof: string } | null;
   onSelect?: (selected: boolean) => void;
 };
 
@@ -23,10 +24,15 @@ export function AddressAutocomplete({
   placeholder = "Ulica i broj",
   maxLength = 400,
   error,
+  initial,
   onSelect,
 }: AddressAutocompleteProps) {
-  const [text, setText] = useState("");
-  const [selection, setSelection] = useState<AddressSuggestion | null>(null);
+  const [text, setText] = useState(initial?.text ?? "");
+  const [selection, setSelection] = useState<AddressSuggestion | null>(
+    initial?.text && initial.proof
+      ? { text: initial.text, placeId: initial.proof, proof: initial.proof }
+      : null,
+  );
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -40,6 +46,8 @@ export function AddressAutocomplete({
   const focused = useRef(false);
   const picking = useRef(false);
   const blurTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const touchMoved = useRef(false);
 
   useEffect(() => {
     inputRef.current?.setCustomValidity(selection ? "" : CHOOSE_ADDRESS);
@@ -218,7 +226,7 @@ export function AddressAutocomplete({
           id={listId}
           role="listbox"
           aria-label={label}
-          className="absolute z-30 mt-1 max-h-60 w-full overflow-y-auto rounded-2xl border-2 border-zinc-200 bg-white shadow-lg"
+          className="absolute z-30 mt-1 max-h-72 w-full overflow-y-auto overscroll-contain rounded-2xl border-2 border-zinc-200 bg-white shadow-lg [-webkit-overflow-scrolling:touch]"
         >
           {suggestions.map((suggestion, index) => (
             <li key={suggestion.placeId} role="presentation">
@@ -228,12 +236,36 @@ export function AddressAutocomplete({
                 role="option"
                 aria-selected={index === activeIndex}
                 tabIndex={-1}
-                onTouchStart={(event) => chooseSuggestion(event, suggestion)}
+                onTouchStart={(event) => {
+                  picking.current = true;
+                  touchStartY.current = event.touches[0]?.clientY ?? null;
+                  touchMoved.current = false;
+                }}
+                onTouchMove={(event) => {
+                  const startY = touchStartY.current;
+                  const y = event.touches[0]?.clientY;
+                  if (startY == null || y == null) return;
+                  if (Math.abs(y - startY) > 10) {
+                    touchMoved.current = true;
+                    picking.current = false;
+                  }
+                }}
+                onTouchEnd={(event) => {
+                  if (touchMoved.current) {
+                    touchStartY.current = null;
+                    return;
+                  }
+                  chooseSuggestion(event, suggestion);
+                }}
+                onTouchCancel={() => {
+                  picking.current = false;
+                  touchStartY.current = null;
+                }}
                 onMouseDown={(event) => {
                   if (event.button !== 0) return;
                   chooseSuggestion(event, suggestion);
                 }}
-                className={`block w-full cursor-pointer px-4 py-3.5 text-left text-sm font-medium text-ink [touch-action:manipulation] hover:bg-brand/10 ${
+                className={`block w-full cursor-pointer px-4 py-3.5 text-left text-sm font-medium text-ink [touch-action:pan-y] hover:bg-brand/10 ${
                   index === activeIndex ? "bg-brand/10" : ""
                 }`}
               >

@@ -122,7 +122,7 @@ test("stvarne akcije: priprema ne upisuje, potvrda mapira detalje stana u postoj
   assert.equal(confirmed.price, prepared.quote.price);
   assert.deepEqual(inserts, [{ p_title: "Dve pice", p_shop: pickup.text,
     p_address: `${destination.text}; ulaz B, 2. sprat, stan 8`, p_phone: "066 123 4567",
-    p_delivery_price: 260, p_distance_m: 2000, p_place_id: destination.placeId }]);
+    p_delivery_price: 260, p_distance_m: 2000, p_place_id: destination.placeId, p_note: null }]);
   assert.deepEqual(notifications, ["P-19"]); assert.equal(googleCalls, 1);
   assert.equal((await createGuestOrder(new FormData())).status, "error");
   assert.equal(inserts.length, 1);

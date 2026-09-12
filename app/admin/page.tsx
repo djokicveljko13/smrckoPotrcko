@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signOut } from "@/app/actions/auth";
+import { AdminNav } from "@/components/admin/admin-nav";
 import { OrderColumn } from "@/components/admin/order-column";
 import { RefreshButton } from "@/components/admin/refresh-button";
 import { requireOwner } from "@/lib/auth";
@@ -107,16 +108,16 @@ export default async function AdminPage() {
             Levo / gore je posao. Desno / dole je gotovo. Osveži ručno (F5).
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Link href="/admin/kuriri" className={secondaryButtonClass}>
-            Kuriri
-          </Link>
-          <RefreshButton />
-          <form action={signOut}>
-            <button type="submit" className={secondaryButtonClass}>
-              Odjavi se
-            </button>
-          </form>
+        <div className="flex flex-col items-stretch gap-2 sm:items-end">
+          <AdminNav current="/admin" />
+          <div className="flex items-center gap-2">
+            <RefreshButton />
+            <form action={signOut}>
+              <button type="submit" className={secondaryButtonClass}>
+                Odjavi se
+              </button>
+            </form>
+          </div>
         </div>
       </div>
 

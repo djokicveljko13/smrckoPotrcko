@@ -15,6 +15,7 @@ import {
 } from "@/components/shopping/shopping-paper";
 import { StorePicker } from "@/components/shopping/store-picker";
 import { DISPLAY_PHONE, TEL_URL } from "@/lib/contact";
+import { ADDRESS_DETAILS_LABEL } from "@/lib/labels";
 import { deliveryPriceLabel, findShoppingStore, type ShoppingStore } from "@/lib/pricing";
 import type {
   CreateShoppingOrderState,
@@ -205,7 +206,7 @@ export function ShoppingOrderForm() {
               />
               <div>
                 <label htmlFor="shopping_address_details" className={labelClass}>
-                  Sprat, stan, ulaz{" "}
+                  {ADDRESS_DETAILS_LABEL}{" "}
                   <span className="font-medium text-zinc-500">(opciono)</span>
                 </label>
                 <input

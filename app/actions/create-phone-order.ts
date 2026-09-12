@@ -1,18 +1,28 @@
-﻿"use server";
+"use server";
 
+import { revalidatePath } from "next/cache";
+import { requireOwner } from "@/lib/auth";
 import { confirmOrderQuote } from "@/lib/order-quote";
 import type { CreateGuestOrderState } from "@/lib/order-types";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendOfferForPublicNumber } from "@/lib/telegram";
 
-export async function createGuestOrder(token: string): Promise<Exclude<CreateGuestOrderState, null>> {
+/**
+ * Isti potpisani tok kao javna porudžbina, ali izvor je telefon.
+ * requireOwner je ulaz: gost ne sme da zove ovu akciju.
+ */
+export async function createPhoneOrder(
+  token: string,
+): Promise<Exclude<CreateGuestOrderState, null>> {
+  await requireOwner();
+
   try {
     if (typeof token !== "string") {
       return { status: "error", message: "Ponovo proveri cenu pre potvrde.", expired: true };
     }
-    return await confirmOrderQuote(token, async ({ order, price, distanceM }) => {
+    const result = await confirmOrderQuote(token, async ({ order, price, distanceM }) => {
       const admin = createSupabaseAdminClient();
-      const { data, error } = await admin.rpc("create_web_order", {
+      const { data, error } = await admin.rpc("create_phone_order", {
         p_title: order.title,
         p_shop: order.shop,
         p_address: order.addressDetails ? `${order.address}; ${order.addressDetails}` : order.address,
@@ -23,13 +33,15 @@ export async function createGuestOrder(token: string): Promise<Exclude<CreateGue
         p_note: order.note || null,
       });
       if (error || typeof data !== "string") {
-        console.error("create_web_order failed", error?.code ?? "invalid response");
+        console.error("create_phone_order failed", error?.code ?? "invalid response");
         return null;
       }
       return data;
     }, sendOfferForPublicNumber);
+    if (result.status === "ok") revalidatePath("/admin");
+    return result;
   } catch {
-    console.error("Order confirmation unavailable");
-    return { status: "error", message: "Slanje nije potvrđeno. Pozovi nas da proverimo porudžbinu pre ponovnog slanja." };
+    console.error("Phone order confirmation unavailable");
+    return { status: "error", message: "Porudžbina nije upisana. Pokušaj ponovo." };
   }
 }

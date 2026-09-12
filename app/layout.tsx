@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Archivo, Caveat, Plus_Jakarta_Sans } from "next/font/google";
+import { CallFab } from "@/components/call-fab";
 import "./globals.css";
 
 /*
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col bg-white font-sans text-ink">
         {children}
+        <CallFab />
       </body>
     </html>
   );

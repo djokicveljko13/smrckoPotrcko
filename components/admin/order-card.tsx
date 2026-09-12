@@ -84,7 +84,7 @@ export function OrderCard({ order, delivered = false, couriers }: Props) {
             </dd>
           </div>
         ) : null}
-        {order.order_type === "kupovina" && order.shopping_note ? (
+        {order.shopping_note ? (
           <div>
             <dt className="inline text-zinc-500">Napomena: </dt>
             <dd className="inline whitespace-pre-wrap">{order.shopping_note}</dd>

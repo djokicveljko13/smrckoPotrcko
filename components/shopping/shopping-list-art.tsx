@@ -7,9 +7,14 @@
  * šavove. Ovako se ceo crtež nacrta neprozirno pa se JEDNOM stopi sa crvenom —
  * bez šavova, i dobije se onaj svetliji crveni ton iz dizajna.
  *
- * Prazan string = red sa golom linijom; tekst = već upisana stavka.
+ * Primeri na papiru su namerno obične stavke iz marketa, ne generički „Mleko".
  */
-const ROWS = ["Mleko", "Jogurt", "Hleb", "Sapun", ""];
+const ROWS = [
+  "Imlek Moja kravica mleko 1.5 l",
+  "Persil prašak",
+  "Coca cola zero 1l",
+  "Chipsy čips",
+];
 
 export function ShoppingListArt() {
   return (
@@ -32,17 +37,16 @@ export function ShoppingListArt() {
         </p>
         <span className="mt-2 block h-[3px] w-32 rounded-full bg-brand" />
 
-        <ul className="mt-6 space-y-4">
+        <ul className="mt-6 space-y-3">
           {ROWS.map((label, index) => (
             <li key={index} className="flex items-end gap-3">
               <span className="mb-1.5 h-[18px] w-[18px] shrink-0 rounded-[5px] border-2 border-zinc-300" />
               {/*
                 Tekst i linija su ISTI element: linija je donja ivica (border-b),
-                pa reč uvek sedi na njoj kao u svesci. Prazan red dobija razmak
-                ( ) da bi linija zadržala visinu.
+                pa reč uvek sedi na njoj kao u svesci.
               */}
-              <span className="min-w-0 flex-1 border-b border-zinc-200 pb-1 font-hand text-xl leading-tight text-ink">
-                {label || " "}
+              <span className="min-w-0 flex-1 border-b border-zinc-200 pb-1 font-hand text-base leading-snug text-ink sm:text-lg">
+                {label}
               </span>
             </li>
           ))}

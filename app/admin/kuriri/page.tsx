@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { CourierCreateForm } from "@/components/admin/courier-create-form";
 import { CourierRow } from "@/components/admin/courier-row";
+import { AdminNav } from "@/components/admin/admin-nav";
 import { requireOwner } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AdminCourier } from "@/lib/types";
@@ -52,12 +52,7 @@ export default async function CouriersPage() {
             Dodaj kurira, daj mu PIN i link. Smenu kurir pali sam.
           </p>
         </div>
-        <Link
-          href="/admin"
-          className="inline-flex items-center justify-center rounded-xl border-2 border-zinc-200 bg-white px-4 py-2.5 text-sm font-bold text-ink transition-colors hover:border-ink"
-        >
-          Nazad na tablu
-        </Link>
+        <AdminNav current="/admin/kuriri" />
       </div>
 
       <div className="mt-6">

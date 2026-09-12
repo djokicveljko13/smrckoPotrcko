@@ -1,6 +1,8 @@
-import { SiteNav } from "@/components/site-nav";
+import { AnnouncementBar } from "@/components/announcement-bar";
 import { HeroDivider } from "@/components/hero-divider";
 import { PartnershipForm } from "@/components/partnership-form";
+import { SiteNav } from "@/components/site-nav";
+import { DISPLAY_PHONE, TEL_URL } from "@/lib/contact";
 import { heroButtonClass } from "@/lib/ui";
 
 const OWN_COURIER_ITEMS = [
@@ -47,13 +49,28 @@ export default function PartnershipPage() {
 <span className="hero-title-accent">Mi trčimo za vas.</span>
         </h1>
 
-    <p className="hero-description mt-5 max-w-2xl">
-  Pekare, restorani, apoteke, cvećare, prodavnice. Vi radite svoj
-  posao, mi dostavljamo vašim kupcima.
-</p>
-<a href="#saradnja-forma" className={`${heroButtonClass} mt-8`}>
-  Dogovorimo saradnju
-</a>
+        <div className="hero-description mx-auto mt-5 max-w-2xl space-y-3 text-base sm:text-lg">
+          <p>
+            Šmrčko Potrčko vrši dostavu za pravna lica na teritoriji Jagodine i
+            okoline. Isporuku obavljamo po sistemu danas za odmah, danas za danas
+            ili po dogovorenom ugovoru.
+          </p>
+          <p>
+            Nudimo zaključivanje ugovora o dugoročnoj saradnji uz povoljnije
+            uslove za firme. Stojimo vam na raspolaganju za sve vaše poslovne
+            potrebe.
+          </p>
+          <p>
+            Popunite kontakt obrazac ili nas pozovite na{" "}
+            <a href={TEL_URL} className="underline decoration-white/70 underline-offset-4">
+              {DISPLAY_PHONE}
+            </a>
+            .
+          </p>
+        </div>
+        <a href="#saradnja-forma" className={`${heroButtonClass} mt-8`}>
+          Dogovorimo saradnju
+        </a>
         <HeroDivider />
       </section>
       <section className="px-4 py-16">
@@ -133,6 +150,8 @@ export default function PartnershipPage() {
           <PartnershipForm />
         </div>
       </section>
+
+      <AnnouncementBar />
     </main>
 
 

@@ -2,6 +2,7 @@ import { readOrderValue, signOrderValue } from "@/lib/order-signing";
 import { deliveryPriceFromMeters } from "@/lib/pricing";
 import {
   asRecord,
+  MAX_ORDER_NOTE,
   readPlace,
   readString,
   validPhone,
@@ -21,12 +22,14 @@ export async function prepareOrderQuote(
   const title = readString(formData, "title");
   const phone = readString(formData, "phone");
   const addressDetails = readString(formData, "address_details");
+  const note = readString(formData, "note");
   const shop = readPlace(readString(formData, "shop_selection"), readString(formData, "shop"), 300);
   const address = readPlace(readString(formData, "address_selection"), readString(formData, "address"), 400);
   const fields: Partial<Record<OrderField, string>> = {};
   if (!validText(title, 500)) fields.title = "Upiši šta naručuješ, najviše 500 znakova.";
   if (!validPhone(phone)) fields.phone = "Upiši ispravan broj telefona (najmanje 6 cifara).";
   if (!validText(addressDetails, 150, true)) fields.address_details = "Detalji adrese mogu imati najviše 150 znakova.";
+  if (!validText(note, MAX_ORDER_NOTE, true)) fields.note = `Napomena može imati najviše ${MAX_ORDER_NOTE} znakova.`;
   if (!shop) fields.shop = CHOOSE_ADDRESS;
   if (!address) fields.address = CHOOSE_ADDRESS;
   if (Object.keys(fields).length || !shop || !address) {
@@ -38,7 +41,7 @@ export async function prepareOrderQuote(
     return { status: "error", message: "Cena dostave trenutno nije dostupna. Pokušaj ponovo ili nas pozovi." };
   }
   const quote: OrderQuote = {
-    order: { title, shop: shop.text, address: address.text, addressDetails, phone, destinationPlaceId: address.placeId },
+    order: { title, shop: shop.text, address: address.text, addressDetails, note, phone, destinationPlaceId: address.placeId },
     distanceM,
     price: deliveryPriceFromMeters(distanceM),
     expiresAt: now() + QUOTE_TTL_MS,
@@ -50,6 +53,7 @@ function isOrderDetails(value: unknown): value is OrderDetails {
   const order = asRecord(value);
   return Boolean(order && validText(order.title, 500) && validText(order.shop, 300) &&
     validText(order.address, 400) && validText(order.addressDetails, 150, true) &&
+    validText(order.note, MAX_ORDER_NOTE, true) &&
     validPhone(order.phone) && validText(order.destinationPlaceId, 300));
 }
 

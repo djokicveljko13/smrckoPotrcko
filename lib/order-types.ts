@@ -6,6 +6,7 @@ export type OrderDetails = {
   shop: string;
   address: string;
   addressDetails: string;
+  note: string;
   phone: string;
   destinationPlaceId: string;
 };
@@ -17,7 +18,7 @@ export type OrderQuote = {
   expiresAt: number;
 };
 
-export type OrderField = "title" | "shop" | "address" | "address_details" | "phone";
+export type OrderField = "title" | "shop" | "address" | "address_details" | "note" | "phone";
 
 export type PrepareOrderResult =
   | { status: "ok"; quote: OrderQuote; token: string }
