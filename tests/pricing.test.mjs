@@ -2,31 +2,36 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { loadTypeScript } from "./load-typescript.mjs";
 
-const { deliveryPriceFromMeters, findShoppingStore } = loadTypeScript("lib/pricing.ts");
+const { deliveryPriceFromMeters, findShoppingStore, startFeeFromKm } = loadTypeScript("lib/pricing.ts");
 
-// Ulazi su metri iz Routes API-ja. Očekivanja su iz dogovorenog cenovnika.
+test("start fee bands follow the agreed distance ranges", () => {
+  assert.equal(startFeeFromKm(0), 100);
+  assert.equal(startFeeFromKm(4.999), 100);
+  assert.equal(startFeeFromKm(5), 200);
+  assert.equal(startFeeFromKm(9.999), 200);
+  assert.equal(startFeeFromKm(10), 300);
+  assert.equal(startFeeFromKm(15), 300);
+  assert.equal(startFeeFromKm(15.001), 400);
+});
+
+// Ulazi su metri iz Routes API-ja. Očekivanja su start + 80 × km.
 const cases = [
-  { meters: 0, rounded: 30, expected: 180 },
-  { meters: 125, rounded: 40, expected: 180 },
-  { meters: 126, rounded: 50, expected: 200 },
-  { meters: 250, rounded: 50, expected: 200 },
-  { meters: 251, rounded: 60, expected: 200 },
-  { meters: 1500, rounded: 150, expected: 200 },
-  { meters: 1501, rounded: 160, expected: 220 },
-  { meters: 2125, rounded: 200, expected: 220 },
-  { meters: 2126, rounded: 210, expected: 220 },
-  { meters: 2375, rounded: 220, expected: 220 },
-  { meters: 2376, rounded: 230, expected: 250 },
-  { meters: 2625, rounded: 240, expected: 250 },
-  { meters: 2750, rounded: 250, expected: 250 },
-  { meters: 2751, rounded: 260, expected: 300 },
-  { meters: 3700, rounded: 330, expected: 300 },
-  { meters: 5875, rounded: 500, expected: 300 },
-  { meters: 10875, rounded: 900, expected: 300 },
+  { meters: 0, expected: 100 },
+  { meters: 1600, expected: 228 },
+  { meters: 3700, expected: 396 },
+  { meters: 4999, expected: 500 },
+  { meters: 5000, expected: 600 },
+  { meters: 5875, expected: 670 },
+  { meters: 9999, expected: 1000 },
+  { meters: 10000, expected: 1100 },
+  { meters: 10875, expected: 1170 },
+  { meters: 15000, expected: 1500 },
+  { meters: 15001, expected: 1600 },
+  { meters: 16000, expected: 1680 },
 ];
 
-for (const { meters, rounded, expected } of cases) {
-  test(`${meters} m: rounded basis ${rounded} -> final ${expected} din`, () => {
+for (const { meters, expected } of cases) {
+  test(`${meters} m -> ${expected} din`, () => {
     assert.equal(deliveryPriceFromMeters(meters), expected);
   });
 }

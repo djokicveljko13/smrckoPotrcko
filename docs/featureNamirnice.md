@@ -2,7 +2,7 @@
 
 ## Context
 
-Šmrčko Potrčko danas zna samo jednu vrstu posla: *preuzmi nešto sa tačke A i donesi na tačku B*. Kupac upiše šta hoće, odakle, gde da se donese — i cena se izračuna iz kilometraže (`30 + 80 × km` → razredi 180–300 din).
+Šmrčko Potrčko danas zna samo jednu vrstu posla: *preuzmi nešto sa tačke A i donesi na tačku B*. Kupac upiše šta hoće, odakle, gde da se donese — i cena se izračuna iz kilometraže (`start + 80 × km`, vidi `docs/featureGoogleMaps.md`).
 
 Klijent sada uvodi drugu uslugu: **kurir ode u veliki market (Maxi, IDEA, Roda, Lidl) i sam kupi stvari sa kupčeve liste.** To je drugačiji posao — kurir ne preuzima gotov paket, već bira proizvode. Klijent za to ima **posebno dogovorenu, fiksnu cenu dostave**.
 

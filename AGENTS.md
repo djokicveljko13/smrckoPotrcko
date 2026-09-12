@@ -113,23 +113,22 @@ Google login i sačuvane adrese **nisu V1**.
 
 ## Porudžbina (tanka)
 
-Polja: **naziv** (šta treba), **radnja** (na sajtu izbor Places predloga, čuva se kao tekst), **adresa** (bira se iz Places predloga), **telefon** (obavezan), **izvor** (`sajt` \| `telefon` — kako je porudžbina ušla), **cena_dostave** (server računa `30 + 80 × km`, naviše na 10 din, pa primenjuje cenovne razrede ispod; javna porudžbina ne prolazi bez cene, stari `NULL` redovi ostaju za ručni unos), **distance_m** (metri firma → kupac), **destination_place_id** (Google ID adrese), **status**, **javni broj** (npr. P-17), **kurir**, **vreme dodele**, **kurirski token** (dugačak, nije P-17). Kolona **zona** (`grad` \| `van_grada`) ostaje u bazi zbog starih redova, ali se više ne popunjava. Izvor istine za cenu: `docs/featureGoogleMaps.md`.
+Polja: **naziv** (šta treba), **radnja** (na sajtu izbor Places predloga, čuva se kao tekst), **adresa** (bira se iz Places predloga), **telefon** (obavezan), **izvor** (`sajt` \| `telefon` — kako je porudžbina ušla), **cena_dostave** (server računa `start + 80 × km` po razredima ispod; javna porudžbina ne prolazi bez cene, stari `NULL` redovi ostaju za ručni unos), **distance_m** (metri firma → kupac), **destination_place_id** (Google ID adrese), **status**, **javni broj** (npr. P-17), **kurir**, **vreme dodele**, **kurirski token** (dugačak, nije P-17). Kolona **zona** (`grad` \| `van_grada`) ostaje u bazi zbog starih redova, ali se više ne popunjava. Izvor istine za cenu: `docs/featureGoogleMaps.md`.
 
 Nema liste partnera, nema posebnog polja napomena u V1 (može ući u naziv).
 
-### Cenovni razredi dostave (05.09.2026)
+### Cena dostave (12.09.2026)
 
-Prvo se izračuna osnovica `ceil((30 + 80 × km) / 10) × 10`, pa se jednom preslika u konačnu cenu:
+Svaka dostava je **start + (80 × km)**. Start zavisi samo od razdaljine firma → kupac, ne od robe. Nema više fiksnog dodatka od 30 din ni plafona od 300 din.
 
-| Zaokružena osnovica | Konačna cena dostave |
+| Razdaljina | Start |
 |---|---|
-| Manje od 50 din | 180 din |
-| Od 50 do uključujući 150 din | 200 din |
-| Preko 150 do uključujući 220 din | 220 din |
-| Preko 220 do uključujući 250 din | 250 din |
-| Preko 250 din | 300 din, fiksno i za veće udaljenosti |
+| Ispod 5 km | 100 din |
+| Od 5 km do ispod 10 km | 200 din |
+| Od 10 km do uključujući 15 km | 300 din |
+| Preko 15 km | 400 din |
 
-Razredi se odnose na obračun dostave, ne na vrednost kupljene robe. U bazu se upisuje konačna cena; ranije upisane porudžbine se ne preračunavaju. Javna forma ne šalje porudžbinu ako kilometraža ili cena nedostaju. Ručni unos cene ostaje za stare redove sa `NULL`.
+Primeri: 1,6 km → 100 + 128 = 228 din; 5 km → 200 + 400 = 600 din; 10 km → 300 + 800 = 1100 din; 16 km → 400 + 1280 = 1680 din. Iznos se zaokružuje na najbliži dinar. Kupovina iz marketa (`/kupovina`) ostaje fiksna po lancu, bez kilometraže. U bazu se upisuje konačna cena; ranije upisane porudžbine se ne preračunavaju. Javna forma ne šalje porudžbinu ako kilometraža ili cena nedostaju. Ručni unos cene ostaje za stare redove sa `NULL`.
 
 ### Predlozi adresa u javnoj formi (05.09.2026)
 
@@ -231,7 +230,7 @@ Ručna dodela je obična ponuda: Telegram stiže, kurir sme da odbije.
 ## Kako agent radi u ovom repo-u
 
 - Učenje je deo zadatka — vidi odeljak **Cilj učenja**.
-- Cena dostave: `30 + 80 × km`, naviše na 10 din, zatim cenovni razredi 180/200/220/250/300 din iz ovog fajla i `docs/featureGoogleMaps.md`. Ne nagađaj spisak kurira ni naselja.
+- Cena dostave: `start + 80 × km` (start 100/200/300/400 po razdaljini) iz ovog fajla i `docs/featureGoogleMaps.md`. Kupovina ostaje fiksna po lancu. Ne nagađaj spisak kurira ni naselja.
 - Kad klijent promeni zahtev: ažuriraj **ovaj fajl**, pa implementiraj.
 - Ne širi scope „dok si već tu“ (partneri, Google, zvuk, CSV).
 - Posle UI izmene: proveri tok u browseru ako alati postoje.

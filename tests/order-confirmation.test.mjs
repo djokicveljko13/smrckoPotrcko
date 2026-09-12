@@ -73,13 +73,13 @@ test("obračun zove Routes samo za odredište, traje 15 minuta i potvrđuje istu
   let calls = 0;
   const result = await prepareOrderQuote(form(), async (id) => { calls++; assert.equal(id, destination.placeId); return 2000; }, () => 1000);
   assert.equal(result.status, "ok");
-  assert.equal(result.quote.price, 220);
+  assert.equal(result.quote.price, 260);
   assert.equal(result.quote.expiresAt, 1000 + QUOTE_TTL_MS);
   const events = [];
   const confirmed = await confirmOrderQuote(result.token, async (quote) => {
     assert.deepEqual(quote, result.quote); events.push("insert"); return "P-17";
   }, async (ticket) => { assert.equal(ticket, "P-17"); events.push("notify"); }, () => 2000);
-  assert.deepEqual(confirmed, { status: "ok", ticket: "P-17", price: 220 });
+  assert.deepEqual(confirmed, { status: "ok", ticket: "P-17", price: 260 });
   assert.deepEqual(events, ["insert", "notify"]);
   assert.equal(calls, 1);
 });
@@ -101,7 +101,7 @@ test("greška upisa ne šalje obaveštenje; greška obaveštenja ne poništava u
   const result = await prepareOrderQuote(form(), async () => 2000);
   assert.equal((await confirmOrderQuote(result.token, async () => null, async () => assert.fail("Nema obaveštenja"))).status, "error");
   const response = await confirmOrderQuote(result.token, async () => "P-18", async () => { throw new Error("Telegram down"); });
-  assert.deepEqual(response, { status: "ok", ticket: "P-18", price: 220 });
+  assert.deepEqual(response, { status: "ok", ticket: "P-18", price: 260 });
 });
 
 test("stvarne akcije: priprema ne upisuje, potvrda mapira detalje stana u postojeću kolonu", async () => {
@@ -122,7 +122,7 @@ test("stvarne akcije: priprema ne upisuje, potvrda mapira detalje stana u postoj
   assert.equal(confirmed.price, prepared.quote.price);
   assert.deepEqual(inserts, [{ p_title: "Dve pice", p_shop: pickup.text,
     p_address: `${destination.text}; ulaz B, 2. sprat, stan 8`, p_phone: "066 123 4567",
-    p_delivery_price: 220, p_distance_m: 2000, p_place_id: destination.placeId }]);
+    p_delivery_price: 260, p_distance_m: 2000, p_place_id: destination.placeId }]);
   assert.deepEqual(notifications, ["P-19"]); assert.equal(googleCalls, 1);
   assert.equal((await createGuestOrder(new FormData())).status, "error");
   assert.equal(inserts.length, 1);

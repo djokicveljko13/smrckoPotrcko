@@ -2,12 +2,17 @@
  * Cena dostave se računa iz stvarne kilometraže (firma → kupac).
  * Formula je dogovorena sa klijentom, izvor istine: docs/featureGoogleMaps.md.
  *
- *   osnovica = 30 + 80 din/km, zaokruženo NAVIŠE na 10 dinara
- *   konačna cena = cenovni razred 180 / 200 / 220 / 250 / 300 din
+ *   cena = start(razdaljina) + 80 din/km
+ *   start: <5 km → 100, 5–10 → 200, 10–15 → 300, preko 15 → 400
+ *
+ * Kupovina iz marketa se ovde ne računa — vidi SHOPPING_STORES ispod.
  */
 
-export const PRICE_BASE_DIN = 30;
 export const PRICE_PER_KM_DIN = 80;
+export const START_FEE_UNDER_5KM_DIN = 100;
+export const START_FEE_5_TO_10KM_DIN = 200;
+export const START_FEE_10_TO_15KM_DIN = 300;
+export const START_FEE_OVER_15KM_DIN = 400;
 
 /**
  * Polazna tačka svake dostave: Кнеза Милоша 24, Јагодина.
@@ -17,23 +22,24 @@ export const PRICE_PER_KM_DIN = 80;
  */
 export const PICKUP = { latitude: 43.978_143, longitude: 21.268_273 } as const;
 
+/** Start po razdaljini. Tačno 5 km ide u 200, tačno 10 km u 300, tačno 15 km u 300. */
+export function startFeeFromKm(km: number): number {
+  if (km < 5) return START_FEE_UNDER_5KM_DIN;
+  if (km < 10) return START_FEE_5_TO_10KM_DIN;
+  if (km <= 15) return START_FEE_10_TO_15KM_DIN;
+  return START_FEE_OVER_15KM_DIN;
+}
+
 /**
- * Metri koje vrati Google Routes → osnovica → konačna cena u dinarima.
- * Razred biramo po zaokruženoj osnovici, samo jednom.
+ * Metri koje vrati Google Routes → konačna cena u dinarima.
  *
- *   1.5 km → osnovica 150 → konačno 200 din
- *   3.7 km → osnovica 330 → konačno 300 din
+ *   1.6 km → 100 + 128 = 228 din
+ *   5 km   → 200 + 400 = 600 din
+ *   10 km  → 300 + 800 = 1100 din
  */
 export function deliveryPriceFromMeters(meters: number): number {
   const km = meters / 1000;
-  const raw = PRICE_BASE_DIN + PRICE_PER_KM_DIN * km;
-  const rounded = Math.ceil(raw / 10) * 10;
-
-  if (rounded < 50) return 180;
-  if (rounded <= 150) return 200;
-  if (rounded <= 220) return 220;
-  if (rounded <= 250) return 250;
-  return 300;
+  return Math.round(startFeeFromKm(km) + PRICE_PER_KM_DIN * km);
 }
 
 /** Cena za prikaz: 330 → "330 dinara". */

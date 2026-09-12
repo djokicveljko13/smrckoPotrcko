@@ -20,22 +20,28 @@ Status: izrada u toku. Pravila od 07.09.2026. ispod zamenjuju stari tok slanja b
 
 Provera ove faze: potpisi i rok, obe adrese, Google greška, bez upisa pre potvrde, ista cena u potvrdi i upisu, detalji stana, dvoklik, mobilni prikaz i tastatura. Testovi koriste zamene za Google, bazu i Telegram.
 
-## Važeći cenovnik (05.09.2026)
+## Važeći cenovnik (12.09.2026)
 
-Google i dalje daje razdaljinu **firma → kupac**. Server prvo računa osnovicu
-`ceil((30 + 80 × km) / 10) × 10`, a zatim jednom primenjuje sledeće razrede:
+Google i dalje daje razdaljinu **firma → kupac**. Stari cenovnik od 05.09.2026.
+(`30 + 80 × km`, zatim plafon 180–300 din) je ukinut: duže vožnje su padale na
+fiksnih 300 din pa su bile preniske.
 
-| Zaokružena osnovica | Konačna cena dostave |
+Nova formula: **start + (80 × km)**. Start bira razdaljina, a kilometri se uvek
+naplaćuju. Nema plafona. Kupovina iz marketa se **ne** računa ovde — ostaje
+fiksna po lancu.
+
+| Razdaljina | Start |
 |---|---|
-| Manje od 50 din | 180 din |
-| 50 do uključujući 150 din | 200 din |
-| Preko 150 do uključujući 220 din | 220 din |
-| Preko 220 do uključujući 250 din | 250 din |
-| Preko 250 din | 300 din, fiksno |
+| Ispod 5 km | 100 din |
+| Od 5 km do ispod 10 km | 200 din |
+| Od 10 km do uključujući 15 km | 300 din |
+| Preko 15 km | 400 din |
 
-Primeri: 150 → 200, 160 → 220, 200 → 220, 220 → 220, 230 → 250,
-250 → 250, 260 → 300, 900 → 300 din. Razredi se ne primenjuju ponovo na
-već dobijenu konačnu cenu i ne odnose se na vrednost robe.
+Granice: 4,999 km → start 100; 5 km → 200; 9,999 km → 200; 10 km → 300;
+15 km → 300; 15,001 km → 400. Iznos se zaokružuje na najbliži dinar.
+
+Primeri: 1,6 km → 100 + 128 = 228 din; 5 km → 200 + 400 = 600 din;
+10,875 km → 300 + 870 = 1170 din; 16 km → 400 + 1280 = 1680 din.
 
 U `orders.delivery_price` čuva se konačna cena koju vide kupac, vlasnik i kurir.
 Stare porudžbine zadržavaju upisanu cenu. Kad Google ne vrati kilometražu,
@@ -68,16 +74,9 @@ Pre obračuna po kilometrima cena je bila dve konstante u `lib/pricing.ts`
 1. Kupac na 12 km plaća isto kao kupac na 1 km — vožnja van grada jede kurira.
 2. Kupac sam bira zonu. Ništa ga ne sprečava da uvek klikne „U gradu".
 
-Za obračun iz stvarne razdaljine uvedena je formula, koja od 05.09.2026.
-predstavlja **osnovicu pre primene važećih cenovnih razreda**:
-
-```
-osnovica = 30 + 80 × km, zaokruženo naviše na 10 dinara
-```
-
-Primeri (km → osnovica → konačna cena): 1.2 km → 130 → 200 din;
-2.1 km → 200 → 220 din; 3.0 km → 270 → 300 din;
-5.7 km → 490 → 300 din; 12 km → 990 → 300 din.
+Za obračun iz stvarne razdaljine uvedena je formula. Od 12.09.2026. važi
+**start + (80 × km)** iz odeljka *Važeći cenovnik* iznad. Stari plafon
+180–300 din je ukinut jer je 12 km i dalje davalo 300 din.
 
 Polazna tačka je uvek ista: **Кнеза Милоша 24, Јагодина**.
 
@@ -138,7 +137,7 @@ po formi) ostajemo duboko unutar besplatnog.
 | Odluka | Izbor |
 |---|---|
 | Ruta | firma → kupac (radnja se ne uračunava) |
-| Formula | `30 + 80 × km`, naviše na 10 din, zatim važeći cenovni razredi 180/200/220/250/300 din |
+| Formula | `start + 80 × km` (start 100/200/300/400 po razdaljini); kupovina fiksna po lancu |
 | Unos adrese | Places Autocomplete, kupac bira iz liste |
 | Kad kupac vidi cenu | u popup-u pre potvrde, zatim opet na `/hvala` |
 | Google zakaže | javna porudžbina **ne prolazi**; ponovni pokušaj ili poziv |
@@ -365,8 +364,8 @@ nasledi gotovu logiku.
    Editoru red ima `delivery_price`, `distance_m`, `destination_place_id`, a
    `zone` je NULL.
 3. **Ručna provera formule:** uzmi `distance_m` iz reda i proveri
-   `ceil((30 + 80 × m/1000) / 10) × 10`, zatim primeni važeći cenovni razred
-   sa vrha ovog dokumenta — konačni rezultat mora da odgovara prikazanoj ceni.
+   `start + 80 × m/1000` po važećem cenovniku sa vrha ovog dokumenta —
+   konačni rezultat mora da odgovara prikazanoj ceni.
 4. **Fallback:** privremeno pokvari `GOOGLE_MAPS_API_KEY` u `.env.local` i
    pošalji porudžbinu. Mora da **prođe** sa cenom NULL, `/hvala` pokaže poruku bez
    iznosa, a na `/admin` kartica ima upozorenje i polje za unos. Upiši cenu ručno
