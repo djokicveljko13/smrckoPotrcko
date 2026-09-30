@@ -5,6 +5,7 @@ import logoTransparent from "@/public/logo-transparent.png";
 type Props = {
   /** Veličina se zadaje CSS-om, npr. "w-64". Ne prop-om width. */
   className?: string;
+  sizes?: string;
   priority?: boolean;
   /**
    * Verzija bez bele pozadine — za obojene podloge (crveni hero).
@@ -30,6 +31,7 @@ type Props = {
  */
 export function BrandLogo({
   className,
+  sizes = "(max-width: 639px) 240px, (max-width: 1023px) 320px, 416px",
   priority = false,
   onColor = false,
 }: Props) {
@@ -37,8 +39,8 @@ export function BrandLogo({
     <Image
       src={onColor ? logoTransparent : logo}
       alt="Šmrčko Potrčko — mi trčimo umesto Vas"
-      sizes="(max-width: 640px) 75vw, 340px"
-      priority={priority}
+      sizes={sizes}
+      preload={priority}
       className={className}
     />
   );

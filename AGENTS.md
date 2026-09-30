@@ -91,6 +91,33 @@ Javna stranica `/cena` (tab „Cena”) da kupac vidi cenu **pre** porudžbine, 
 - Prikaz: samo „Cena dostave”, iznos, i dve izabrane adrese. Bez napomena o plaćanju. „Poruči ovu dostavu” vodi na `/#poruci` i unapred popuni ista dva Places izbora (sessionStorage u ovom tabu). Kupovina (`/kupovina`) ovde nije — tamo je fiksna cena po lancu.
 - Google greška: unos ostaje, ponovni pokušaj ili poziv `DISPLAY_PHONE`.
 
+## SEO i pronalaženje biznisa (15.09.2026)
+
+- Optimizacija javnih `/`, `/kupovina`, `/cena` i `/saradnja` koristi postojeće tekstove i potvrđene podatke: Šmrčko Potrčko, Jagodina i do 30 km oko grada, javni telefon, radno vreme i društvene mreže.
+- Svaka javna strana ima zaseban naslov, opis, canonical URL (glavna adresa stranice) i Open Graph/Twitter prikaz za deljenje. `sitemap.xml` navodi samo ove četiri strane; `robots.txt` omogućava čitanje javnog sadržaja pretraživačima i AI pretrazi.
+- `/admin`, `/prijava`, `/k`, `/hvala`, `/registracija` i API odgovori nisu za indeksiranje. SEO oznake ne zamenjuju postojeću autentifikaciju. Preview okruženje se ne indeksira.
+- Strukturirani podaci opisuju organizaciju, područje usluge, kontakt i usluge. Ne izmišljati javnu poslovnicu, ocene, recenzije ili partnerstva sa marketima. Interna polazna adresa za obračun nije automatski javna poslovnica.
+- Potvrđen glavni domen je **https://smrckopotrcko.rs**. SEO adrese koriste `SITE_URL` (opciona izmena glavnog domena), sa ovim domenom kao podrazumevanim. `NEXT_PUBLIC_SITE_URL` i dalje služi operativnim linkovima; lokalna ili Vercel adresa iz njega ne menja javni SEO domen.
+- Poboljšati čitljivost lokalnih podataka i otkrivene probleme učitavanja bez promene toka poručivanja. Ne dodavati sadržaj samo za robote ni gomilati ključne reči.
+- Proverom su obuhvaćeni mobilni prikaz, kontrast sitnog teksta, semantičke oblasti stranice i brendirana ikonica. Sitni crveni natpisi i donja traka koriste tamnocrvenu varijantu zbog kontrasta; osnovna hero pozadina ostaje zajednička.
+- Google Search Console, Bing Webmaster Tools i Google Business Profile zahtevaju pristup/verifikaciju vlasnika. Uputstvo i preostali koraci su u `docs/seo.md`. Nema garancije indeksiranja, pozicije ili AI preporuke.
+
+## Lokacija — novi zahtev klijenta (29.09.2026)
+
+- Dodati javnu stranicu `/lokacija` sa ugrađenom Google mapom, nazivom biznisa, opisom i radnim vremenom.
+- Podatke na stranici i u strukturiranom zapisu uskladiti sa potvrđenim Google Business Profile profilom (ranije Google My Business).
+- Klijent traži Schema.org `LocalBusiness` zapis. Pre implementacije potvrditi tačan Google Maps profil i da li postoji javna poslovnica koja prima kupce ili je u pitanju samo dostava na području usluge.
+- Veljko je prosledio https://maps.app.goo.gl/ChcMGeUF6qa1bBF27. Proverom preusmerenja 29.09.2026 link vodi na Google Maps lokaciju **Autoperionica SMRK**, a ne na profil sa nazivom Šmrčko Potrčko. Veljko je potvrdio da dostava koristi istu adresu. Mapa može prikazati tu zajedničku lokaciju uz jasno objašnjenje da Google oznaka glasi Autoperionica SMRK.
+- Zajednička adresa ne znači isti biznis: naziv, opis, telefon i radno vreme ostaju podaci Šmrčka Potrčka. Profil perionice ne dodavati kao `sameAs` identitet dostave; time se ne može tvrditi da je Google profil dostave usklađen.
+- Veljko je potvrdio javnu adresu **Kneza Miloša 24, Jagodina**. Nije potvrđeno da dostava tu prima kupce, pa tekst stranice navodi lokaciju bez poziva „Posetite nas” ili tvrdnje o prijemu kupaca. Ne koristiti internu polaznu adresu obračuna kao zamenu za ovu potvrđenu adresu.
+- Ako profil ima skrivenu adresu, ne objavljivati je kroz mapu ili strukturirane podatke. Izbor prikaza mape i primenu `LocalBusiness` uskladiti sa potvrđenim načinom rada; ne izmišljati adresu radi Google validacije.
+- Postojeće podatke (Šmrčko Potrčko, 066 59 355 35, svaki dan 08:00–23:00) uporediti sa profilom; eventualne razlike razjasniti sa vlasnikom.
+- `/lokacija` koristi zajedničku crvenu hero pozadinu i pocepanu ivicu, `BrandLogo` u navigaciji, kontakt sekciju i donju traku. Hero ima naslov „Tu smo, u Jagodini.” i dugme koje vodi na mapu. Ispod su podaci dostave i ugrađena Google mapa: dve kolone na računaru, jedna na telefonu.
+- Mapa koristi javni Google embed bez serverskog Places/Routes ključa, ima pristupačan naslov, odloženo učitavanje i zaseban link za Google Maps. Uz mapu piše da je zajednička lokacija označena kao Autoperionica SMRK.
+- Nova stranica ulazi u javnu navigaciju i SEO obuhvat, uključujući sitemap. Na telefonu dugme „Meni” otvara pet linkova ispod zaglavlja; na računaru ostaju u jednom redu. Prethodni SEO odeljak opisuje prvobitne četiri strane.
+- Izmene sajta ne ažuriraju automatski Google profil. Implementacija ide u malim celinama uz objašnjenja Veljku.
+- Schema (30.09.2026): na Veljkov zahtev postojeći zapis firme koristi `LocalBusiness` i `PostalAddress` iz `BUSINESS_ADDRESS`, uz isti `@id`. Koristi se potvrđena javna adresa; ne tvrdi se da tu postoji prijem kupaca. Zajednički `OpeningHoursSpecification` opisuje radno vreme biznisa i dostupnost kontakta, svakog dana 08:00–23:00. Komponenta se uključuje i na `/lokacija`; za tu stranicu se ne pravi izmišljena usluga nazvana „Lokacija”. Zapis proveriti u lokalnom HTML-u, a posle objave i Google Rich Results Test alatom.
+
 ## Tech stack
 
 Jedna aplikacija, ne dva frontenda.
@@ -208,7 +235,8 @@ Ručna dodela je obična ponuda: Telegram stiže, kurir sme da odbije.
 ## Šta nije V1 (ne radi osim ako vlasnik ovog repoa kaže da klijent to sada traži)
 
 - Katalog partnera / proizvodi (kasniji **upsell**: naplata prodavnicama za izlistavanje) — nema tabele `partners` u V1
-- Google **login**, Google Maps prikaz na stranici, sačuvane adrese, tracking kupca, CMS cena u UI, zvuk, statistika, radno vreme koje zatvara formu
+- Google **login**, sačuvane adrese, tracking kupca, CMS cena u UI, zvuk, statistika, radno vreme koje zatvara formu
+  - Google Maps prikaz je sada tražen za `/lokacija`; vidi odeljak **Lokacija**.
   - **Kuriri u UI su sada V1** (`/admin/kuriri`): vlasnik dodaje kurira, sam bira
     njegov PIN (4–8 cifara), menja ime/telefon, gasi ga (`is_active`) ili briše,
     i kopira mu `/k/{token}` link. Detalji: `docs/featureAdmin.md`.

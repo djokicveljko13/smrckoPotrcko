@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Archivo, Caveat, Plus_Jakarta_Sans } from "next/font/google";
 import { CallFab } from "@/components/call-fab";
+import { BUSINESS_NAME, NO_INDEX, SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
 /*
@@ -13,32 +14,41 @@ import "./globals.css";
 const archivo = Archivo({
   variable: "--font-archivo",
   subsets: ["latin", "latin-ext"],
-  weight: ["600", "700", "800", "900"],
+  weight: "variable",
   style: ["normal", "italic"],
 });
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: "variable",
 });
 
 const caveat = Caveat({
   variable: "--font-caveat",
   subsets: ["latin", "latin-ext"],
-  weight: ["500", "700"],
+  weight: "variable",
+  // Rukopis nije iznad prevoja na većini strana; učitava se kada je potreban.
+  preload: false,
 });
 
 export const metadata: Metadata = {
-  title: "Šmrčko Potrčko dostava",
-  description:
-    "Naruči bilo šta iz bilo koje radnje. Kurir donosi, plaćaš kešom na vrata.",
+  metadataBase: new URL(SITE_URL),
+  title: BUSINESS_NAME,
+  applicationName: BUSINESS_NAME,
+  robots: NO_INDEX,
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION,
+    other: process.env.BING_SITE_VERIFICATION
+      ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION }
+      : undefined,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="sr"
+      lang="sr-Latn"
       className={`${archivo.variable} ${jakarta.variable} ${caveat.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white font-sans text-ink">

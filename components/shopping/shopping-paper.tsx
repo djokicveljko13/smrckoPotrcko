@@ -89,7 +89,7 @@ export function ShoppingPaper({
       <h2 className="font-display text-lg font-black italic uppercase tracking-tight sm:text-xl">
         Šta kupujemo danas?
       </h2>
-      <p className="mt-1 text-sm font-medium text-[#8a7f63]">
+      <p className="mt-1 text-sm font-medium text-[#73694f]">
         Napiši šta ti treba. Enter dodaje novi red.
       </p>
 
@@ -127,12 +127,12 @@ export function ShoppingPaper({
             onChange([...items, created]);
             queueMicrotask(() => inputRefs.current.get(created.key)?.focus());
           }}
-          className="inline-flex items-center gap-1.5 rounded-xl px-2 py-1.5 text-sm font-bold text-brand hover:bg-brand/10 disabled:opacity-40"
+          className="inline-flex items-center gap-1.5 rounded-xl px-2 py-1.5 text-sm font-bold text-brand-dark hover:bg-brand/10 disabled:opacity-40"
         >
           <PlusIcon className="h-4 w-4" />
           Dodaj stavku
         </button>
-        <p className="text-xs font-bold text-[#8a7f63]" aria-live="polite">
+        <p className="text-xs font-bold text-[#73694f]" aria-live="polite">
           {filled}/{MAX_SHOPPING_ITEMS}
         </p>
       </div>

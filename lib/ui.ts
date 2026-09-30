@@ -40,7 +40,7 @@ export const labelClass = "block text-sm font-bold text-ink";
  * to je taj "efekat" na dugmetu, bez ijedne linije JavaScripta.
  */
 export const primaryButtonClass =
-  "inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand " +
+  "inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-dark " +
   "px-5 py-3.5 font-display text-base font-extrabold uppercase tracking-wide text-white " +
   "shadow-[0_4px_0_var(--color-brand-dark)] transition sm:py-4 " +
   "hover:bg-brand-dark " +
@@ -57,7 +57,7 @@ export const primaryButtonClass =
  */
 export const heroButtonClass =
   "inline-flex items-center justify-center gap-2.5 rounded-2xl bg-white " +
-  "px-7 py-4 font-display text-base font-extrabold uppercase tracking-wide text-brand " +
+  "px-7 py-4 font-display text-base font-extrabold uppercase tracking-wide text-brand-dark " +
   "shadow-[0_5px_0_rgba(112,14,10,0.55)] transition " +
   "hover:bg-red-50 " +
   "active:translate-y-[4px] active:shadow-[0_1px_0_rgba(112,14,10,0.55)] sm:px-9 sm:text-lg";

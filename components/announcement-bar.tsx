@@ -37,7 +37,7 @@ export function AnnouncementBar() {
   return (
     <footer
       aria-label="Obaveštenje"
-      className="w-full min-w-0 overflow-hidden bg-brand text-white"
+      className="w-full min-w-0 overflow-hidden bg-brand-dark text-white"
     >
       {/*
        * Čitač ekrana čita jednom. Kad OS traži manje animacije, isti pasus

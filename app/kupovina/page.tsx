@@ -6,15 +6,16 @@ import { ShoppingListArt } from "@/components/shopping/shopping-list-art";
 import { ShoppingOrderForm } from "@/components/shopping/shopping-order-form";
 import { SiteNav } from "@/components/site-nav";
 import { heroButtonClass } from "@/lib/ui";
+import { publicMetadata } from "@/lib/seo";
+import { StructuredData } from "@/components/structured-data";
 
-export const metadata = {
-  title: "Potrčko ide u kupovinu",
-  description: "Napiši listu — mi kupimo u marketu i donesemo na vrata.",
-};
+export const metadata = publicMetadata("/kupovina");
 
 export default function ShoppingPage() {
   return (
+    <>
     <main>
+      <StructuredData path="/kupovina" />
       <SiteNav />
 
       <section className="hero-surface relative flex min-h-[85vh] items-center overflow-hidden px-4 pb-28 pt-28 sm:pb-36 sm:pt-32">
@@ -24,7 +25,7 @@ export default function ShoppingPage() {
               Potrčko ide u kupovinu
             </h1>
             <p className="hero-description mx-auto mt-5 max-w-md lg:mx-0">
-              Ti napiši listu, mi donosimo.
+              Ti napiši listu, mi donosimo. Kupovina i dostava namirnica u Jagodini i okolini.
             </p>
             <a href="#kupovina-forma" className={`${heroButtonClass} mt-8`}>
               Napravi listu
@@ -46,7 +47,8 @@ export default function ShoppingPage() {
       </section>
 
       <ContactStrip />
-      <AnnouncementBar />
     </main>
+    <AnnouncementBar />
+    </>
   );
 }

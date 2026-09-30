@@ -4,6 +4,10 @@ import { PartnershipForm } from "@/components/partnership-form";
 import { SiteNav } from "@/components/site-nav";
 import { DISPLAY_PHONE, TEL_URL } from "@/lib/contact";
 import { heroButtonClass } from "@/lib/ui";
+import { publicMetadata } from "@/lib/seo";
+import { StructuredData } from "@/components/structured-data";
+
+export const metadata = publicMetadata("/saradnja");
 
 const OWN_COURIER_ITEMS = [
   "Plata svakog meseca, i kada ima manje dostava",
@@ -39,7 +43,9 @@ const PARTNERSHIP_STEPS = [
 ];
 export default function PartnershipPage() {
   return (
+    <>
     <main>
+      <StructuredData path="/saradnja" />
       <SiteNav />
 
       <section className="hero-surface relative flex min-h-[70vh] flex-col items-center justify-center overflow-hidden px-4 pb-24 pt-28 text-center sm:pb-36">
@@ -151,8 +157,9 @@ export default function PartnershipPage() {
         </div>
       </section>
 
-      <AnnouncementBar />
     </main>
+    <AnnouncementBar />
+    </>
 
 
 

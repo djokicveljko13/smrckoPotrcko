@@ -33,6 +33,9 @@ export function ContactStrip() {
         >
           Ne voliš forme? Pozovi nas.
         </h2>
+        <p className="mt-2 text-sm font-semibold text-zinc-600">
+          Šmrčko Potrčko — dostava u Jagodini i do 30 km oko grada.
+        </p>
         <a
           href={TEL_URL}
           className="mt-1 font-display text-2xl font-black italic tracking-tight text-brand sm:text-3xl"
@@ -45,7 +48,7 @@ export function ContactStrip() {
         <p className="mt-1 text-sm font-semibold text-zinc-500">
           Dostupni smo i na WhatsApp-u i Viber-u.
         </p>
-        <div className="mt-4 flex w-full max-w-lg gap-2">
+        <div className="mt-4 flex w-full max-w-lg flex-wrap gap-2">
           <a href={TEL_URL} className={actionClass}>
             <PhoneIcon className="h-4 w-4" />
             Pozovi

@@ -5,21 +5,25 @@ import { ArrowRightIcon } from "@/components/icons";
 import { PriceCalculatorForm } from "@/components/price-calculator-form";
 import { SiteNav } from "@/components/site-nav";
 import { heroButtonClass } from "@/lib/ui";
+import { publicMetadata } from "@/lib/seo";
+import { StructuredData } from "@/components/structured-data";
 
-export const metadata = {
-  title: "Izračunaj cenu dostave",
-  description: "Piši odakle i dokle. Cena je ista kao kad poručiš.",
-};
+export const metadata = publicMetadata("/cena");
 
 export default function PriceCalculatorPage() {
   return (
+    <>
     <main>
+      <StructuredData path="/cena" />
       <SiteNav />
 
       <section className="hero-surface relative flex min-h-[70vh] flex-col items-center justify-center overflow-hidden px-4 pb-24 pt-28 text-center sm:pb-36">
         <h1 className="hero-title font-display text-3xl font-black italic uppercase sm:text-5xl">
           Izračunaj cenu dostave
         </h1>
+        <p className="hero-description mx-auto mt-5 max-w-2xl">
+          Piši odakle i dokle. Cena je ista kao kad poručiš.
+        </p>
       
         <a href="#cena-forma" className={`${heroButtonClass} mt-8`}>
           Izračunaj cenu
@@ -35,7 +39,8 @@ export default function PriceCalculatorPage() {
       </section>
 
       <ContactStrip />
-      <AnnouncementBar />
     </main>
+    <AnnouncementBar />
+    </>
   );
 }

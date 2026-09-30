@@ -261,7 +261,7 @@ export function ShoppingOrderForm() {
                   </p>
                 </>
               ) : (
-                <p className="mt-2 text-sm font-semibold text-zinc-500">
+                <p className="mt-2 text-sm font-semibold text-zinc-600">
                   Izaberi radnju da vidiš cenu
                 </p>
               )}

@@ -14,14 +14,17 @@ const HIDDEN_PREFIXES = ["/admin", "/prijava", "/registracija", "/k/"];
 export function CallFab() {
   const pathname = usePathname();
   const hiddenRoute = HIDDEN_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+  if (hiddenRoute) return null;
+  // Nova stranica dobija svoje početno stanje; nema dodatnog rendera radi resetovanja.
+  return <VisibleCallFab key={pathname} />;
+}
+
+function VisibleCallFab() {
   const [footerInView, setFooterInView] = useState(false);
 
   useEffect(() => {
     const footer = document.querySelector("footer");
-    if (!footer) {
-      setFooterInView(false);
-      return;
-    }
+    if (!footer) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => setFooterInView(entry.isIntersecting),
@@ -29,11 +32,12 @@ export function CallFab() {
     );
     observer.observe(footer);
     return () => observer.disconnect();
-  }, [pathname]);
+  }, []);
 
-  if (hiddenRoute || footerInView) return null;
+  if (footerInView) return null;
 
   return (
+    <aside aria-label="Telefonska porudžbina">
     <a
       href={TEL_URL}
       aria-label={`Pozovi ${DISPLAY_PHONE}`}
@@ -41,5 +45,6 @@ export function CallFab() {
     >
       <PhoneIcon className="h-6 w-6" />
     </a>
+    </aside>
   );
 }

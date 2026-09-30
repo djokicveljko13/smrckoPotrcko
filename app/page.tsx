@@ -12,6 +12,10 @@ import {
 } from "@/components/icons";
 import { heroButtonClass } from "@/lib/ui";
 import { SiteNav } from "@/components/site-nav";
+import { publicMetadata } from "@/lib/seo";
+import { StructuredData } from "@/components/structured-data";
+
+export const metadata = publicMetadata("/");
 /*
  * Tri obećanja koja kupac traži pre nego što ostavi telefon: koliko čeka,
  * dolazi li do njega i mora li da pravi nalog. Lista je podatak, ne tri
@@ -65,7 +69,9 @@ const CTA_DELAY_MS = 1000;
 export default function HomePage() {
   return (
   
-    <div className="flex min-h-dvh flex-col">
+    <>
+    <main className="flex min-h-dvh flex-col">
+      <StructuredData path="/" />
        <SiteNav />
       <section className="hero-surface relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-4 pb-24 pt-24 text-center sm:pb-36 sm:pt-28">
         <BrandLogo className="w-60 sm:w-80 lg:w-[26rem]" priority onColor />
@@ -90,7 +96,7 @@ export default function HomePage() {
           style={{ animationDelay: `${DESCRIPTION_DELAY_MS}ms` }}
         >
           Hrana, namirnice, apoteka ili bilo šta drugo. Reci nam šta ti treba i
-          donosimo na tvoju adresu.
+          donosimo na tvoju adresu u Jagodini i do 30 km oko grada.
         </p>
 
         {/*
@@ -177,7 +183,8 @@ export default function HomePage() {
 
       <ContactStrip />
 
-      <AnnouncementBar />
-    </div>
+    </main>
+    <AnnouncementBar />
+    </>
   );
 }
