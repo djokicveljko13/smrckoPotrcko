@@ -1,7 +1,10 @@
+import { randomUUID } from "node:crypto";
 import { readOrderValue, signOrderValue } from "@/lib/order-signing";
+import type { OrderInsertResult } from "@/lib/order-types";
 import { findShoppingStore, type ShoppingStore } from "@/lib/pricing";
 import {
   asRecord,
+  QUOTE_ID_RE,
   readPlace,
   readString,
   validPhone,
@@ -21,6 +24,8 @@ const NEED_ITEMS = "Upiši bar jednu stavku na listu (najviše 30).";
 export type ShoppingField = "store" | "items" | "note" | "address" | "address_details" | "phone";
 
 export type ShoppingQuote = {
+  /** Jednokratni ID ponude; baza ga čuva u orders.quote_id (unique). */
+  id: string;
   store: ShoppingStore;
   storeLabel: string;
   items: string[];
@@ -55,6 +60,8 @@ function isShoppingQuote(value: unknown): value is ShoppingQuote {
   const items = normalizeItems(quote.items);
   return Boolean(
     items &&
+      typeof quote.id === "string" &&
+      QUOTE_ID_RE.test(quote.id) &&
       quote.store === store.id &&
       quote.storeLabel === store.label &&
       quote.price === store.price &&
@@ -101,6 +108,7 @@ export async function prepareShoppingQuote(
   }
 
   const quote: ShoppingQuote = {
+    id: randomUUID(),
     store: store.id,
     storeLabel: store.label,
     items,
@@ -119,7 +127,7 @@ export async function prepareShoppingQuote(
 /** Upis dobija isključivo proverene podatke iz potpisane ponude. */
 export async function confirmShoppingQuote(
   token: string,
-  insert: (quote: ShoppingQuote) => Promise<string | null>,
+  insert: (quote: ShoppingQuote) => Promise<OrderInsertResult>,
   notify: (ticket: string) => Promise<void>,
   now: () => number = Date.now,
 ): Promise<Exclude<CreateShoppingOrderState, null>> {
@@ -130,14 +138,17 @@ export async function confirmShoppingQuote(
   if (quote.expiresAt <= now()) {
     return { status: "error", message: "Ponuda je istekla. Ponovo pošalji listu pre potvrde.", expired: true };
   }
-  const ticket = await insert(quote);
-  if (!ticket || !/^P-\d+$/.test(ticket)) {
+  const inserted = await insert(quote);
+  if (!inserted || !/^P-\d+$/.test(inserted.ticket)) {
     return { status: "error", message: "Porudžbina nije upisana. Pokušaj ponovo ili nas pozovi." };
   }
-  try {
-    await notify(ticket);
-  } catch {
-    console.error("Shopping order notification failed");
+  // Ponovljena ponuda: isti broj, bez druge poruke kuriru.
+  if (inserted.created) {
+    try {
+      await notify(inserted.ticket);
+    } catch {
+      console.error("Shopping order notification failed");
+    }
   }
-  return { status: "ok", ticket, price: quote.price };
+  return { status: "ok", ticket: inserted.ticket, price: quote.price };
 }

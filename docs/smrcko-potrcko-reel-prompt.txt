@@ -1,0 +1,201 @@
+Create a polished 30-second motion graphics advertisement for Šmrčko Potrčko, smrckopotrcko.rs, a local delivery service in Jagodina, Serbia.
+
+The video should feel like the existing website brought to life: bold red backgrounds, heavy italic headlines, torn-paper edges, a friendly courier identity, and a handwritten shopping list. Show motion design craft through thoughtful transitions and readable compositions.
+
+Someone watching on a phone with the sound off must understand what the service offers and how to order on the first viewing. All visible text must be Serbian in Latin script, with correct č, ć, š, ž and đ. Follow the exact on-screen copy below.
+
+ABOUT THE BUSINESS — FACTUAL SOURCE OF TRUTH
+
+Brand: Šmrčko Potrčko.
+Website: https://smrckopotrcko.rs
+Public phone: 066 59 355 35.
+Working hours: every day, 08:00-23:00.
+Service area: Jagodina and the surrounding area, up to 30 km around the city.
+Brand promise: “Mi trčimo umesto Vas!” The consumer-facing website also uses “Mi trčimo umesto tebe.” Preserve the original slogan inside the supplied logo.
+
+The public website offers:
+
+1. DELIVERY ON REQUEST — /
+Customers describe what they need delivered, select a pickup location and a destination from address suggestions, and enter their phone number. Food is one example; the service also covers groceries, packages and other everyday delivery needs. This is a delivery request form, not a product catalogue. Customers can also call the owner to place a delivery order.
+
+2. GROCERY SHOPPING — /kupovina
+The courier goes to a supermarket and buys the items on the customer's list, then delivers them. The customer chooses Maxi, Roda, IDEA or Lidl. Shopping delivery fees are fixed by chain: Maxi, Roda and IDEA cost 500 din; Lidl costs 1.000 din. These are delivery service fees, not the price of the groceries. Using these shops does not imply an official partnership. The advertisement does not need to display this price list; it is factual context to prevent invented offers.
+
+3. DELIVERY PRICE CALCULATOR — /cena
+Customers can check the delivery price before ordering, without entering a phone number. They choose pickup and destination addresses. Ordinary delivery pricing uses the business-to-customer distance, not the pickup-to-customer distance. The order form also shows the delivery price before the customer confirms. Use the message “Proveri cenu pre poručivanja.” Do not invent a universal price or imply free delivery.
+
+4. DELIVERY FOR BUSINESSES — /saradnja
+Businesses can request one-off delivery or ongoing cooperation. They can send an inquiry with their business name, phone number and an optional message, or call to discuss terms. Pricing is agreed by phone. Use respectful Serbian wording for this scene.
+
+5. LOCATION AND CONTACT — /lokacija
+The website includes a location page with a map, business information and working hours. The confirmed public address is Kneza Miloša 24, Jagodina. Customer reception at the address is not confirmed. The shared Google Maps location is labelled Autoperionica SMRK; it is not a separate verified Google profile for the delivery business. For the Reel, use a stylized Jagodina location marker and the contact information, rather than a screenshot of that map or an invitation to visit a storefront.
+
+Orders are handled by an internal owner dashboard and assigned to couriers, who receive Telegram notifications. These are background operations, not customer-facing features to advertise. Customers do not have live courier tracking, a customer account, or online payment. Payment is cash outside the app. Do not add payment messaging to the price preview.
+
+CREATIVE CONCEPT: “MI TRČIMO UMESTO TEBE”
+
+Use one white piece of paper as the visual thread through the film. It begins as a delivery request, becomes a shopping list, then a price-check card and a business inquiry, before resolving into a final contact card. A simple red delivery vehicle or unbranded parcel can provide secondary movement between scenes.
+
+Make transitions feel connected: preserve the paper's position and shape as its content changes. Use the site's irregular torn-paper edge as a recurring visual motif. The film should feel friendly, local, capable and energetic, while remaining calm enough to read.
+
+FORMAT
+
+- Vertical 1080 × 1920, 9:16, for Instagram Reels, TikTok and Stories.
+- Exactly 30 seconds at 30 fps, 900 frames.
+- No audio or voiceover. The entire message must work silently.
+- Fixed 1080 × 1920 design canvas; scale the preview proportionally without reflowing the composition.
+- Keep essential text and logos within a conservative safe area: at least 150 px from the top, 380 px from the bottom, 90 px from the left and 180 px from the right. Background art may extend to the edges.
+- Each scene has one main message. Keep every essential line fully readable for at least 2.5 seconds, excluding its entrance and exit animation.
+- Aim for at most 8 words of main promotional copy at once. The supplied logo and final contact information are exceptions. Avoid extra labels in illustrations that compete with the main message.
+- Create a smooth loop using a brief visual transition after the final readable hold. Never shorten the end card's hold to achieve the loop.
+
+STORYBOARD — EXACT TOTAL: 30 SECONDS
+
+0.0-4.0 s | THE HOOK
+
+Brand-red background with the original logo visible from the opening frame. Beneath it, a white paper card settles into place. A simple clock outline and a small parcel sit around the card, with subtle secondary movement.
+
+Main copy, two lines:
+“Nemaš vremena?”
+“Mi trčimo umesto tebe.”
+
+Both lines finish entering by 0.5 s and remain readable until at least 3.4 s. Do not repeat the slogan as another separate caption. Lead into the next scene through the paper card.
+
+4.0-9.0 s | DELIVERY IN JAGODINA
+
+The paper expands into a simplified delivery request. Use three large illustrations: a takeaway bag, a grocery bag and a parcel. A small red delivery vehicle moves smoothly toward a generic home symbol, then settles. This is an illustration of the service, not a live-tracking screen.
+
+Main copy:
+“Dostava na tvoju adresu.”
+Supporting line:
+“Jagodina i okolina.”
+
+Text is stable by 4.5 s and remains readable until at least 8.4 s. Do not animate a delivery countdown or promise a specific arrival time.
+
+9.0-14.0 s | POTRČKO DOES THE SHOPPING
+
+The same paper becomes the site's shopping-list motif: cream paper, a small pink piece of tape at the top, hand-drawn checkbox marks, a shopping cart and a grocery bag. Use recognizable item illustrations such as milk, bread and household detergent, without product brand labels. The items settle into the bag as check marks draw onto the paper.
+
+Main copy:
+“Ti napiši listu.”
+“Mi kupujemo i donosimo.”
+
+Both lines are stable by 9.5 s and remain readable until at least 13.4 s. The visual must communicate that the courier buys the items, not merely collects an already packed order. Do not display shopping-list item names or chain names as additional small reading tasks.
+
+14.0-19.0 s | CHECK THE DELIVERY PRICE
+
+The paper smoothly becomes a clean, close-up phone interface inspired by the site's price calculator. Show two large address-selection rows as simple interface shapes, followed by a price-result card. Keep the treatment illustrative: do not fabricate an actual quote, address, discount or successful real order. A magnifying-glass icon can become a check mark to communicate a completed price check. Do not show a moving courier map.
+
+Main copy:
+“Proveri cenu pre poručivanja.”
+
+The only additional interface copy may be:
+“Izračunaj cenu”
+
+Main copy is stable by 14.5 s and remains readable until at least 18.4 s. An exact fee is unnecessary; focus on the ability to check it in advance. Do not use a zero price, placeholder “0 din”, or a fake price counter.
+
+19.0-24.0 s | DELIVERY FOR BUSINESSES
+
+The phone card becomes a simple business inquiry card. A neutral storefront illustration and a parcel connect through a short curved line. Keep the scene general enough to represent different local businesses; do not invent partner logos. Use a subtle confirmation tick as a decorative graphic, not a claim that a real inquiry has been sent.
+
+Main copy:
+“Dostava i za Vašu firmu.”
+Supporting line:
+“Dogovorimo saradnju.”
+
+Both lines are stable by 19.5 s and remain readable until at least 23.4 s. This scene should make ongoing cooperation feel approachable and professional.
+
+24.0-30.0 s | ORDER ONLINE OR CALL
+
+Return to the brand-red background with a large white card framed by the torn-paper motif. Display the original full logo above the contact details. Give the website and phone number strong visual hierarchy and generous space.
+
+Exact copy:
+“Poruči onlajn ili pozovi”
+“smrckopotrcko.rs”
+“066 59 355 35”
+“Svaki dan 08:00-23:00”
+
+The entire card must be in place by 24.5 s. Hold it readable and essentially still through 29.5 s. Only tiny decorative motion is allowed during this hold; do not pulse or bounce the phone number or URL.
+
+Use the last 0.5 s to transition smoothly toward the opening background and logo arrangement. The frame around 27 s must work as a standalone thumbnail. Do not add a separate location line, social handles, QR code or another slogan to this already complete end card.
+
+VISUAL IDENTITY — MATCH THE EXISTING WEBSITE
+
+Palette:
+- Brand red: #DF352D.
+- Dark red: #B8241D.
+- Near-black: #101010.
+- White: #FFFFFF.
+- Light interface grey: #F1F1F3.
+- Warm paper: #FFFDF7.
+- Pale pink torn-paper backing: #EDCBC7.
+- Soft pink for hand-drawn shopping accents: #FFB5AE.
+
+Use the original logo's additional colors only as they already appear in the supplied asset. Do not recolor the logo to force it into the palette.
+
+Typography:
+- Archivo 800/900, preferably italic for large headlines.
+- Plus Jakarta Sans 500/600/700 for supporting text, contact details and interface labels.
+- Caveat only for nonessential handwritten decorative details, if any.
+- Load Serbian Latin extended characters correctly.
+- Main headlines approximately 76-100 px on the 1080 px canvas; supporting text at least 44 px; contact details approximately 52-68 px, fitted within the safe area.
+- Use white text on red and near-black text on white or cream for the core messages.
+
+Art direction:
+- Bold, welcoming and clean, with roomy compositions.
+- Slightly tilted headline styling may echo the logo, but keep reading easy.
+- Irregular horizontal torn-paper edges with both large notches and smaller imperfections; a thin pale layer adds depth.
+- Rounded cards, light shadows and restrained paper texture.
+- Simple flat vector props with confident outlines that complement the courier mascot.
+- No stock photography, photorealistic people, glossy 3D objects, underwater imagery, bubbles or baby-product motifs from the reference brand.
+
+LOGO ASSET
+
+Use the supplied file logo-transparent.png, taken from this project's public/logo-transparent.png. It is a 1200 × 583 full logo with a courier mascot, the brand wordmark and its original slogan.
+
+Preserve its aspect ratio, colors, lettering and character proportions. Animate the complete asset through position, scale or a reveal mask. Do not redraw it, regenerate the lettering, stretch it, crop off the mascot or separate body parts from the flattened image. Keep it sharp and comfortably inside the safe area. Use a white paper backing where needed for contrast.
+
+If the asset is not available in the generation environment, request it rather than inventing a replacement logo. Do not claim the file is attached unless it has actually been supplied.
+
+MOTION DIRECTION
+
+- Use smooth easing, gentle springs with minimal overshoot, and overlapping motion.
+- Let each object's movement settle before viewers need to read.
+- Use 0.5-0.8 s transitions around scene boundaries without reducing the minimum readable text hold.
+- Animate text by line or by phrase; no letter scrambling or typewriter effects.
+- Use shared objects across scenes: the same paper, the same card silhouette, the same parcel.
+- Decorative movement stays secondary to the service message.
+- Avoid flashing, glitch effects, fast zooms, whip pans, camera shake, decorative speed streaks or rapid cuts.
+- Do not make the final contact information move continuously.
+
+TECHNICAL AND DELIVERABLES
+
+The preferred final deliverable is an actual 1080 × 1920 MP4 video, H.264, yuv420p, 30 fps, exactly 30 seconds, with no audio track, ready to upload as a Reel. Include a PNG cover exported from the stable final card.
+
+If your environment supports code-based animation, also provide one self-contained HTML source file with inline CSS and JavaScript and a single deterministic master timeline. GSAP is acceptable. Embed the logo and other local assets when possible. Wait for fonts and images to load before playback or capture; do not start the timeline during loading. Ensure repeatable seeking to any timestamp and correct frame-zero state.
+
+Include preview controls outside the video canvas: play/pause, restart and a scrub bar. All visible control labels are Serbian. Pressing H hides the controls. Controls and mouse cursors must not appear in the video export.
+
+If MP4 rendering is unavailable, deliver the complete runnable HTML animation and clearly state that it is an animation source requiring export or recording. Never present an HTML file as if it were a finished video. Do not provide only a storyboard when executable animation or video generation is available.
+
+QUALITY CHECKS
+
+- Check a small phone-size preview for readability, especially the website and phone number.
+- Check every Serbian diacritic and the spelling “Šmrčko Potrčko”.
+- Check the public domain is exactly smrckopotrcko.rs.
+- Check the phone number is exactly 066 59 355 35.
+- Verify all six scenes and their readable hold times fit exactly within 30 seconds.
+- Verify the final card is stable for at least 4 seconds.
+- Ensure the exported file contains no preview controls, clipped text, missing fonts or missing logo.
+
+DO NOT
+
+- Reuse Bebarijum's name, palette, claims, logo story or price-comparison concept.
+- Add English text to the visible film.
+- Use em dashes or en dashes in added on-screen copy; use a plain hyphen if needed.
+- Promise delivery within a fixed number of minutes, free delivery, the lowest price, 24-hour service or nationwide coverage.
+- Advertise live order tracking, customer accounts, online payment, a downloadable mobile app or an in-app product catalogue.
+- Present market chains as official partners.
+- Advertise the car wash as part of the delivery service or invite customers to an unconfirmed storefront.
+- Show private customer data, owner dashboard screens, courier tokens or Telegram conversations.
+- Add more messages to the six scenes just because there is spare visual space.

@@ -9,14 +9,12 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
  */
 export const requireOwner = cache(async () => {
   const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+    const { data, error } = await supabase.auth.getClaims();
 
-  if (error || !user) {
+  if (error || !data?.claims) {
     redirect("/prijava");
   }
 
-  return user;
+  return data.claims;
+
 });

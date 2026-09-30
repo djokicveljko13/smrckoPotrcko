@@ -95,8 +95,9 @@ test("confirmShoppingQuote upisuje i ne zove Google", async () => {
     async (quote) => {
       assert.equal(quote.price, 500);
       assert.equal(quote.storeLabel, "IDEA");
+      assert.equal(quote.id, prepared.quote.id);
       events.push("insert");
-      return "P-42";
+      return { ticket: "P-42", created: true };
     },
     async (ticket) => {
       assert.equal(ticket, "P-42");
@@ -105,6 +106,17 @@ test("confirmShoppingQuote upisuje i ne zove Google", async () => {
     () => 5000,
   );
   assert.deepEqual(events, ["insert", "notify"]);
+  assert.deepEqual(confirmed, { status: "ok", ticket: "P-42", price: 500 });
+});
+
+test("ponovljena kupovina vraća isti broj bez novog obaveštenja", async () => {
+  const prepared = await prepareShoppingQuote(shoppingForm({ store: "idea" }), () => 5000);
+  const confirmed = await confirmShoppingQuote(
+    prepared.token,
+    async () => ({ ticket: "P-42", created: false }),
+    async () => assert.fail("Ponovljena ponuda ne sme ponovo da zove kurira"),
+    () => 5000,
+  );
   assert.deepEqual(confirmed, { status: "ok", ticket: "P-42", price: 500 });
 });
 

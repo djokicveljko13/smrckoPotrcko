@@ -1,0 +1,160 @@
+{
+  "file": "reel-sfx.wav",
+  "durationSeconds": 11,
+  "sampleRate": 48000,
+  "channels": 2,
+  "encoding": "PCM signed 16-bit little-endian",
+  "sampleFrames": 528000,
+  "peakDbfs": -5,
+  "rmsDbfs": -27.83153643894362,
+  "provenance": "Original deterministic synthesis; no samples, music, or speech.",
+  "events": [
+    {
+      "name": "opening soft pop",
+      "start": 0.1,
+      "duration": 0.28,
+      "gain": 0.66,
+      "pan": 0
+    },
+    {
+      "name": "clock tick 1",
+      "start": 0.45,
+      "duration": 0.055,
+      "gain": 0.18,
+      "pan": -0.1
+    },
+    {
+      "name": "clock tick 2",
+      "start": 0.8,
+      "duration": 0.055,
+      "gain": 0.18,
+      "pan": 0.1
+    },
+    {
+      "name": "clock tick 3",
+      "start": 1.15,
+      "duration": 0.055,
+      "gain": 0.18,
+      "pan": -0.1
+    },
+    {
+      "name": "paper transition 1",
+      "start": 1.9,
+      "duration": 0.2,
+      "gain": 0.73,
+      "pan": "gentle sweep"
+    },
+    {
+      "name": "delivery movement",
+      "start": 2.2,
+      "duration": 1.1,
+      "gain": 0.35,
+      "pan": "gentle sweep"
+    },
+    {
+      "name": "paper transition 2",
+      "start": 3.9,
+      "duration": 0.2,
+      "gain": 0.73,
+      "pan": "gentle sweep"
+    },
+    {
+      "name": "shopping checkbox 1",
+      "start": 4.35,
+      "duration": 0.105,
+      "gain": 0.35,
+      "pan": -0.08
+    },
+    {
+      "name": "shopping checkbox 2",
+      "start": 4.62,
+      "duration": 0.105,
+      "gain": 0.35,
+      "pan": 0
+    },
+    {
+      "name": "shopping checkbox 3",
+      "start": 4.89,
+      "duration": 0.105,
+      "gain": 0.35,
+      "pan": 0.08
+    },
+    {
+      "name": "shopping landing 1",
+      "start": 5,
+      "duration": 0.16,
+      "gain": 0.29,
+      "pan": 0.1
+    },
+    {
+      "name": "shopping landing 2",
+      "start": 5.25,
+      "duration": 0.16,
+      "gain": 0.29,
+      "pan": 0
+    },
+    {
+      "name": "shopping landing 3",
+      "start": 5.5,
+      "duration": 0.16,
+      "gain": 0.29,
+      "pan": -0.1
+    },
+    {
+      "name": "paper transition 3",
+      "start": 5.9,
+      "duration": 0.2,
+      "gain": 0.73,
+      "pan": "gentle sweep"
+    },
+    {
+      "name": "calculator tap",
+      "start": 6.18,
+      "duration": 0.055,
+      "gain": 0.24,
+      "pan": 0
+    },
+    {
+      "name": "calculator result ping",
+      "start": 6.48,
+      "duration": 0.4,
+      "gain": 0.28,
+      "pan": 0.03
+    },
+    {
+      "name": "paper transition 4",
+      "start": 6.9,
+      "duration": 0.2,
+      "gain": 0.73,
+      "pan": "gentle sweep"
+    },
+    {
+      "name": "business parcel thump",
+      "start": 7.65,
+      "duration": 0.3,
+      "gain": 0.55,
+      "pan": 0
+    },
+    {
+      "name": "paper transition 5",
+      "start": 8.9,
+      "duration": 0.2,
+      "gain": 0.73,
+      "pan": "gentle sweep"
+    },
+    {
+      "name": "closing chime lower",
+      "start": 9.12,
+      "duration": 1.05,
+      "gain": 0.37,
+      "pan": -0.12
+    },
+    {
+      "name": "closing chime upper",
+      "start": 9.29,
+      "duration": 1.25,
+      "gain": 0.34,
+      "pan": 0.12
+    }
+  ]
+}

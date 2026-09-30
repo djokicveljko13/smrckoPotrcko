@@ -1,0 +1,25 @@
+ŠMRČKO POTRČKO — REEL V2
+
+Ova izmena zamenjuje trajanje i pravila zvuka iz prvog prompta.
+Vizuelni identitet, usluge i potvrđeni kontakt podaci ostaju isti.
+
+Format: 1080 × 1920, 30 fps, MP4 H.264 + AAC, ukupno 11 sekundi.
+
+0-2 s: Nemaš vremena? Mi trčimo umesto tebe.
+2-4 s: Dostava na tvoju adresu. Jagodina i okolina.
+4-6 s: Ti napiši listu. Mi kupujemo i donosimo.
+6-7 s: Proveri cenu.
+7-9 s: Dostava i za Vašu firmu. Dogovorimo saradnju.
+9-11 s: Poruči onlajn ili pozovi. smrckopotrcko.rs, 066 59 355 35, svaki dan 08:00-23:00.
+
+Pokreti: kratki papirni prelazi, kazaljka sata, redom ulazeće ilustracije,
+vozilo koje se kreće i okreće točkove, namirnice koje uleću u kesu,
+čekiranje liste, pritisak dugmeta i potvrda cene, paket koji stiže firmi.
+Naslovi brzo zauzimaju konačan položaj; domen i telefon ostaju mirni.
+
+Zvuk: originalni sintetisani efekti bez govora i muzike, usklađeni sa
+prelazima, čekiranjem, spuštanjem namirnica i završnom karticom.
+HTML pregled ima dugme za uključivanje zvuka zbog pravila pregledača.
+
+Prva verzija od 30 sekundi ostaje sačuvana. Nova verzija je u
+artifacts/smrcko-reel/v2/.

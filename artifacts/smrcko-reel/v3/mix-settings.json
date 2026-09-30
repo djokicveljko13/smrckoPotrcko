@@ -1,0 +1,25 @@
+{
+  "music": "Sonican — Upbeat Ukulele Loop - Positive Ads",
+  "trackId": 268489,
+  "sourceUrl": "https://pixabay.com/music/upbeat-upbeat-ukulele-loop-positive-ads-268489/",
+  "sourceFilename": "sonican-upbeat-ukulele-loop-positive-ads-268489.mp3",
+  "startSeconds": 0,
+  "durationSeconds": 11,
+  "musicTargetLUFS": -28,
+  "fadeInSeconds": 0.15,
+  "fadeOutStartSeconds": 9.65,
+  "originalSoundEffects": true,
+  "videoReencoded": false,
+  "sourceMeasurement": {
+    "input_i": "-11.39",
+    "input_tp": "-0.49",
+    "input_lra": "0.50",
+    "input_thresh": "-21.39",
+    "output_i": "-28.06",
+    "output_tp": "-17.20",
+    "output_lra": "0.50",
+    "output_thresh": "-38.06",
+    "normalization_type": "dynamic",
+    "target_offset": "0.06"
+  }
+}

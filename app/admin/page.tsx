@@ -7,7 +7,12 @@ import { requireOwner } from "@/lib/auth";
 import { secondaryButtonClass } from "@/lib/ui";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AssignCourierOption, BoardOrder } from "@/lib/types";
-
+const DELIVERED_DAYS = 7;
+function deliveredSince(): string {
+  return new Date(
+    Date.now() - DELIVERED_DAYS * 24 * 60 * 60 * 1000,
+  ).toISOString();
+}
 const ORDER_COLUMNS =
   "id, public_number, title, shop, address, phone, delivery_price, distance_m, source, status, courier_id, assigned_at, created_at, order_type, shopping_note, shopping_items(text, sort_order), courier:couriers(name, phone)";
 
@@ -42,10 +47,12 @@ export default async function AdminPage() {
 
   // Dva upita paralelno: cekati ih jedan za drugim bi bez razloga usporilo
   // tablu, jer ne zavise jedan od drugog.
+const since = deliveredSince();
   const [ordersResult, couriersResult] = await Promise.all([
     supabase
       .from("orders")
       .select(ORDER_COLUMNS)
+      .or(`status.neq.isporuceno,created_at.gte.${since}`)
       .order("created_at", { ascending: false }),
     supabase
       .from("couriers")

@@ -1,14 +1,16 @@
+import { randomUUID } from "node:crypto";
 import { readOrderValue, signOrderValue } from "@/lib/order-signing";
 import { deliveryPriceFromMeters } from "@/lib/pricing";
 import {
   asRecord,
   MAX_ORDER_NOTE,
+  QUOTE_ID_RE,
   readPlace,
   readString,
   validPhone,
   validText,
 } from "@/lib/order-validation";
-import type { CreateGuestOrderState, OrderDetails, OrderField, OrderQuote, PrepareOrderResult } from "@/lib/order-types";
+import type { CreateGuestOrderState, OrderDetails, OrderField, OrderInsertResult, OrderQuote, PrepareOrderResult } from "@/lib/order-types";
 
 export const QUOTE_TTL_MS = 15 * 60 * 1000;
 const CHOOSE_ADDRESS = "Izaberi adresu iz ponuđene liste.";
@@ -41,6 +43,7 @@ export async function prepareOrderQuote(
     return { status: "error", message: "Cena dostave trenutno nije dostupna. Pokušaj ponovo ili nas pozovi." };
   }
   const quote: OrderQuote = {
+    id: randomUUID(),
     order: { title, shop: shop.text, address: address.text, addressDetails, note, phone, destinationPlaceId: address.placeId },
     distanceM,
     price: deliveryPriceFromMeters(distanceM),
@@ -59,7 +62,8 @@ function isOrderDetails(value: unknown): value is OrderDetails {
 
 function isQuote(value: unknown): value is OrderQuote {
   const quote = asRecord(value);
-  return Boolean(quote && isOrderDetails(quote.order) &&
+  return Boolean(quote && typeof quote.id === "string" && QUOTE_ID_RE.test(quote.id) &&
+    isOrderDetails(quote.order) &&
     typeof quote.distanceM === "number" && Number.isSafeInteger(quote.distanceM) &&
     quote.distanceM >= 0 && quote.distanceM <= 2_147_483_647 &&
     typeof quote.price === "number" && Number.isSafeInteger(quote.price) && quote.price > 0 &&
@@ -69,7 +73,7 @@ function isQuote(value: unknown): value is OrderQuote {
 /** Upis dobija isključivo proverene podatke iz potpisane ponude. */
 export async function confirmOrderQuote(
   token: string,
-  insert: (quote: OrderQuote) => Promise<string | null>,
+  insert: (quote: OrderQuote) => Promise<OrderInsertResult>,
   notify: (ticket: string) => Promise<void>,
   now: () => number = Date.now,
 ): Promise<Exclude<CreateGuestOrderState, null>> {
@@ -80,11 +84,14 @@ export async function confirmOrderQuote(
   if (quote.expiresAt <= now()) {
     return { status: "error", message: "Cena je istekla. Ponovo proveri cenu pre potvrde.", expired: true };
   }
-  const ticket = await insert(quote);
-  if (!ticket || !/^P-\d+$/.test(ticket)) {
+  const inserted = await insert(quote);
+  if (!inserted || !/^P-\d+$/.test(inserted.ticket)) {
     return { status: "error", message: "Porudžbina nije upisana. Pokušaj ponovo ili nas pozovi." };
   }
+  // Ponovljena ponuda: kupac dobija isti broj, kurir ne dobija drugu poruku.
   // Upis je završen. Greška obaveštenja ne sme kupcu sugerisati da šalje ponovo.
-  try { await notify(ticket); } catch { console.error("Order notification failed"); }
-  return { status: "ok", ticket, price: quote.price };
+  if (inserted.created) {
+    try { await notify(inserted.ticket); } catch { console.error("Order notification failed"); }
+  }
+  return { status: "ok", ticket: inserted.ticket, price: quote.price };
 }

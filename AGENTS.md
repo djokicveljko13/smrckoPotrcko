@@ -187,7 +187,8 @@ Primeri: 1,6 km → 100 + 128 = 228 din; 5 km → 200 + 400 = 600 din; 10 km →
 - Server potpisuje Google ID i tekst svakog predloga, pa proverava oba izbora. Potpisana ponuda vezuje proverene podatke, cenu, kilometražu i rok od 15 minuta; potvrda ne zove ponovo Google. Koristi se HMAC-SHA256 i serverski `ORDER_SIGNING_SECRET`.
 - Bez uspešnog obračuna nema slanja: sačuvaj unos, ponudi ponovni pokušaj i poziv 066 59 355 35. Istekla ponuda traži novi obračun i novu potvrdu.
 - Popup se zatvara dugmetom „Izmeni podatke”, Escape-om ili klikom na pozadinu; unos ostaje, prethodna ponuda se poništava. Tokom obračuna unos je zaključan, tokom potvrde i zatvaranje i dupli klikovi su blokirani.
-- Samo javna forma; nema novih tabela, statusa, migracija, geografskih ograničenja ni promene cenovnika. Potpis ne obezbeđuje trajnu evidenciju jednokratne upotrebe ponude.
+- Samo javna forma; nema novih tabela, statusa, geografskih ograničenja ni promene cenovnika.
+- Jednokratna ponuda (30.09.2026): svaka potpisana ponuda (dostava, kupovina, unos sa poziva) nosi nasumičan `id`, koji upis čuva u `orders.quote_id` (`unique`). Ponovljena potvrda iste ponude ne pravi novu porudžbinu ni novi Telegram; vraća isti broj. Provera je u bazi, ne u aplikaciji, da dva istovremena zahteva ne prođu oba.
 
 Statusi: `nova` → `poslata_kuriru` → `krenuo` → `isporuceno`.
 
@@ -268,6 +269,14 @@ Ručna dodela je obična ponuda: Telegram stiže, kurir sme da odbije.
 - Kurir `update` samo preko tokena (RPC ili server), ne „update bilo kog reda“.
 - Kupac ne vidi tuđe adrese/telefone.
 - Token kurira nije pogodiv (`/k/1` je pogrešno).
+
+## Reel reklama (30.09.2026)
+
+- Zaseban reklamni video u `artifacts/smrcko-reel`; ne menja tokove na sajtu.
+- Kraća verzija traje **11 sekundi**: uvod 2 s, dostava 2 s, kupovina 2 s, provera cene 1 s, saradnja 2 s, kontakt 2 s.
+- Na Veljkov zahtev dodati zvučne efekte usklađene sa prelazima i pokretima, kao i izraženije animacije ilustracija. Ovo se odnosi na reklamu, ne na zvuk u aplikaciji.
+- Za verziju sa muzikom Veljko je izabrao **Sonican — Upbeat Ukulele Loop - Positive Ads** sa Pixabay-a (numera `268489`). Koristiti 11-sekundni isečak tiho ispod efekata, uz blago utišavanje na kraju; sačuvati izvor i podatke o licenci uz izvozni fajl. Verzija samo sa efektima ostaje sačuvana.
+- Sačuvati prvu verziju od 30 sekundi. Nova verzija ostaje vertikalna 1080 × 1920, sa originalnim logotipom, postojećim bojama i istinitim opisom usluga. Završni telefon i domen ostaju mirni radi čitljivosti.
 
 ## Kako agent radi u ovom repo-u
 

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireOwner } from "@/lib/auth";
 import { confirmOrderQuote } from "@/lib/order-quote";
 import type { CreateGuestOrderState } from "@/lib/order-types";
+import { readCreatedOrder } from "@/lib/order-validation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendOfferForPublicNumber } from "@/lib/telegram";
 
@@ -20,9 +21,10 @@ export async function createPhoneOrder(
     if (typeof token !== "string") {
       return { status: "error", message: "Ponovo proveri cenu pre potvrde.", expired: true };
     }
-    const result = await confirmOrderQuote(token, async ({ order, price, distanceM }) => {
+    const result = await confirmOrderQuote(token, async ({ id, order, price, distanceM }) => {
       const admin = createSupabaseAdminClient();
       const { data, error } = await admin.rpc("create_phone_order", {
+        p_quote_id: id,
         p_title: order.title,
         p_shop: order.shop,
         p_address: order.addressDetails ? `${order.address}; ${order.addressDetails}` : order.address,
@@ -32,11 +34,12 @@ export async function createPhoneOrder(
         p_place_id: order.destinationPlaceId,
         p_note: order.note || null,
       });
-      if (error || typeof data !== "string") {
+      const created = readCreatedOrder(data);
+      if (error || !created) {
         console.error("create_phone_order failed", error?.code ?? "invalid response");
         return null;
       }
-      return data;
+      return created;
     }, sendOfferForPublicNumber);
     if (result.status === "ok") revalidatePath("/admin");
     return result;

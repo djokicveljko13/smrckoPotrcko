@@ -12,6 +12,8 @@ export type OrderDetails = {
 };
 
 export type OrderQuote = {
+  /** Jednokratni ID ponude; baza ga čuva u orders.quote_id (unique). */
+  id: string;
   order: OrderDetails;
   distanceM: number;
   price: number;
@@ -23,6 +25,9 @@ export type OrderField = "title" | "shop" | "address" | "address_details" | "not
 export type PrepareOrderResult =
   | { status: "ok"; quote: OrderQuote; token: string }
   | { status: "error"; message: string; fields?: Partial<Record<OrderField, string>> };
+
+/** created = false: ista ponuda je već upisana, pa nema novog obaveštenja kuriru. */
+export type OrderInsertResult = { ticket: string; created: boolean } | null;
 
 export type CreateGuestOrderState =
   | { status: "ok"; ticket: string; price: number }

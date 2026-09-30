@@ -77,7 +77,7 @@ test("obračun zove Routes samo za odredište, traje 15 minuta i potvrđuje istu
   assert.equal(result.quote.expiresAt, 1000 + QUOTE_TTL_MS);
   const events = [];
   const confirmed = await confirmOrderQuote(result.token, async (quote) => {
-    assert.deepEqual(quote, result.quote); events.push("insert"); return "P-17";
+    assert.deepEqual(quote, result.quote); events.push("insert"); return { ticket: "P-17", created: true };
   }, async (ticket) => { assert.equal(ticket, "P-17"); events.push("notify"); }, () => 2000);
   assert.deepEqual(confirmed, { status: "ok", ticket: "P-17", price: 260 });
   assert.deepEqual(events, ["insert", "notify"]);
@@ -100,8 +100,26 @@ test("istekla, promenjena ili pogrešne namene ponuda ne stiže do baze", async 
 test("greška upisa ne šalje obaveštenje; greška obaveštenja ne poništava uspešan upis", async () => {
   const result = await prepareOrderQuote(form(), async () => 2000);
   assert.equal((await confirmOrderQuote(result.token, async () => null, async () => assert.fail("Nema obaveštenja"))).status, "error");
-  const response = await confirmOrderQuote(result.token, async () => "P-18", async () => { throw new Error("Telegram down"); });
+  const response = await confirmOrderQuote(result.token, async () => ({ ticket: "P-18", created: true }), async () => { throw new Error("Telegram down"); });
   assert.deepEqual(response, { status: "ok", ticket: "P-18", price: 260 });
+});
+
+test("svaka ponuda dobija svoj ID; ponovljena ponuda vraća isti broj bez novog obaveštenja", async () => {
+  const first = await prepareOrderQuote(form(), async () => 2000);
+  const second = await prepareOrderQuote(form(), async () => 2000);
+  assert.match(first.quote.id, /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+  assert.notEqual(first.quote.id, second.quote.id);
+  const response = await confirmOrderQuote(first.token, async () => ({ ticket: "P-17", created: false }),
+    async () => assert.fail("Ponovljena ponuda ne sme ponovo da zove kurira"));
+  assert.deepEqual(response, { status: "ok", ticket: "P-17", price: 260 });
+});
+
+test("ponuda bez ID-ja (potpisana pre ove izmene) ne stiže do baze", async () => {
+  const { id, ...withoutId } = (await prepareOrderQuote(form(), async () => 2000)).quote;
+  assert.ok(id);
+  const response = await confirmOrderQuote(signOrderValue("quote", withoutId), async () => assert.fail("Nema upisa"), async () => assert.fail("Nema obaveštenja"));
+  assert.equal(response.status, "error");
+  assert.equal(response.expired, true);
 });
 
 test("stvarne akcije: priprema ne upisuje, potvrda mapira detalje stana u postojeću kolonu", async () => {
@@ -110,7 +128,7 @@ test("stvarne akcije: priprema ne upisuje, potvrda mapira detalje stana u postoj
   const mocks = {
     "@/lib/google/routes": { computeDistanceMeters: async () => { googleCalls++; return 2000; } },
     "@/lib/supabase/admin": { createSupabaseAdminClient: () => ({ rpc: async (name, args) => {
-      assert.equal(name, "create_web_order"); inserts.push(args); return { data: "P-19", error: null };
+      assert.equal(name, "create_web_order"); inserts.push(args); return { data: { public_number: "P-19", created: true }, error: null };
     } }) },
     "@/lib/telegram": { sendOfferForPublicNumber: async (ticket) => notifications.push(ticket) },
   };
@@ -120,7 +138,7 @@ test("stvarne akcije: priprema ne upisuje, potvrda mapira detalje stana u postoj
   assert.equal(inserts.length, 0); assert.equal(notifications.length, 0);
   const confirmed = await createGuestOrder(prepared.token);
   assert.equal(confirmed.price, prepared.quote.price);
-  assert.deepEqual(inserts, [{ p_title: "Dve pice", p_shop: pickup.text,
+  assert.deepEqual(inserts, [{ p_quote_id: prepared.quote.id, p_title: "Dve pice", p_shop: pickup.text,
     p_address: `${destination.text}; ulaz B, 2. sprat, stan 8`, p_phone: "066 123 4567",
     p_delivery_price: 260, p_distance_m: 2000, p_place_id: destination.placeId, p_note: null }]);
   assert.deepEqual(notifications, ["P-19"]); assert.equal(googleCalls, 1);

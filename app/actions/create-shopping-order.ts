@@ -1,5 +1,6 @@
 "use server";
 
+import { readCreatedOrder } from "@/lib/order-validation";
 import { buildShoppingTitle } from "@/lib/shopping";
 import {
   confirmShoppingQuote,
@@ -28,6 +29,7 @@ export async function createShoppingOrder(
           ? `${quote.address}; ${quote.addressDetails}`
           : quote.address;
         const { data, error } = await admin.rpc("create_shopping_order", {
+          p_quote_id: quote.id,
           p_title: buildShoppingTitle(quote.items),
           p_shop: quote.storeLabel,
           p_address: address,
@@ -37,11 +39,12 @@ export async function createShoppingOrder(
           p_note: quote.note || null,
           p_items: quote.items,
         });
-        if (error || typeof data !== "string") {
+        const created = readCreatedOrder(data);
+        if (error || !created) {
           console.error("create_shopping_order failed", error?.code ?? "invalid response");
           return null;
         }
-        return data;
+        return created;
       },
       sendOfferForPublicNumber,
     );

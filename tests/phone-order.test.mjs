@@ -35,7 +35,7 @@ test("telefonski unos zove create_phone_order i ostaje bez javne hvala stranice"
     "@/lib/supabase/admin": { createSupabaseAdminClient: () => ({ rpc: async (name, args) => {
       assert.equal(name, "create_phone_order");
       inserts.push(args);
-      return { data: "P-40", error: null };
+      return { data: { public_number: "P-40", created: true }, error: null };
     } }) },
     "@/lib/telegram": { sendOfferForPublicNumber: async (ticket) => notifications.push(ticket) },
   };
@@ -47,5 +47,6 @@ test("telefonski unos zove create_phone_order i ostaje bez javne hvala stranice"
   assert.equal(ownerChecks, 1);
   assert.deepEqual(confirmed, { status: "ok", ticket: "P-40", price: prepared.quote.price });
   assert.equal(inserts[0].p_phone, "066 123 4567");
+  assert.equal(inserts[0].p_quote_id, prepared.quote.id);
   assert.deepEqual(notifications, ["P-40"]);
 });
