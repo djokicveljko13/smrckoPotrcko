@@ -84,7 +84,7 @@ export default function LocationPage() {
 
             <div className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-[0_18px_60px_-30px_rgba(16,16,16,0.3)]">
               <iframe
-                title={`Mapa zajedničke lokacije — ${BUSINESS_ADDRESS.streetAddress}, ${BUSINESS_ADDRESS.addressLocality}`}
+                title={`${BUSINESS_NAME} na Google mapi — ${BUSINESS_ADDRESS.streetAddress}, ${BUSINESS_ADDRESS.addressLocality}`}
                 src={LOCATION_MAP_EMBED_URL}
                 width="600"
                 height="450"
@@ -92,13 +92,8 @@ export default function LocationPage() {
                 loading="lazy"
                 allowFullScreen
                 referrerPolicy="strict-origin-when-cross-origin"
-                aria-describedby="map-caption"
               />
-              <div className="space-y-4 p-5 sm:p-6">
-                <p id="map-caption" className="text-sm leading-relaxed text-zinc-600">
-                  Delimo adresu sa Autoperionicom SMRK. Na Google mapi lokacija
-                  je označena tim imenom.
-                </p>
+              <div className="p-5 sm:p-6">
                 <a href={LOCATION_MAP_URL} target="_blank" rel="noopener noreferrer" className={`${secondaryButtonClass} w-full gap-2 sm:w-auto`}>
                   Otvori u Google Maps
                   <ArrowRightIcon className="h-4 w-4" />

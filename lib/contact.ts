@@ -37,7 +37,7 @@ export const BUSINESS_ADDRESS = {
   addressCountry: "RS",
 };
 
-// Zajednička lokacija; Google profil nosi naziv Autoperionica SMRK.
-export const LOCATION_MAP_URL = "https://maps.app.goo.gl/ChcMGeUF6qa1bBF27";
+// Google profil dostave; na mapi piše „Smrko Potrcko”.
+export const LOCATION_MAP_URL = "https://maps.app.goo.gl/bzJm8XKemWUwhiw78";
 export const LOCATION_MAP_EMBED_URL =
-  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2871.098922908816!2d21.265773175416815!3d43.978003771088474!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4756c5f6ea576087%3A0xe368dd43339ab72b!2sAutoperionica%20SMRK!5e0!3m2!1ssr!2srs!4v1790717421666!5m2!1ssr!2srs";
+  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2871.100629791246!2d21.265827976020415!3d43.97796847108856!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4756c5b346fed2bd%3A0x537c119c0379fa2e!2sSmrko%20Potrcko!5e0!3m2!1ssr!2srs!4v1791566324199!5m2!1ssr!2srs";

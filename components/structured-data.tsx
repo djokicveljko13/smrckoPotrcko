@@ -18,6 +18,16 @@ const openingHours = {
   closes: CLOSING_TIME,
 };
 
+// JSON-LD prati pravopis Google profila; tekst stranice i meta oznake ostaju sa dijakritikom.
+const SCHEMA_NAME = "Smrko Potrcko";
+const SCHEMA_STREET_ADDRESS = "Kneza Milosa 24";
+
+function profileSpelling(text: string): string {
+  return text
+    .replaceAll(BUSINESS_NAME, SCHEMA_NAME)
+    .replaceAll(BUSINESS_ADDRESS.streetAddress, SCHEMA_STREET_ADDRESS);
+}
+
 export function StructuredData({ path }: { path: PublicPath }) {
   const page = PUBLIC_PAGES[path];
   const pageId = siteUrl(`${path}#webpage`);
@@ -25,13 +35,16 @@ export function StructuredData({ path }: { path: PublicPath }) {
     {
       "@type": "LocalBusiness",
       "@id": businessId,
-      name: BUSINESS_NAME, url: siteUrl("/"),
+      name: SCHEMA_NAME, url: siteUrl("/"),
       logo: siteUrl("/logo.png"), image: siteUrl("/opengraph-image"),
       description: PUBLIC_PAGES["/"].description,
       telephone: E164_PHONE, areaServed,
       address: {
         "@type": "PostalAddress",
-        ...BUSINESS_ADDRESS,
+        streetAddress: SCHEMA_STREET_ADDRESS,
+        addressLocality: BUSINESS_ADDRESS.addressLocality,
+        postalCode: "35000",
+        addressCountry: BUSINESS_ADDRESS.addressCountry,
       },
       sameAs: [FACEBOOK_URL, INSTAGRAM_URL],
       openingHoursSpecification: openingHours,
@@ -43,11 +56,11 @@ export function StructuredData({ path }: { path: PublicPath }) {
     },
     {
       "@type": "WebSite", "@id": websiteId, url: siteUrl("/"),
-      name: BUSINESS_NAME, inLanguage: "sr-Latn", publisher: { "@id": businessId },
+      name: SCHEMA_NAME, inLanguage: "sr-Latn", publisher: { "@id": businessId },
     },
     {
       "@type": "WebPage", "@id": pageId, url: siteUrl(path),
-      name: page.title, description: page.description, inLanguage: "sr-Latn",
+      name: profileSpelling(page.title), description: profileSpelling(page.description), inLanguage: "sr-Latn",
       isPartOf: { "@id": websiteId }, about: { "@id": businessId },
       ...(path !== "/" ? { breadcrumb: { "@id": siteUrl(`${path}#breadcrumb`) } } : {}),
     },
@@ -56,7 +69,7 @@ export function StructuredData({ path }: { path: PublicPath }) {
   if (path !== "/cena" && path !== "/lokacija") {
     graph.push({
       "@type": "Service", "@id": siteUrl(`${path}#service`),
-      name: page.label, serviceType: page.label, description: page.description,
+      name: page.label, serviceType: page.label, description: profileSpelling(page.description),
       url: siteUrl(path), provider: { "@id": businessId }, areaServed,
       mainEntityOfPage: { "@id": pageId },
     });
@@ -66,7 +79,7 @@ export function StructuredData({ path }: { path: PublicPath }) {
     graph.push({
       "@type": "BreadcrumbList", "@id": siteUrl(`${path}#breadcrumb`),
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: BUSINESS_NAME, item: siteUrl("/") },
+        { "@type": "ListItem", position: 1, name: SCHEMA_NAME, item: siteUrl("/") },
         { "@type": "ListItem", position: 2, name: page.label, item: siteUrl(path) },
       ],
     });

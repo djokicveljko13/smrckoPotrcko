@@ -48,11 +48,18 @@ Vercel, test okruženje takođe mora dobiti `VERCEL_ENV=preview` ili ekvivalentn
 
 Javna `/lokacija` je dodata kao peta stranica u navigaciju i sitemap, sa zasebnim
 naslovom, opisom, canonical i oznakama za deljenje. Prikazuje potvrđenu adresu
-Kneza Miloša 24, Jagodina, i postojeće podatke dostave. Google mapa je preuzeta
-iz opcije „Ugradite mapu” za prosleđeni profil Autoperionica SMRK; tekst jasno
-objašnjava zajedničku adresu. Taj profil nije `sameAs` identitet dostave.
-Ova faza dodaje mapu i izgled; `LocalBusiness` zapis ostaje sledeća celina.
+Kneza Miloša 24, Jagodina, i postojeće podatke dostave. Ranije prikazan profil
+Autoperionica SMRK zamenjen je 09.10.2026 Google profilom dostave **Smrko Potrcko**
+(mapa iz opcije „Ugradite mapu” i link https://maps.app.goo.gl/bzJm8XKemWUwhiw78).
 Ranije provere i spisak četiri strane iz ovog dokumenta opisuju prethodnu fazu.
+
+### Dopuna: schema prema Google profilu (09.10.2026)
+
+Na zahtev klijenta JSON-LD koristi pravopis Google profila: naziv „Smrko Potrcko”
+(`LocalBusiness`, `WebSite`, `BreadcrumbList`, nazivi i opisi `WebPage`/`Service`),
+ulicu „Kneza Milosa 24” i `postalCode` 35000. Pravila su u
+`components/structured-data.tsx`. Vidljivi tekst, `<title>`, meta opis i Open Graph
+ostaju „Šmrčko Potrčko” / „Kneza Miloša 24”.
 
 1. Objaviti testirani kod u isti Vercel projekat. Ovaj zadatak sam po sebi nije
    izvršio deploy niti commit.
