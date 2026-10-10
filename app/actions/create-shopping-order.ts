@@ -1,5 +1,6 @@
 "use server";
 
+import { notifyWebOrder } from "@/lib/notify-web-order";
 import { readCreatedOrder } from "@/lib/order-validation";
 import { buildShoppingTitle } from "@/lib/shopping";
 import {
@@ -7,7 +8,6 @@ import {
   type CreateShoppingOrderState,
 } from "@/lib/shopping-quote";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { sendOfferForPublicNumber } from "@/lib/telegram";
 
 export async function createShoppingOrder(
   token: string,
@@ -46,7 +46,7 @@ export async function createShoppingOrder(
         }
         return created;
       },
-      sendOfferForPublicNumber,
+      notifyWebOrder,
     );
   } catch {
     console.error("Shopping order confirmation unavailable");

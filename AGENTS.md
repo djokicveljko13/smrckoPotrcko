@@ -77,7 +77,7 @@ Druga usluga pored klasične dostave: kurir **ode u market i kupi** sa liste, ne
 - Browser šalje samo `store` id; server cenu izvodi iz `SHOPPING_STORES` u `lib/pricing.ts` i potpisuje HMAC-om (`purpose: "shopping"`).
 - Lista stavki (1–30 × max 120 znakova) u tabeli `shopping_items`; `orders.order_type = 'kupovina'`, opciona `shopping_note`.
 - `title` = sažetak liste, `shop` = naziv lanca — da tabla, Telegram i `/k/{token}` rade bez posebnog UI-ja dok se lista ne doda.
-- Upis samo preko RPC `create_shopping_order` (`service_role`), ista auto-dodela i Telegram.
+- Upis samo preko RPC `create_shopping_order` (`service_role`), ista auto-dodela, Telegram i mejl vlasniku.
 - Telefonski unos kupovine na tabli i čekiranje stavki kod kurira **nisu** sada.
 - Plan izrade: `docs/featureNamirnice.md`.
 
@@ -119,6 +119,16 @@ Javna stranica `/cena` (tab „Cena”) da kupac vidi cenu **pre** porudžbine, 
 - Nova stranica ulazi u javnu navigaciju i SEO obuhvat, uključujući sitemap. Na telefonu dugme „Meni” otvara pet linkova ispod zaglavlja; na računaru ostaju u jednom redu. Prethodni SEO odeljak opisuje prvobitne četiri strane.
 - Izmene sajta ne ažuriraju automatski Google profil. Implementacija ide u malim celinama uz objašnjenja Veljku.
 - Schema (30.09.2026): na Veljkov zahtev postojeći zapis firme koristi `LocalBusiness` i `PostalAddress` iz `BUSINESS_ADDRESS`, uz isti `@id` (od 09.10.2026 naziv i ulica u zapisu prate pravopis Google profila, vidi gore). Koristi se potvrđena javna adresa; ne tvrdi se da tu postoji prijem kupaca. Zajednički `OpeningHoursSpecification` opisuje radno vreme biznisa i dostupnost kontakta, svakog dana 08:00–23:00. Komponenta se uključuje i na `/lokacija`; za tu stranicu se ne pravi izmišljena usluga nazvana „Lokacija”. Zapis proveriti u lokalnom HTML-u, a posle objave i Google Rich Results Test alatom.
+
+## Mejl vlasniku za novu porudžbinu (10.10.2026)
+
+Vlasnik želi uvid u porudžbine bez prijave u aplikaciju.
+
+- Svaka nova porudžbina sa sajta (`/` i `/kupovina`, `izvor = sajt`) šalje vlasniku mejl preko Resend-a, na istu adresu kao upit za saradnju (`PARTNERSHIP_EMAIL_TO`, `potrckosmrcko@gmail.com`). Koriste se isti `RESEND_API_KEY` i `EMAIL_FROM`; nema novog env-a.
+- Telo mejla je **isti tekst** kao Telegram poruka kuriru (`buildCourierMessage`): običan tekst, bez HTML-a. Kurirski link `/k/{token}` ne ide u mejl. Naslov: `Nova porudžbina P-17`.
+- Mejl ide **jednom, pri upisu**, i kad baza nije našla slobodnog kurira (porudžbina ostaje `nova`). Odbijanje i ponuda sledećem kuriru, ručna dodela i ponovljena potvrda iste ponude **ne** šalju nov mejl.
+- Unos sa poziva (`/admin/nova`, `izvor = telefon`) ostaje **bez mejla** (potvrdio Veljko 10.10.2026).
+- Posle upisa Telegram i mejl idu paralelno. Greška mejla se samo loguje, bez ličnih podataka; porudžbina je već upisana i kupac dobija broj.
 
 ## Tech stack
 
@@ -214,7 +224,7 @@ Zašto ne posebna tabela „telefonske“: dupli kod, dupli izveštaji, lako da 
 1. Gost popuni formu, izabere oba Google predloga i klikne „Poruči”. Server računa cenu bez upisa; popup prikazuje pregled.
 2. „Potvrdi porudžbinu” proverava potpisanu ponudu i upisuje `orders` (`izvor = sajt`) + broj.
 3. Stranica: hvala, ista **cena dostave**, pa broj. Bez obračunate cene nema nove javne porudžbine. **Nema** live praćenja za kupca.
-4. Mejl vlasniku.
+4. Mejl vlasniku sa istim tekstom kao Telegram poruka (odeljak **Mejl vlasniku za novu porudžbinu**).
 
 **B — kupac zove vlasnika**
 

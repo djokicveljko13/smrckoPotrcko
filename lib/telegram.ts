@@ -1,5 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { buildCourierMessage } from "@/lib/courier-message";
+import { ORDER_MESSAGE_COLUMNS, orderMessageText } from "@/lib/order-message";
 
 function botToken(): string | null {
   const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
@@ -32,16 +32,6 @@ export function telegramConnectUrl(accessToken: string): string | null {
 function asChatId(value: unknown): number | string | null {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (typeof value === "string" && /^-?\d+$/.test(value)) return value;
-  return null;
-}
-
-/** Postgres numeric/integer ume da stigne kao broj ili kao string. */
-function asNumberOrNull(value: unknown): number | null {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string" && value.trim() !== "") {
-    const parsed = Number(value);
-    if (Number.isFinite(parsed)) return parsed;
-  }
   return null;
 }
 
@@ -125,9 +115,7 @@ export async function sendOffer(
 
     const { data: order, error: orderError } = await admin
       .from("orders")
-      .select(
-        "id, public_number, title, shop, address, phone, delivery_price, distance_m, order_type, shopping_note",
-      )
+      .select(ORDER_MESSAGE_COLUMNS)
       .eq("courier_id", courierId)
       .eq("status", "poslata_kuriru")
       .order("assigned_at", { ascending: false })
@@ -139,49 +127,11 @@ export async function sendOffer(
       return;
     }
 
-    if (
-      !order ||
-      typeof order.public_number !== "string" ||
-      typeof order.title !== "string" ||
-      typeof order.shop !== "string" ||
-      typeof order.address !== "string" ||
-      typeof order.phone !== "string"
-    ) {
+    const text = await orderMessageText(admin, order);
+    if (!text) {
       console.warn("sendOffer: no pending offer for courier", courierId);
       return;
     }
-
-    let items: { text: string }[] | null = null;
-    if (order.order_type === "kupovina" && typeof order.id === "string") {
-      const { data: rows, error: itemsError } = await admin
-        .from("shopping_items")
-        .select("text, sort_order")
-        .eq("order_id", order.id)
-        .order("sort_order", { ascending: true });
-      if (itemsError) {
-        console.error("sendOffer shopping items lookup failed", itemsError);
-      } else {
-        items = (rows ?? [])
-          .filter((row): row is { text: string; sort_order: number } => typeof row.text === "string")
-          .map((row) => ({ text: row.text }));
-      }
-    }
-
-    // Cena i razdaljina smeju da budu null — Google je mogao da zakaže.
-    // Zato NISU deo provere iznad; poruka sama zna šta da napiše kad fale.
-    const text = buildCourierMessage({
-      public_number: order.public_number,
-      title: order.title,
-      shop: order.shop,
-      address: order.address,
-      phone: order.phone,
-      delivery_price: asNumberOrNull(order.delivery_price),
-      distance_m: asNumberOrNull(order.distance_m),
-      order_type: order.order_type === "kupovina" ? "kupovina" : "dostava",
-      shopping_note:
-        typeof order.shopping_note === "string" ? order.shopping_note : null,
-      items,
-    });
 
     const origin = siteUrl();
     const pageUrl =

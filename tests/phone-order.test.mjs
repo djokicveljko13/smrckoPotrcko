@@ -27,6 +27,7 @@ function form() {
 test("telefonski unos zove create_phone_order i ostaje bez javne hvala stranice", async () => {
   const inserts = [];
   const notifications = [];
+  const emails = [];
   let ownerChecks = 0;
   const mocks = {
     "@/lib/auth": { requireOwner: async () => { ownerChecks++; return { id: "owner" }; } },
@@ -38,6 +39,7 @@ test("telefonski unos zove create_phone_order i ostaje bez javne hvala stranice"
       return { data: { public_number: "P-40", created: true }, error: null };
     } }) },
     "@/lib/telegram": { sendOfferForPublicNumber: async (ticket) => notifications.push(ticket) },
+    "@/lib/order-email": { sendNewOrderEmail: async (ticket) => emails.push(ticket) },
   };
   const { prepareGuestOrder } = loadTypeScript("app/actions/prepare-guest-order.ts", mocks);
   const { createPhoneOrder } = loadTypeScript("app/actions/create-phone-order.ts", mocks);
@@ -49,4 +51,6 @@ test("telefonski unos zove create_phone_order i ostaje bez javne hvala stranice"
   assert.equal(inserts[0].p_phone, "066 123 4567");
   assert.equal(inserts[0].p_quote_id, prepared.quote.id);
   assert.deepEqual(notifications, ["P-40"]);
+  // Unos sa poziva: vlasnik je već na tabli, mejl ne ide.
+  assert.deepEqual(emails, []);
 });

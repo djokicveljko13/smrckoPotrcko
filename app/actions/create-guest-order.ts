@@ -1,10 +1,10 @@
 ﻿"use server";
 
+import { notifyWebOrder } from "@/lib/notify-web-order";
 import { confirmOrderQuote } from "@/lib/order-quote";
 import type { CreateGuestOrderState } from "@/lib/order-types";
 import { readCreatedOrder } from "@/lib/order-validation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { sendOfferForPublicNumber } from "@/lib/telegram";
 
 export async function createGuestOrder(token: string): Promise<Exclude<CreateGuestOrderState, null>> {
   try {
@@ -30,7 +30,7 @@ export async function createGuestOrder(token: string): Promise<Exclude<CreateGue
         return null;
       }
       return created;
-    }, sendOfferForPublicNumber);
+    }, notifyWebOrder);
   } catch {
     console.error("Order confirmation unavailable");
     return { status: "error", message: "Slanje nije potvrđeno. Pozovi nas da proverimo porudžbinu pre ponovnog slanja." };
