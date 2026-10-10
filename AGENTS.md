@@ -130,6 +130,22 @@ Vlasnik želi uvid u porudžbine bez prijave u aplikaciju.
 - Unos sa poziva (`/admin/nova`, `izvor = telefon`) ostaje **bez mejla** (potvrdio Veljko 10.10.2026).
 - Posle upisa Telegram i mejl idu paralelno. Greška mejla se samo loguje, bez ličnih podataka; porudžbina je već upisana i kupac dobija broj.
 
+## SEO faza 2 i AI pretraga (10.10.2026)
+
+Povod: za „dostava Jagodina” sajt nije na prvoj strani Google-a. `site:smrckopotrcko.rs` 10.10.2026 prikazuje sve javne stranice, znači problem nije indeksiranje nego rangiranje. Cilj je i da AI pretraga (ChatGPT/Bing, Gemini/Google, Perplexity) pominje biznis za lokalna pitanja o dostavi.
+
+Redosled (Veljko potvrdio plan 10.10.2026):
+
+0. **Merenje** — Google Search Console i Bing Webmaster Tools (pristup vlasnika; uputstvo u `docs/seo.md`).
+1. **Google Business Profile i recenzije** — kategorija, link ka sajtu, mesta koja se pokrivaju, fotografije, opis. Samo iskrene recenzije stvarnih kupaca.
+2. **Tehničko:** `www` preusmerenje sa 307 na trajno 308 (Vercel podešavanja, ne kod). Svaka `*.vercel.app` adresa dobija `X-Robots-Tag: noindex, nofollow` na svim putanjama. Telegram webhook je 10.10.2026 prebačen na `https://smrckopotrcko.rs/api/telegram/webhook` (Telegram ne prati preusmerenja), pa se `smrcko-potrcko.vercel.app` u Vercel Domains preusmerava **308** na glavni domen. Preview i adrese pojedinačnih deploy-eva se ne preusmeravaju; za njih važi noindex.
+3. **Sadržaj:** H1 početne treba da kaže uslugu i grad uz postojeći slogan (pre izmene potvrda klijenta); odeljak „Česta pitanja” sa stvarnim odgovorima (cena, područje, radno vreme, plaćanje, šta se dostavlja). Spisak okolnih mesta potvrđuje vlasnik.
+4. **Pominjanja van sajta:** poslovni imenici, Bing Places, Apple Business Connect, link ka sajtu na Facebook-u i Instagramu, lokalni portali i radnje sa kojima se sarađuje.
+5. **Provera AI odgovora** jednom mesečno, istim pitanjima.
+
+- Google profil glasi „Smrko Potrcko”, a sajt, domen, Instagram i Facebook koriste „Smrcko/Šmrčko”. Preporuka: vlasnik ispravi naziv u profilu na „Šmrčko Potrčko”, pa JSON-LD vratiti na pravi naziv. Dok to ne potvrdi, JSON-LD ostaje kao u odeljku **Lokacija**.
+- Ne izmišljati recenzije, ne kupovati linkove, ne praviti stranice samo za robote, ne gomilati ključne reči. Nema garancije pozicije ni AI preporuke. `llms.txt` se ne uvodi kao navodni faktor rangiranja.
+
 ## Tech stack
 
 Jedna aplikacija, ne dva frontenda.

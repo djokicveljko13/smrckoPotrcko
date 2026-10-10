@@ -8,10 +8,18 @@ const nextConfig: NextConfig = {
     const privatePaths = ["/admin/:path*", "/prijava/:path*", "/k/:path*", "/hvala/:path*", "/registracija/:path*", "/api/:path*"];
     const sources = process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production"
       ? ["/:path*"] : privatePaths;
-    return sources.map((source) => ({
-      source,
-      headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
-    }));
+    return [
+      ...sources.map((source) => ({
+        source,
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      })),
+      // Vercel adresa prikazuje isti sajt; u pretrazi treba da ostane samo glavni domen.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: ".*\\.vercel\\.app" }],
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+    ];
   },
 
   // Lock Turbopack to this folder (avoids picking up a lockfile in the user home dir).

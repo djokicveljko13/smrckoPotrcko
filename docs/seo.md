@@ -78,6 +78,32 @@ ostaju „Šmrčko Potrčko” / „Kneza Miloša 24”.
    verziju. Ako se uvodi preusmerenje operativnih URL-ova, posebno proveriti
    Telegram webhook i POST zahteve; canonical oznaka ne preusmerava zahteve.
 
+### Dopuna: SEO faza 2 (10.10.2026)
+
+Plan i redosled su u `AGENTS.md` (odeljak **SEO faza 2 i AI pretraga**).
+`site:smrckopotrcko.rs` prikazuje sve javne stranice, pa je problem rangiranje,
+ne indeksiranje.
+
+- **Vercel adresa:** `smrcko-potrcko.vercel.app` (i svaka `*.vercel.app` adresa)
+  dobija `X-Robots-Tag: noindex, nofollow` na svim putanjama, preko `has` uslova
+  `type: "host"` u `next.config.ts`. Glavni domen ne dobija ovo zaglavlje; to čuvaju testovi.
+- **Telegram webhook** je 10.10.2026 prebačen sa `smrcko-potrcko.vercel.app` na
+  `https://smrckopotrcko.rs/api/telegram/webhook` (ista tajna, `allowed_updates: ["message"]`).
+  Pre promene je prazan zahtev sa tajnom na glavnom domenu vratio 200, tj. tajna na
+  Vercelu se poklapa sa lokalnom. Webhook služi samo za povezivanje kurira (`/start <token>`);
+  ponude za porudžbine šalje server direktno Telegramu.
+- Tek posle toga `smrcko-potrcko.vercel.app` u Vercel → Domains dobija
+  „Redirect to Another Domain” → `smrckopotrcko.rs`, **308**. Telegram ne prati
+  preusmerenja, zato redosled mora biti ovakav. Preview i adrese pojedinačnih
+  deploy-eva ostaju bez preusmerenja, sa noindex zaglavljem.
+- **DNS:** domen je registrovan na Loopiji, ali NS zapisi pokazuju na
+  `ns1/ns2.vercel-dns.com`. DNS i `www` se podešavaju u Vercelu, ne u Loopiji.
+- **`www`:** 10.10.2026 `https://www.smrckopotrcko.rs` vraća Vercel **307**
+  (privremeno) na glavni domen; cilj je **308** (trajno). U Domains ovog projekta
+  vidi se samo glavni domen, a dodavanje `www` Vercel ne dozvoljava — tačnu
+  poruku greške još treba proveriti (verovatno je `www` vezan za drugi projekat).
+  Ovo se ne može rešiti u kodu: Vercel preusmerava pre nego što zahtev stigne do aplikacije.
+
 ## Posle objave: Google Search Console
 
 Search Console pokazuje da li Google čita sajt, koje strane je indeksirao i

@@ -54,7 +54,17 @@ test("private route families receive noindex even on redirects or non-HTML respo
     const rule = headers.find(({ source }) => source === `/${route}/:path*`);
     assert.equal(rule?.headers[0].value, "noindex, nofollow");
   }
-  assert.ok(!headers.some(({ source }) => source === "/:path*"));
+  assert.ok(!headers.some(({ source, has }) => source === "/:path*" && !has));
+});
+
+test("vercel.app host is noindex in production, the main domain is not", async (t) => {
+  environment(t, { VERCEL_ENV: "production" });
+  const headers = await loadTypeScript("next.config.ts").default.headers();
+  const rule = headers.find(({ source, has }) => source === "/:path*" && has?.[0]?.type === "host");
+  assert.equal(rule?.headers[0].value, "noindex, nofollow");
+  const host = new RegExp(`^${rule.has[0].value}$`);
+  assert.ok(host.test("smrcko-potrcko.vercel.app"));
+  assert.ok(!host.test("smrckopotrcko.rs"));
 });
 
 test("canonical override rejects localhost, insecure URLs and paths", (t) => {
