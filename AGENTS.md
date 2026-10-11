@@ -176,6 +176,12 @@ U Supabase Auth podešavanjima mora biti isključeno „Allow new users to sign 
 `/prijava` ostaje ulaz za postojeće naloge; skrivenost URL-a nije zaštita od
 pogađanja lozinki. Prijava ne otkriva da li nalog postoji, a prekoračenje Supabase
 ograničenja pokušaja prikazuje poruku da se sačeka. CAPTCHA/MFA nisu još uvedeni.
+Promena lozinke (11.10.2026): Veljko novom vlasniku pravi nalog sa **privremenom**
+lozinkom (Add user + Auto Confirm User). Vlasnik je posle prve prijave menja na
+`/admin/nalog` (tab „Lozinka”): trenutna lozinka, nova (najmanje 8 znakova) i
+ponovljena nova. Server prvo proverava trenutnu lozinku, pa menja, pa odjavljuje
+ostale sesije tog naloga. Tako Veljko ne zna konačnu lozinku. Pozivnica mejlom
+(Invite user) nije uvedena: ugrađeni Supabase mejl ne šalje van članova tima.
 | Kurir   | PIN + tajni URL    | Telegram ponuda, prihvati/odbij, statusi |
 
 Google login i sačuvane adrese **nisu V1**.

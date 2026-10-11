@@ -5,6 +5,7 @@ const LINKS = [
   { href: "/admin", label: "Tabla" },
   { href: "/admin/nova", label: "Unesi porudžbinu" },
   { href: "/admin/kuriri", label: "Kuriri" },
+  { href: "/admin/nalog", label: "Lozinka" },
 ] as const;
 
 /**

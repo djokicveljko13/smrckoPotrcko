@@ -9,6 +9,12 @@ Postojeći vlasnik ulazi preko `/prijava`; novi nalog pravi Veljko kroz
 Supabase Dashboard → Authentication → Users → Add user → Create new user.
 Ne upisivati korisnika običnim SQL INSERT-om u aplikacione tabele.
 
+Nov nalog dobija privremenu lozinku i štikliran **Auto Confirm User**. Vlasnik
+je posle prve prijave sam menja na `/admin/nalog` (tab „Lozinka”), pa Veljko ne
+zna konačnu lozinku. Akcija `changePassword` (`app/actions/auth.ts`) proverava
+trenutnu lozinku preko `signInWithPassword`, menja je preko `updateUser`, pa
+zove `signOut({ scope: "others" })` da ugasi ostale sesije tog naloga.
+
 Obavezno u Authentication → Sign In / Providers isključiti **Allow new users to
 sign up** i ostaviti anonimne prijave isključene. To je podešavanje Supabase
 servisa; uklanjanje forme u repou ga samo po sebi ne menja. Svi prijavljeni
