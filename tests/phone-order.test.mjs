@@ -24,7 +24,7 @@ function form() {
   return data;
 }
 
-test("telefonski unos zove create_phone_order i ostaje bez javne hvala stranice", async () => {
+test("telefonski unos zove create_phone_order, javlja kuriru i vlasniku, bez javne hvala stranice", async () => {
   const inserts = [];
   const notifications = [];
   const emails = [];
@@ -51,6 +51,6 @@ test("telefonski unos zove create_phone_order i ostaje bez javne hvala stranice"
   assert.equal(inserts[0].p_phone, "066 123 4567");
   assert.equal(inserts[0].p_quote_id, prepared.quote.id);
   assert.deepEqual(notifications, ["P-40"]);
-  // Unos sa poziva: vlasnik je već na tabli, mejl ne ide.
-  assert.deepEqual(emails, []);
+  // Od 12.10.2026 i unos sa poziva ide vlasniku na mejl, da sve bude u sanduku.
+  assert.deepEqual(emails, ["P-40"]);
 });

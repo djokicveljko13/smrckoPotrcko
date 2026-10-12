@@ -1,6 +1,6 @@
 "use server";
 
-import { notifyWebOrder } from "@/lib/notify-web-order";
+import { notifyNewOrder } from "@/lib/notify-new-order";
 import { readCreatedOrder } from "@/lib/order-validation";
 import { buildShoppingTitle } from "@/lib/shopping";
 import {
@@ -46,7 +46,7 @@ export async function createShoppingOrder(
         }
         return created;
       },
-      notifyWebOrder,
+      notifyNewOrder,
     );
   } catch {
     console.error("Shopping order confirmation unavailable");

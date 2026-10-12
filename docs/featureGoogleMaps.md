@@ -335,7 +335,8 @@ vlasnik — kupac može da prepravi URL, ali time ništa ne menja.
 ## Faza 6 — Telefonski unos
 
 Urađeno 12.09.2026: `/admin/nova`, `create_phone_order` (izvor `telefon`),
-ista `prepareGuestOrder` + potvrda cene, bez `/hvala` i bez mejla.
+ista `prepareGuestOrder` + potvrda cene, bez `/hvala`. Od 12.10.2026 šalje
+i mejl vlasniku, kao sajt (AGENTS.md, „Mejl vlasniku za novu porudžbinu”).
 
 ## Faza 7 — Dokumentacija i env
 

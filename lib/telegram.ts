@@ -1,5 +1,8 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { googleMapsUrl } from "@/lib/maps-link";
 import { ORDER_MESSAGE_COLUMNS, orderMessageText } from "@/lib/order-message";
+
+type UrlButton = { text: string; url: string };
 
 function botToken(): string | null {
   const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
@@ -27,6 +30,31 @@ export function telegramConnectUrl(accessToken: string): string | null {
   const username = process.env.TELEGRAM_BOT_USERNAME?.trim().replace(/^@/, "");
   if (!username) return null;
   return `https://t.me/${username}?start=${accessToken}`;
+}
+
+/**
+ * Preuzimanje i dostava u Google Maps. Kod kupovine je `shop` naziv lanca
+ * (Maxi), ne adresa, pa ostaje samo dostava.
+ */
+function mapButtons(order: Record<string, unknown>): UrlButton[] {
+  const buttons: UrlButton[] = [];
+
+  if (order.order_type !== "kupovina" && typeof order.shop === "string") {
+    const url = googleMapsUrl(order.shop);
+    if (url) buttons.push({ text: "📍 Preuzimanje", url });
+  }
+
+  if (typeof order.address === "string") {
+    const placeId =
+      typeof order.destination_place_id === "string"
+        ? order.destination_place_id
+        : null;
+    // Server dopisuje „ulaz, sprat, stan” posle „;” — to nije deo pretrage.
+    const url = googleMapsUrl(order.address.split(";")[0], placeId);
+    if (url) buttons.push({ text: "📍 Dostava", url });
+  }
+
+  return buttons;
 }
 
 function asChatId(value: unknown): number | string | null {
@@ -115,7 +143,7 @@ export async function sendOffer(
 
     const { data: order, error: orderError } = await admin
       .from("orders")
-      .select(ORDER_MESSAGE_COLUMNS)
+      .select(`${ORDER_MESSAGE_COLUMNS}, destination_place_id`)
       .eq("courier_id", courierId)
       .eq("status", "poslata_kuriru")
       .order("assigned_at", { ascending: false })
@@ -128,7 +156,7 @@ export async function sendOffer(
     }
 
     const text = await orderMessageText(admin, order);
-    if (!text) {
+    if (!order || !text) {
       console.warn("sendOffer: no pending offer for courier", courierId);
       return;
     }
@@ -139,13 +167,15 @@ export async function sendOffer(
         ? `${origin}/k/${accessToken}`
         : null;
 
+    // Svaki niz je jedan red dugmadi: mape jedna pored druge, porudžbina ispod.
+    const keyboard: UrlButton[][] = [];
+    const maps = mapButtons(order);
+    if (maps.length > 0) keyboard.push(maps);
+    if (pageUrl) keyboard.push([{ text: "Otvori porudžbinu", url: pageUrl }]);
+
     const body: Record<string, unknown> = { chat_id: chatId, text };
-    if (pageUrl) {
-      body.reply_markup = {
-        inline_keyboard: [
-          [{ text: "Otvori porudžbinu", url: pageUrl }],
-        ],
-      };
+    if (keyboard.length > 0) {
+      body.reply_markup = { inline_keyboard: keyboard };
     }
 
     await telegramApi("sendMessage", body);

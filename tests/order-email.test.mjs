@@ -96,10 +96,10 @@ test("bez porudžbine ili bez baze mejl ne ide, a greška ne izlazi napolje", as
 
 test("pukao Telegram ne zaustavlja mejl vlasniku", async () => {
   const emails = [];
-  const { notifyWebOrder } = loadTypeScript("lib/notify-web-order.ts", {
+  const { notifyNewOrder } = loadTypeScript("lib/notify-new-order.ts", {
     "@/lib/telegram": { sendOfferForPublicNumber: async () => { throw new Error("Telegram down"); } },
     "@/lib/order-email": { sendNewOrderEmail: async (ticket) => { emails.push(ticket); } },
   });
-  await notifyWebOrder("P-21");
+  await notifyNewOrder("P-21");
   assert.deepEqual(emails, ["P-21"]);
 });

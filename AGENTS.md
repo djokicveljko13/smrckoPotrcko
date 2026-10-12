@@ -124,11 +124,22 @@ Javna stranica `/cena` (tab „Cena”) da kupac vidi cenu **pre** porudžbine, 
 
 Vlasnik želi uvid u porudžbine bez prijave u aplikaciju.
 
-- Svaka nova porudžbina sa sajta (`/` i `/kupovina`, `izvor = sajt`) šalje vlasniku mejl preko Resend-a, na istu adresu kao upit za saradnju (`PARTNERSHIP_EMAIL_TO`, `potrckosmrcko@gmail.com`). Koriste se isti `RESEND_API_KEY` i `EMAIL_FROM`; nema novog env-a.
+- Svaka nova porudžbina, sa sajta (`/` i `/kupovina`, `izvor = sajt`) i sa table (`/admin/nova`, `izvor = telefon`), šalje vlasniku mejl preko Resend-a, na istu adresu kao upit za saradnju (`PARTNERSHIP_EMAIL_TO`, `potrckosmrcko@gmail.com`). Koriste se isti `RESEND_API_KEY` i `EMAIL_FROM`; nema novog env-a.
 - Telo mejla je **isti tekst** kao Telegram poruka kuriru (`buildCourierMessage`): običan tekst, bez HTML-a. Kurirski link `/k/{token}` ne ide u mejl. Naslov: `Nova porudžbina P-17`.
 - Mejl ide **jednom, pri upisu**, i kad baza nije našla slobodnog kurira (porudžbina ostaje `nova`). Odbijanje i ponuda sledećem kuriru, ručna dodela i ponovljena potvrda iste ponude **ne** šalju nov mejl.
-- Unos sa poziva (`/admin/nova`, `izvor = telefon`) ostaje **bez mejla** (potvrdio Veljko 10.10.2026).
+- Unos sa poziva (`/admin/nova`, `izvor = telefon`) od 12.10.2026 **takođe šalje mejl** (zahtev Veljka). Do tada je bio bez mejla, pa je izgledalo da mejl ne radi: većinu porudžbina vlasnik unosi sa table. Sada su sve porudžbine i u sanduku.
 - Posle upisa Telegram i mejl idu paralelno. Greška mejla se samo loguje, bez ličnih podataka; porudžbina je već upisana i kupac dobija broj.
+
+## Google Maps dugmad u Telegram ponudi (12.10.2026)
+
+Kurir jednim dodirom otvara adresu u Google Maps, bez prekucavanja.
+
+- Ispod teksta ponude, u jednom redu: **„📍 Preuzimanje”** (polje „Odakle”, `shop`) i **„📍 Dostava”** (`address`). „Otvori porudžbinu” (`/k/{token}`) ostaje u svom redu ispod.
+- Kupovina (`order_type = 'kupovina'`) ima samo „📍 Dostava”: `shop` je naziv lanca, ne adresa.
+- Link je javni Google Maps URL (`google.com/maps/search/?api=1&query=…`): bez API ključa, ne troši Places/Routes kvotu, na telefonu otvara aplikaciju.
+- „Dostava” šalje i `query_place_id` iz `destination_place_id`, pa vodi tačno na izabrano mesto; tekst adrese je rezerva za stare redove bez ID-a. Deo adrese posle `;` („Ulaz, sprat, stan”) ne ide u pretragu.
+- „Preuzimanje” traži samo po tekstu: ID mesta preuzimanja se ne čuva u bazi. Kolona `pickup_place_id` se uvodi tek ako kuriri jave da link promašuje.
+- Tekst poruke se ne menja (ostaje običan tekst, bez `parse_mode`), pa ni mejl vlasniku. Jedno dugme sa rutom preko međustanice (waypoint) je odbačeno: neki Google proizvodi međustanicu preskoče, pa bi ruta zaobišla radnju.
 
 ## SEO faza 2 i AI pretraga (10.10.2026)
 
@@ -233,7 +244,7 @@ Danas klijent živi od telefona. Sajt **neće** ugasiti pozive. Javni broj vlasn
 Zato postoje **dva ulaza u istu tabelu** `orders`, ne dva sistema:
 
 1. **Sajt** — kupac sam popuni javnu formu (`izvor = sajt`). Dobije hvala + broj. Vlasniku stigne mejl (nije pored ekrana).
-2. **Telefon** — kupac zove, kaže šta želi. Vlasnik na tabli otvori **„Unesi porudžbinu“** (`/admin/nova`) i upiše ista polja dok razgovara (`izvor = telefon`). Nema stranice hvala za kupca (već je na vezi). **Mejl vlasniku se ne šalje** — već je na tabli i na telefonu; dupli signal smeta.
+2. **Telefon** — kupac zove, kaže šta želi. Vlasnik na tabli otvori **„Unesi porudžbinu“** (`/admin/nova`) i upiše ista polja dok razgovara (`izvor = telefon`). Nema stranice hvala za kupca (već je na vezi). Vlasniku stiže isti mejl kao za porudžbinu sa sajta (od 12.10.2026), da sve porudžbine budu na jednom mestu.
 
 Od tog trenutka tok je **isti**: auto-dodela kurira → Telegram ponuda → kurirski link → statusi. Kurir ne mora da zna da li je naručeno sa sajta ili pozivom.
 
@@ -253,13 +264,13 @@ Zašto ne posebna tabela „telefonske“: dupli kod, dupli izveštaji, lako da 
 1. Vlasnik (ulogovan) otvori **Unesi porudžbinu** (`/admin/nova`).
 2. Upiše naziv, radnju, adresu (isti Places izbor kao na sajtu), telefon kupca. Server računa cenu; vlasnik vidi pregled pa potvrdi.
 3. Insert u `orders` (`izvor = telefon`) + broj. Broj može da pročita kupcu na vezi ako zatreba.
-4. Bez mejla, bez javne hvala-stranice. Ostaje na `/admin/nova` sa brojem, pa može odmah sledeći poziv.
+4. Mejl vlasniku kao kod sajta (od 12.10.2026), bez javne hvala-stranice. Ostaje na `/admin/nova` sa brojem, pa može odmah sledeći poziv.
 
 **Zajednički nastavak (A i B)**
 
 5. Tabla: prvo **ručno osvežavanje (F5)**. Kad to radi, tek onda pretplata na tabelu (Supabase Realtime = tabla sluša insert, ne pita server u krug). Polling ne uvoditi osim ako Realtime zapne.
 6. Baza sama izabere slobodnog kurira na smeni (`offer_order_to_next_courier`) i upiše `poslata_kuriru`.
-7. Server javi tom kuriru preko **Telegram bota**: tekst porudžbine + dugme ka `/k/{token}`. Kurir prihvati („krenuo") ili odbije — odbijena ide sledećem kuriru.
+7. Server javi tom kuriru preko **Telegram bota**: tekst porudžbine + Google Maps dugmad (vidi odeljak **Google Maps dugmad u Telegram ponudi**) + dugme ka `/k/{token}`. Kurir prihvati („krenuo") ili odbije — odbijena ide sledećem kuriru.
 
 Auto-dodela ostaje podrazumevana. Vlasnik **sme i ručno** da pošalje porudžbinu
 kuriru kog izabere (dugme na kartici) — za slučaj kad su svi zauzeti pa
@@ -286,11 +297,11 @@ Ručna dodela je obična ponuda: Telegram stiže, kurir sme da odbije.
 2. Tabele `orders`, `couriers` + RLS
 3. Forma + hvala + broj
 4. Login + tabla sa F5
-5. **Unos sa poziva** na tabli (`/admin/nova`, ista polja, `izvor = telefon`, bez mejla)
+5. **Unos sa poziva** na tabli (`/admin/nova`, ista polja, `izvor = telefon`)
 6. Lista kurira + smena + izbor
 7. Auto-dodela kurira + Telegram ponuda (zamenilo `wa.me`)
 8. Kurirski link + statusi
-9. Mejl vlasniku (samo `izvor = sajt`)
+9. Mejl vlasniku (sajt i, od 12.10.2026, telefon)
 10. Live tabla (Realtime), tek kad 4–8 razumeš
 11. Vlasnički deo (`docs/featureAdmin.md`): ručno pravljenje naloga u Supabase-u,
     `/admin/kuriri`, ručna dodela porudžbine kuriru

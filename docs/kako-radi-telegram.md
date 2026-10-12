@@ -31,7 +31,9 @@ Ne mešaj ih.
 
 **Slanje ponude (svaki put).** Posle uspešnog `offer_order_to_next_courier`,
 Next.js zove `sendOffer`. Tekst je isti kao WhatsApp
-(`buildCourierMessage`), plus dugme ka `/k/{token}`. PIN **nije** u poruci.
+(`buildCourierMessage`), plus dugmad „📍 Preuzimanje” / „📍 Dostava” (Google
+Maps, `lib/maps-link.ts`; kupovina ima samo „Dostava”) i dugme ka `/k/{token}`.
+PIN **nije** u poruci.
 
 ---
 

@@ -5,8 +5,8 @@ import { requireOwner } from "@/lib/auth";
 import { confirmOrderQuote } from "@/lib/order-quote";
 import type { CreateGuestOrderState } from "@/lib/order-types";
 import { readCreatedOrder } from "@/lib/order-validation";
+import { notifyNewOrder } from "@/lib/notify-new-order";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { sendOfferForPublicNumber } from "@/lib/telegram";
 
 /**
  * Isti potpisani tok kao javna porudžbina, ali izvor je telefon.
@@ -40,7 +40,7 @@ export async function createPhoneOrder(
         return null;
       }
       return created;
-    }, sendOfferForPublicNumber);
+    }, notifyNewOrder);
     if (result.status === "ok") revalidatePath("/admin");
     return result;
   } catch {

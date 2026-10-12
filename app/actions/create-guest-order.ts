@@ -1,6 +1,6 @@
 ﻿"use server";
 
-import { notifyWebOrder } from "@/lib/notify-web-order";
+import { notifyNewOrder } from "@/lib/notify-new-order";
 import { confirmOrderQuote } from "@/lib/order-quote";
 import type { CreateGuestOrderState } from "@/lib/order-types";
 import { readCreatedOrder } from "@/lib/order-validation";
@@ -30,7 +30,7 @@ export async function createGuestOrder(token: string): Promise<Exclude<CreateGue
         return null;
       }
       return created;
-    }, notifyWebOrder);
+    }, notifyNewOrder);
   } catch {
     console.error("Order confirmation unavailable");
     return { status: "error", message: "Slanje nije potvrđeno. Pozovi nas da proverimo porudžbinu pre ponovnog slanja." };
