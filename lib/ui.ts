@@ -62,6 +62,15 @@ export const heroButtonClass =
   "hover:bg-red-50 " +
   "active:translate-y-[4px] active:shadow-[0_1px_0_rgba(112,14,10,0.55)] sm:px-9 sm:text-lg";
 
+/**
+ * Glavna akcija u zaglavlju (npr. „Unesi porudžbinu” na tabli): ista visina
+ * kao secondaryButtonClass da stoje u redu, ali crveno — jedina crvena u redu.
+ */
+export const compactPrimaryButtonClass =
+  "inline-flex items-center justify-center gap-1.5 rounded-xl border-2 border-brand-dark bg-brand-dark " +
+  "px-4 py-2.5 text-sm font-extrabold text-white transition-colors " +
+  "hover:border-brand hover:bg-brand";
+
 export const secondaryButtonClass =
   "inline-flex items-center justify-center rounded-xl border-2 border-zinc-200 bg-white " +
   "px-4 py-2.5 text-sm font-bold text-ink transition-colors " +

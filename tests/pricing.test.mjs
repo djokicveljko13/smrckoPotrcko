@@ -14,9 +14,14 @@ test("start fee bands follow the agreed distance ranges", () => {
   assert.equal(startFeeFromKm(15.001), 400);
 });
 
-// Ulazi su metri iz Routes API-ja. Očekivanja su start + 80 × km.
+// Ulazi su metri iz Routes API-ja. Očekivanja su start + 80 × km, najmanje 200.
 const cases = [
-  { meters: 0, expected: 100 },
+  { meters: 0, expected: 200 },
+  { meters: 500, expected: 200 },
+  { meters: 1000, expected: 200 },
+  { meters: 1243, expected: 200 },
+  { meters: 1250, expected: 200 },
+  { meters: 1300, expected: 204 },
   { meters: 1600, expected: 228 },
   { meters: 3700, expected: 396 },
   { meters: 4999, expected: 500 },

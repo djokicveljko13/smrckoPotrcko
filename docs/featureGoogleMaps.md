@@ -44,6 +44,14 @@ Granice: 4,999 km → start 100; 5 km → 200; 9,999 km → 200; 10 km → 300;
 Primeri: 1,6 km → 100 + 128 = 228 din; 5 km → 200 + 400 = 600 din;
 10,875 km → 300 + 870 = 1170 din; 16 km → 400 + 1280 = 1680 din.
 
+**Najmanja cena (14.10.2026): 200 din.** Ako formula da manje od 200, upisuje se
+200; sve ostalo ostaje isto. Pošto start od 5 km naviše već počinje od 200,
+pravilo pogađa samo kratke vožnje do oko 1,25 km: 0 km → 200 (bilo 100);
+1 km → 200 (bilo 180); 1,25 km → 200; 1,3 km → 204; 1,6 km → 228 kao ranije.
+Primenjuje se posle zaokruživanja, u `deliveryPriceFromMeters`, pa važi za javnu
+formu, unos sa poziva i `/cena`. Kupovina i ručni unos cene za stare `NULL`
+redove nisu obuhvaćeni.
+
 U `orders.delivery_price` čuva se konačna cena koju vide kupac, vlasnik i kurir.
 Stare porudžbine zadržavaju upisanu cenu. Kad Google ne vrati kilometražu,
 nova javna porudžbina ne može da se potvrdi. Stari `NULL` redovi ostaju za ručni unos vlasnika.
@@ -138,7 +146,7 @@ po formi) ostajemo duboko unutar besplatnog.
 | Odluka | Izbor |
 |---|---|
 | Ruta | firma → kupac (radnja se ne uračunava) |
-| Formula | `start + 80 × km` (start 100/200/300/400 po razdaljini); kupovina fiksna po lancu |
+| Formula | `start + 80 × km` (start 100/200/300/400 po razdaljini), najmanje 200 din; kupovina fiksna po lancu |
 | Unos adrese | Places Autocomplete, kupac bira iz liste |
 | Kad kupac vidi cenu | u popup-u pre potvrde, na `/hvala`, i na javnom `/cena` (samo adrese, bez upisa) |
 | Google zakaže | javna porudžbina **ne prolazi**; ponovni pokušaj ili poziv |

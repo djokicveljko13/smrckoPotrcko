@@ -86,4 +86,6 @@ export type AdminCourier = {
   is_active: boolean;
   access_token: string;
   telegram_linked: boolean;
+  /** Isporuke za izabrani period; null kad se brojevi nisu učitali. */
+  delivered: number | null;
 };

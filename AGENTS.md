@@ -141,6 +141,15 @@ Kurir jednim dodirom otvara adresu u Google Maps, bez prekucavanja.
 - „Preuzimanje” traži samo po tekstu: ID mesta preuzimanja se ne čuva u bazi. Kolona `pickup_place_id` se uvodi tek ako kuriri jave da link promašuje.
 - Tekst poruke se ne menja (ostaje običan tekst, bez `parse_mode`), pa ni mejl vlasniku. Jedno dugme sa rutom preko međustanice (waypoint) je odbačeno: neki Google proizvodi međustanicu preskoče, pa bi ruta zaobišla radnju.
 
+## Isporuke po kuriru i zaglavlje admin dela (14.10.2026)
+
+Vlasnik želi da vidi koliko je koji kurir dostavio.
+
+- Na `/admin/kuriri` svaka kartica kurira prikazuje **broj isporučenih porudžbina**. Filter ima dve opcije, **„Danas”** i **„Ukupno”**, i menja broj na svim karticama. Samo broj, bez zbira cena i bez izbora datuma.
+- Nema nove tabele: broji se iz `orders` (`status = 'isporuceno'`, grupisano po `courier_id`). „Danas” znači datum `updated_at` po `Europe/Belgrade`, isto kao „danas isporučeno” na kurirskoj strani.
+- Brisanje kurira briše i njegov brojač: isporučene porudžbine ostaju, ali sa `courier_id = NULL`. Vlasnik je to prihvatio, jer statistika za kurira koji je otišao više nije potrebna. Ne uvodi se kolona sa imenom kurira.
+- Zaglavlje admin dela: navigacija je tanka traka sa tabovima (Tabla, Kuriri, Lozinka), a aktivni tab je podvučen. „Odjavi se” je sitan link desno u traci. „Unesi porudžbinu” je jedino crveno dugme, uz naslov table, i stoji pored „Osveži”.
+
 ## SEO faza 2 i AI pretraga (10.10.2026)
 
 Povod: za „dostava Jagodina” sajt nije na prvoj strani Google-a. `site:smrckopotrcko.rs` 10.10.2026 prikazuje sve javne stranice, znači problem nije indeksiranje nego rangiranje. Cilj je i da AI pretraga (ChatGPT/Bing, Gemini/Google, Perplexity) pominje biznis za lokalna pitanja o dostavi.
@@ -214,7 +223,11 @@ Svaka dostava je **start + (80 × km)**. Start zavisi samo od razdaljine firma �
 | Od 10 km do uključujući 15 km | 300 din |
 | Preko 15 km | 400 din |
 
-Primeri: 1,6 km → 100 + 128 = 228 din; 5 km → 200 + 400 = 600 din; 10 km → 300 + 800 = 1100 din; 16 km → 400 + 1280 = 1680 din. Iznos se zaokružuje na najbliži dinar. Kupovina iz marketa (`/kupovina`) ostaje fiksna po lancu, bez kilometraže. U bazu se upisuje konačna cena; ranije upisane porudžbine se ne preračunavaju. Javna forma ne šalje porudžbinu ako kilometraža ili cena nedostaju. Ručni unos cene ostaje za stare redove sa `NULL`.
+Primeri: 1,6 km → 100 + 128 = 228 din; 5 km → 200 + 400 = 600 din; 10 km → 300 + 800 = 1100 din; 16 km → 400 + 1280 = 1680 din. Iznos se zaokružuje na najbliži dinar.
+
+**Najmanja cena (14.10.2026):** dostava nikad ne košta manje od **200 din**. Ako formula da manje od 200, upisuje se 200; sve ostalo se računa normalno. To pogađa samo vožnje kraće od oko 1,25 km (npr. 0,5 km → 140 → 200 din; 1 km → 180 → 200 din). Važi svuda gde se cena računa iz kilometraže: javna forma, unos sa poziva i `/cena`. Ne važi za kupovinu (fiksna po lancu) ni za ručni unos cene vlasnika za stare `NULL` redove.
+
+Kupovina iz marketa (`/kupovina`) ostaje fiksna po lancu, bez kilometraže. U bazu se upisuje konačna cena; ranije upisane porudžbine se ne preračunavaju. Javna forma ne šalje porudžbinu ako kilometraža ili cena nedostaju. Ručni unos cene ostaje za stare redove sa `NULL`.
 
 ### Predlozi adresa u javnoj formi (05.09.2026)
 
@@ -326,7 +339,7 @@ Ručna dodela je obična ponuda: Telegram stiže, kurir sme da odbije.
 ## Kako agent radi u ovom repo-u
 
 - Učenje je deo zadatka — vidi odeljak **Cilj učenja**.
-- Cena dostave: `start + 80 × km` (start 100/200/300/400 po razdaljini) iz ovog fajla i `docs/featureGoogleMaps.md`. Kupovina ostaje fiksna po lancu. Ne nagađaj spisak kurira ni naselja.
+- Cena dostave: `start + 80 × km` (start 100/200/300/400 po razdaljini), najmanje 200 din, iz ovog fajla i `docs/featureGoogleMaps.md`. Kupovina ostaje fiksna po lancu. Ne nagađaj spisak kurira ni naselja.
 - Kad klijent promeni zahtev: ažuriraj **ovaj fajl**, pa implementiraj.
 - Ne širi scope „dok si već tu“ (partneri, Google, zvuk, CSV).
 - Posle UI izmene: proveri tok u browseru ako alati postoje.

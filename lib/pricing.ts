@@ -4,6 +4,7 @@
  *
  *   cena = start(razdaljina) + 80 din/km
  *   start: <5 km → 100, 5–10 → 200, 10–15 → 300, preko 15 → 400
+ *   najmanje 200 din (dogovor sa klijentom, 14.10.2026)
  *
  * Kupovina iz marketa se ovde ne računa — vidi SHOPPING_STORES ispod.
  */
@@ -13,6 +14,8 @@ export const START_FEE_UNDER_5KM_DIN = 100;
 export const START_FEE_5_TO_10KM_DIN = 200;
 export const START_FEE_10_TO_15KM_DIN = 300;
 export const START_FEE_OVER_15KM_DIN = 400;
+/** Ispod ovoga dostava ne ide, ma koliko vožnja bila kratka. */
+export const MIN_DELIVERY_PRICE_DIN = 200;
 
 /**
  * Polazna tačka svake dostave: Кнеза Милоша 24, Јагодина.
@@ -33,13 +36,15 @@ export function startFeeFromKm(km: number): number {
 /**
  * Metri koje vrati Google Routes → konačna cena u dinarima.
  *
+ *   1 km   → 100 + 80 = 180 → najmanje 200 din
  *   1.6 km → 100 + 128 = 228 din
  *   5 km   → 200 + 400 = 600 din
  *   10 km  → 300 + 800 = 1100 din
  */
 export function deliveryPriceFromMeters(meters: number): number {
   const km = meters / 1000;
-  return Math.round(startFeeFromKm(km) + PRICE_PER_KM_DIN * km);
+  const price = Math.round(startFeeFromKm(km) + PRICE_PER_KM_DIN * km);
+  return Math.max(price, MIN_DELIVERY_PRICE_DIN);
 }
 
 /** Cena za prikaz: 330 → "330 dinara". */

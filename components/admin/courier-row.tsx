@@ -51,9 +51,12 @@ function FormError({ state }: { state: CourierFormState }) {
 export function CourierRow({
   courier,
   siteUrl,
+  periodLabel,
 }: {
   courier: AdminCourier;
   siteUrl: string;
+  /** "danas" ili "ukupno" — samo tekst ispod broja isporuka. */
+  periodLabel: string;
 }) {
   // Tri forme = tri odvojena stanja. Greška u PIN-u ne sme da obriše poruku
   // koju je ostavila forma za ime, i obrnuto.
@@ -98,6 +101,12 @@ export function CourierRow({
           >
             {courier.phone}
           </a>
+          <p className="mt-1 text-sm text-zinc-500">
+            Isporučeno {periodLabel}:{" "}
+            <span className="font-display text-base font-black text-ink">
+              {courier.delivered ?? "–"}
+            </span>
+          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5">

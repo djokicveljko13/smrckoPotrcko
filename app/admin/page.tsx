@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { signOut } from "@/app/actions/auth";
 import { AdminNav } from "@/components/admin/admin-nav";
 import { OrderColumn } from "@/components/admin/order-column";
 import { RefreshButton } from "@/components/admin/refresh-button";
 import { requireOwner } from "@/lib/auth";
-import { secondaryButtonClass } from "@/lib/ui";
+import { compactPrimaryButtonClass } from "@/lib/ui";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AssignCourierOption, BoardOrder } from "@/lib/types";
 const DELIVERED_DAYS = 7;
@@ -104,8 +103,10 @@ const since = deliveredSince();
   const loadError = ordersResult.error;
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col px-4 py-6 sm:px-6 sm:py-8">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col px-4 py-4 sm:px-6 sm:py-6">
+      <AdminNav current="/admin" />
+
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-bold text-zinc-500">Samo vlasnik</p>
           <h1 className="mt-1 font-display text-3xl font-black italic uppercase tracking-tight">
@@ -115,16 +116,11 @@ const since = deliveredSince();
             Levo / gore je posao. Desno / dole je gotovo. Osveži ručno (F5).
           </p>
         </div>
-        <div className="flex flex-col items-stretch gap-2 sm:items-end">
-          <AdminNav current="/admin" />
-          <div className="flex items-center gap-2">
-            <RefreshButton />
-            <form action={signOut}>
-              <button type="submit" className={secondaryButtonClass}>
-                Odjavi se
-              </button>
-            </form>
-          </div>
+        <div className="flex items-center gap-2">
+          <RefreshButton />
+          <Link href="/admin/nova" className={`${compactPrimaryButtonClass} flex-1 sm:flex-none`}>
+            + Unesi porudžbinu
+          </Link>
         </div>
       </div>
 
