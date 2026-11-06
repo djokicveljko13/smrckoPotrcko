@@ -1,12 +1,4 @@
-<!-- BEGIN:nextjs-agent-rules -->
 
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->
 
 # Šmrčko Potrčko — kontekst za svaku sesiju
 
@@ -35,13 +27,15 @@ Služba dostave: kupac naruči **bilo šta** (nije katalog hrane), **sa sajta il
 
 Druga usluga: **kupovina iz marketa** (`/kupovina`) — lista stavki, fiksna cena po lancu. Detalji: odeljak **Kupovina** i `docs/featureNamirnice.md`.
 
+Treća usluga (23.10.2026, prerađeno 24.10.2026): **poručivanje hrane iz restorana partnera** (`/partneri/[slug]`). Prvi partner je **Crispy Chicken Korner**, vlasnikov novi biznis. Sistem je od starta za više restorana. Detalji: odeljak **Partneri**.
+
 Ostala dva sajta iz ponude (Food of Šmrk, perionica) **ne radimo**.
 
 ## Izgled hero sekcije
 
 - Početna, `/saradnja`, `/kupovina` i `/cena` koriste zajednički završetak hero sekcije u obliku jasno vidljive pocepane ivice papira, bez dijagonale i linija brzine.
 - Ivica kombinuje veće nepravilne useke i sitnije neravnine, sa tankim svetlim slojem koji naglašava cepanje. Telefon ima jednostavniji crtež sa krupnim detaljima. Dekoracija je statična i povezuje hero sa izgledom porudžbenice.
-- Crvena pozadina i pocepana ivica su iste na sve četiri strane. Sadržaj i animacije hero-a su isti na početnoj i `/saradnja`; `/kupovina` i `/cena` imaju svoj raspored (vidi odeljke **Kupovina** i **Kalkulator cene**).
+- Crvena pozadina i pocepana ivica su iste na sve četiri strane. Sadržaj i animacije hero-a su isti na početnoj i `/saradnja`, osim trake partnera, koja postoji samo na početnoj (vidi **Partneri**). `/kupovina` i `/cena` imaju svoj raspored (vidi odeljke **Kupovina** i **Kalkulator cene**).
 
 ## Saradnja — B2B upit
 
@@ -59,7 +53,7 @@ Ostala dva sajta iz ponude (Food of Šmrk, perionica) **ne radimo**.
 - Hero na `/saradnja` govori firmama: dostava za pravna lica u Jagodini i okolini, danas-za-odmah / danas-za-danas ili ugovor, dugoročna saradnja, poziv na `DISPLAY_PHONE`. B2B tekst koristi persiranje velikim slovom (`Vam`, `Vaše`). Nije katalog pekara/restorana.
 - Cena i uslovi saradnje dogovaraju se telefonom.
 - Nalozi i pristup aplikaciji za firme dodaju se naknadno.
-- Katalog partnera i tabela `partners` nisu deo ove izmene.
+
 - Plan izrade: `docs/saradnjaB2B.md`.
 
 ## Kupovina — Potrčko ide u kupovinu
@@ -90,6 +84,58 @@ Javna stranica `/cena` (tab „Cena”) da kupac vidi cenu **pre** porudžbine, 
 - Server proverava oba potpisana predloga, pa zove isti `computeDistanceMeters` (firma → odredište) i istu `deliveryPriceFromMeters`. Polje „odakle” ne menja kilometražu — kao na porudžbini. Nema HMAC ponude, nema popup-a, nema upisa, nema mejla ni Telegrama.
 - Prikaz: samo „Cena dostave”, iznos, i dve izabrane adrese. Bez napomena o plaćanju. „Poruči ovu dostavu” vodi na `/#poruci` i unapred popuni ista dva Places izbora (sessionStorage u ovom tabu). Kupovina (`/kupovina`) ovde nije — tamo je fiksna cena po lancu.
 - Google greška: unos ostaje, ponovni pokušaj ili poziv `DISPLAY_PHONE`.
+
+## Partneri — hrana iz restorana (23.10.2026, prerađeno 24.10.2026)
+
+Vlasnik Potrčka je otvorio restoran pohovane piletine i želi da se iz njega poručuje direktno sa sajta. Veljko je 24.10.2026 tražio da se to od starta projektuje kao **sistem za više restorana partnera**, lak za održavanje. Plan izrade: `docs/featurePartneri.md`.
+
+**Kako je sistem postavljen (Veljko potvrdio 24.10.2026)**
+
+- **Meni je fajl u kodu, jedan po restoranu:** `lib/partners/<slug>.ts`, sa zajedničkim tipovima u `lib/partners/types.ts` i registrom `PARTNERS` u `lib/partners/index.ts`. Ne čuva se u tabeli u bazi. Novi restoran = novi fajl + slike + deploy, bez nove rute i bez novog koda. Cene menja Veljko, ne vlasnik (ekran za cene nije V1). Oblik podataka je isti kao budući oblik tabela, pa je kasniji prelazak u bazu mehanički, tek kad restorani budu sami održavali meni.
+- Iz registra čitaju prikaz, serverska provera cene, sitemap i JSON-LD. Id stavke je **trajan** (ide u bazu); promena cene ne menja id.
+- **Adrese:** strana restorana je `/partneri/[slug]` (Crispy: `/partneri/crispy-chicken-korner`), a `/partneri` je spisak svih partnera. Jedna dinamička ruta za sve restorane; nepoznat slug vraća 404.
+- **Početna: partneri su u samom hero-u**, vidljivi bez skrola. Ispod dugmeta „Poruči šta ti treba” stoji bela kartica partnera na crvenom, u obliku porudžbenice sa perforacijom (Veljko 06.11.2026): **logo restorana**, natpis „Gladan? Poruči iz restorana”, naziv, kratka ponuda i strelica, bez cene. Cela kartica je link ka meniju. Ulazi poslednja u animaciji hero-a. Logo Potrčka i razmaci u hero-u početne su manji na svim veličinama ekrana, da sve stane na prvi ekran. Sa više partnera isti red postaje horizontalni skrol + link „Svi restorani →”. Deo `#poruci` (Donesi mi nešto / Kupovina + forma) ostaje nepromenjen.
+- Navigacija dobija istaknuto dugme „Partneri” (Veljko 06.11.2026): klik otvara padajuću listu restorana, gde svaki red ima logo i naziv i vodi na stranu restorana. Na `/partneri*` stoji `BrandLogo` levo.
+
+**Restoran Crispy Chicken Korner (potvrdio Veljko 23.10.2026)**
+
+- Zvaničan naziv: **Crispy Chicken Korner**, svuda u tekstu, metapodacima i schema zapisu. Stari logo i štampani meni imaju „Chiken”, a Instagram „Chrispy”; to su greške, ispravljaju se kod vlasnika (Instagram ime, sledeće štampanje). Novi logo na sajtu (01.11.2026) ima ispravan naziv. Pravi se jedan naziv svuda, da se ne ponovi problem „Smrko Potrcko”.
+- Adresa: **Kneza Miloša 24, 35000 Jagodina**, ista kao polazna tačka obračuna (`PICKUP`). Restoran **prima goste**, pa se adresa sme javno prikazati.
+- Telefon restorana: **063 192 95 55** (posebno od `DISPLAY_PHONE`). Na stranici se razdvaja: „Poruči sa dostavom” (korpa na sajtu, porudžbina ide Potrčku) i „Pozovi restoran” (pitanja, preuzimanje u restoranu).
+- Instagram: https://www.instagram.com/chrispy_chiken_korner/ (korisničko ime ima grešku; promena imena prekida stare linkove, pa je to odluka vlasnika). Ide u `sameAs` restorana.
+- Kuhinja se **ne obaveštava iz aplikacije**: u istom je objektu i vlasnik joj sam javlja. Porudžbina ide istim tokom (tabla, mejl vlasniku, auto-dodela, Telegram kuriru).
+- Meni: `public/krilca/viber_image_2026-10-22_19-14-29-559.jpg`. Logo na stranici `/partneri/crispy-chicken-korner` od 01.11.2026 koristi sliku „Crispy Chicken Korner rooster logo.png” koju je dostavio Veljko, sačuvanu kao `public/partneri/crispy-chicken-korner/logo-rooster.png`; zamenjuje raniji isečak iz menija.
+- Animacija oko logotipa (01.11.2026): svetli isprekidani prsten sa žutim akcentom polako se okreće oko logoa na stranici restorana. Logo ostaje miran i čitljiv; pri sistemskom izboru smanjenog kretanja prsten je statičan.
+- **Slike stavki (Veljko 31.10.2026):** nove slike, po jedna za **svaku** stavku menija, u istom folderu. Pravi ih Veljko i zamenjuju raniji plan sa isečcima iz slike menija.
+
+**Meni i porudžbina**
+
+- Meni se prikazuje kao **HTML**, ne kao slika: odeljci Kombinacije (za 1/2/4 osobe), Pravi sam kombinaciju (po komadu), Piće. Svaka stavka ima sliku, naziv, opis, cenu i „Dodaj” → `−`/`+`.
+- **Korpa (Veljko 31.10.2026):** traka zalepljena za dno ekrana, ista na telefonu i računaru. Od 06.11.2026 na sredini piše samo „Trenutna cena” sa zbirom, bez broja stavki, a pored nje je dugme „Završi porudžbinu”. Najviše 30 komada po stavci.
+- **Završetak porudžbine (Veljko 06.11.2026):** posebna strana `/partneri/[slug]/porudzbina`, nije za indeksiranje. Prikazuje naslov „Porudžbina”, tekstualni spisak poručenog, ispod njega dugme „Izmeni”, pa liniju i red „Cena bez dostave”. Ispod su adresa, opciono „Ulaz, sprat, stan” i telefon: čim kupac izabere predlog adrese, server računa dostavu i prikažu se „Cena dostave” i „Ukupno”. Dugme „Poruči” se otključava kad su izabrana adresa, izračunata dostava i unet telefon, i odmah šalje porudžbinu, bez popup-a.
+- **Upis i obaveštenja (Veljko 06.11.2026, „dodaj samo telefon”):** za sada bez nove tabele i bez migracije. Porudžbina ide istim upisom kao dostava sa sajta: stavke su tekst u nazivu porudžbine, a ukupno za naplatu u napomeni. Zato tabla, `/k/{token}`, Telegram i mejl rade bez posebnog koda. Umaci i napomena kupca još nisu na strani. Ovo važi umesto starijih stavki ispod o popup-u, `order_type = 'restoran'`, `order_items` i `create_partner_order`. Korpa se čuva u browseru dok je tab otvoren (preživi prelazak na tu stranu, povratak na meni i osvežavanje). Prazna korpa na toj strani nudi povratak na meni.
+- **Umaci (Veljko 24.10.2026):** jedan spisak kućica **na dnu porudžbine**, uz adresu i telefon (Kečap, Ljutenica, 1000 ostrva, Čili, Garlic sos). Kupac čekira koje želi, **bez ograničenja i bez naplate**. Nisu vezani za stavku, nema opcija ni grupa po stavci. Spisak umaka je polje restorana u registru; izabrani umaci se čuvaju uz porudžbinu i idu kuriru i u mejl.
+- Browser šalje samo `{ id, količina }` za stavke i spisak izabranih umaka; server izvodi cene iz registra, proverava da su umaci sa spiska restorana i potpisuje ponudu HMAC-om (`purpose: "partner"`), kao kod kupovine.
+- Upis u istu tabelu `orders` sa `order_type = 'restoran'` (opšte ime, ne naziv restorana), uz `partner_slug` i `items_total`. Stavke idu u novu opštu tabelu `order_items` i čuvaju **snimak** naziva i cene iz trenutka porudžbine (kasnija promena menija ne menja staru porudžbinu). Upis samo preko RPC `create_partner_order` (`service_role`).
+- `title` = sažetak stavki, `shop` = naziv i adresa restorana, da tabla, `/k/{token}` i Telegram dugme „📍 Preuzimanje” rade bez posebnog koda.
+- Kupac unosi samo **svoju adresu** (Places), telefon i napomenu. Polja „Odakle preuzimamo?” nema, jer je preuzimanje uvek u restoranu.
+- **Cena dostave se dodaje na kraju računa**: popup prikazuje hranu, dostavu i ukupno. Kurir u poruci dobija stavke, hranu, dostavu i ukupno za naplatu.
+
+**SEO (Veljko potvrdio opciju A, 23.10.2026)**
+
+- Stranica na postojećem domenu: `https://smrckopotrcko.rs/partneri/crispy-chicken-korner` (24.10.2026, umesto ranijeg `/crispy-chicken-korner`). Poseban domen je odbačen za sada (sav SEO posao bi se radio dvaput, novi domen kreće od nule); prelazak je moguć kasnije uz 308 preusmerenje.
+- Svoj `title`, opis, canonical, ulazak u `sitemap.xml`. Slika menija je Open Graph slika za deljenje.
+- H1 je naziv restorana, a podnaslov opisuje stvarnu ponudu (pohovana piletina u Jagodini: krilca, batačići, strips, dostava na adresu). Bez gomilanja ključnih reči i bez stranica po mestima.
+- Schema `Restaurant` sa **svojim `@id`** (ne meša se sa Potrčkovim `LocalBusiness`), adresom, telefonom restorana, Instagramom u `sameAs` i `hasMenu` (odeljci, stavke, cene u RSD) iz istog registra kao meni. Bez ocena i recenzija. `sitemap.xml` dobija `/partneri` i stranu svakog partnera.
+- Glavni SEO posao je **Google Business Profile restorana**, koji pravi vlasnik: tačan naziv, vidljiva adresa (restoran prima goste), telefon restorana, link ka meniju na sajtu. Na istoj adresi su već perionica i Potrčko; restoran je stvarno poseban biznis (gosti, svoj telefon), a tabla sa nazivom na ulazu pomaže proveri.
+- Ulazi na sajt: kartica partnera u hero-u početne i link „Partneri” u javnoj navigaciji.
+
+**Otvoreno (pitati vlasnika; ne blokira prikaz menija i korpu)**
+
+- Kurir naplaćuje **hranu + dostavu** u kešu i predaje novac za hranu vlasniku? (pretpostavka)
+- Formula dostave: pretpostavka je ista kao za ostale dostave (start + 80 × km od Kneza Miloša 24, najmanje 200 din).
+- Radno vreme restorana (za profil i schema zapis; forma se ne zatvara van termina). Najmanja porudžbina?
+- Budući partneri na drugoj adresi: dostava od restorana ili od baze? Sada od baze (za Crispy je to ista adresa).
 
 ## SEO i pronalaženje biznisa (15.09.2026)
 
@@ -165,6 +211,22 @@ Redosled (Veljko potvrdio plan 10.10.2026):
 
 - Google profil glasi „Smrko Potrcko”, a sajt, domen, Instagram i Facebook koriste „Smrcko/Šmrčko”. Preporuka: vlasnik ispravi naziv u profilu na „Šmrčko Potrčko”, pa JSON-LD vratiti na pravi naziv. Dok to ne potvrdi, JSON-LD ostaje kao u odeljku **Lokacija**.
 - Ne izmišljati recenzije, ne kupovati linkove, ne praviti stranice samo za robote, ne gomilati ključne reči. Nema garancije pozicije ni AI preporuke. `llms.txt` se ne uvodi kao navodni faktor rangiranja.
+
+## Google Analytics, kolačići i politika privatnosti (18.10.2026)
+
+**Izmena 07.11.2026 (Veljko):** politika privatnosti i strana `/politika-privatnosti` se ne rade, a stavke ispod o njima ne važe. Google Analytics nije uveden; pre uvođenja se ova odluka ponovo razmatra.
+
+Vlasnik želi da vidi posete sajtu (Google Analytics 4), uz pitanje za kolačiće i politiku privatnosti kako zakon traži.
+
+- **Pružalac usluge i rukovalac podacima:** Uroš Milošević PR Dostava hrane i pića Potrčko Šmrčko Jagodina, PIB 115552536, MB 68454298, delatnost 5320. Sedište: Kneza Miloša 24, 35000 Jagodina, Srbija (Veljko potvrdio 18.10.2026). Mejl za privatnost: `potrckosmrcko@gmail.com`; telefon `DISPLAY_PHONE`.
+- **GA se ne učitava pre klika „Prihvatam”.** Pre pristanka i posle „Odbijam” nema GA skripte ni zahteva ka Google-u. Consent Mode sa signalima bez kolačića pre pristanka je odbačen.
+- „Prihvatam” i „Odbijam” su jednako vidljivi; zatvaranje banera nije pristanak. Izbor se pamti u browseru (neophodan zapis, bez pristanka). Link „Podešavanja kolačića” na dnu javnih strana ponovo otvara izbor; povlačenje pristanka gasi merenje i briše `_ga` kolačiće.
+- GA meri samo javne strane. **Nikad** `/admin`, `/prijava`, `/k/…` (tajni token kurira u URL-u). U GA ne idu telefon, adresa ni drugi lični podaci.
+- Measurement ID (`G-…`) iz env-a `NEXT_PUBLIC_GA_ID`; bez njega nema ni GA ni banera. GA nalog 18.10.2026 ne postoji; pravi ga i drži vlasnik. Podešavanja naloga: čuvanje podataka 2 meseca, Google signals isključen.
+- Javna strana `/politika-privatnosti`: rukovalac, koji podaci se uzimaju (porudžbina, kupovina, saradnja, kalkulator), svrha i pravni osnov, primaoci (Supabase, Vercel, Resend, Telegram, Google), prenos van Srbije, rok čuvanja, prava kupca, pritužba Povereniku, spisak kolačića. Opisuje samo ono što aplikacija stvarno radi. Podaci o pružaocu usluge (naziv, PIB, MB, mejl, telefon) vidljivi su na strani. Link „Politika privatnosti” je tekstualni link ispod Facebook/Instagram dugmadi u kontakt sekciji (`ContactStrip`), ne u crvenoj traci na dnu (Veljko: tamo je ružno). `/saradnja` nema kontakt sekciju, pa joj link još fali; dodaje se i uz slanje formi. Tekst pre objave pregleda vlasnik (preporuka: knjigovođa ili pravnik); agent nije pravnik.
+- **Rok čuvanja porudžbina: 30 dana.** Veljko ih briše ručno (18.10.2026); u repou nema automatskog brisanja. Politika ne sme obećati kraći rok nego što se stvarno poštuje. Supabase projekat je u Frankfurtu (EU). Kopije porudžbina u Gmailu vlasnika i u Telegramu kurira, kao i upiti za saradnju, se ne brišu automatski; politika to navodi i nudi brisanje na zahtev. Zato brojač „Ukupno” na `/admin/kuriri` pokazuje samo poslednjih 30 dana.
+- Google mapa na `/lokacija` (iframe postavlja Google kolačiće) učitava se tek na klik „Prikaži mapu” (predlog agenta, čeka potvrdu).
+- Plan izrade: `docs/analitikaPrivatnost.md`.
 
 ## Tech stack
 
@@ -291,35 +353,10 @@ porudžbina visi, ili kad kurir ćuti na ponudu. Preotima se samo do statusa
 `poslata_kuriru`; porudžbinu koju je kurir prihvatio (`krenuo`) ne diramo.
 Ručna dodela je obična ponuda: Telegram stiže, kurir sme da odbije.
 
-## Šta nije V1 (ne radi osim ako vlasnik ovog repoa kaže da klijent to sada traži)
 
-- Katalog partnera / proizvodi (kasniji **upsell**: naplata prodavnicama za izlistavanje) — nema tabele `partners` u V1
-- Google **login**, sačuvane adrese, tracking kupca, CMS cena u UI, zvuk, statistika, radno vreme koje zatvara formu
-  - Google Maps prikaz je sada tražen za `/lokacija`; vidi odeljak **Lokacija**.
-  - **Kuriri u UI su sada V1** (`/admin/kuriri`): vlasnik dodaje kurira, sam bira
-    njegov PIN (4–8 cifara), menja ime/telefon, gasi ga (`is_active`) ili briše,
-    i kopira mu `/k/{token}` link. Detalji: `docs/featureAdmin.md`.
-  - **Ali:** Google **Routes API** (kilometraža) + **Places Autocomplete** (izbor adrese) za cenu dostave **JESU V1** — vidi `docs/featureGoogleMaps.md`. Ključ samo na serveru.
-- Plaćanje online **nikad**
-- Food of Šmrk / perionica
 
-## Faze izrade (radi redom)
 
-0. Papirni tok i ko sme da čita čije podatke
-1. Skelet Next + Supabase, `/` i `/admin`
-2. Tabele `orders`, `couriers` + RLS
-3. Forma + hvala + broj
-4. Login + tabla sa F5
-5. **Unos sa poziva** na tabli (`/admin/nova`, ista polja, `izvor = telefon`)
-6. Lista kurira + smena + izbor
-7. Auto-dodela kurira + Telegram ponuda (zamenilo `wa.me`)
-8. Kurirski link + statusi
-9. Mejl vlasniku (sajt i, od 12.10.2026, telefon)
-10. Live tabla (Realtime), tek kad 4–8 razumeš
-11. Vlasnički deo (`docs/featureAdmin.md`): ručno pravljenje naloga u Supabase-u,
-    `/admin/kuriri`, ručna dodela porudžbine kuriru
-
-## Baza i bezbednost (kad dođemo do koda)
+## Baza i bezbednost 
 
 - Vlasnik može trajno da obriše kurira i sa aktivnom ponudom ili vožnjom. Njegove nezavršene porudžbine vraćaju se u `nova`, uz `courier_id = NULL` i `assigned_at = NULL`, za ponovnu dodelu sa table. Isporučene porudžbine ostaju isporučene, bez veze sa obrisanim kurirom. Brisanje i vraćanje porudžbina moraju biti jedna transakcija.
 
@@ -328,19 +365,14 @@ Ručna dodela je obična ponuda: Telegram stiže, kurir sme da odbije.
 - Kupac ne vidi tuđe adrese/telefone.
 - Token kurira nije pogodiv (`/k/1` je pogrešno).
 
-## Reel reklama (30.09.2026)
-
-- Zaseban reklamni video u `artifacts/smrcko-reel`; ne menja tokove na sajtu.
-- Kraća verzija traje **11 sekundi**: uvod 2 s, dostava 2 s, kupovina 2 s, provera cene 1 s, saradnja 2 s, kontakt 2 s.
-- Na Veljkov zahtev dodati zvučne efekte usklađene sa prelazima i pokretima, kao i izraženije animacije ilustracija. Ovo se odnosi na reklamu, ne na zvuk u aplikaciji.
-- Za verziju sa muzikom Veljko je izabrao **Sonican — Upbeat Ukulele Loop - Positive Ads** sa Pixabay-a (numera `268489`). Koristiti 11-sekundni isečak tiho ispod efekata, uz blago utišavanje na kraju; sačuvati izvor i podatke o licenci uz izvozni fajl. Verzija samo sa efektima ostaje sačuvana.
-- Sačuvati prvu verziju od 30 sekundi. Nova verzija ostaje vertikalna 1080 × 1920, sa originalnim logotipom, postojećim bojama i istinitim opisom usluga. Završni telefon i domen ostaju mirni radi čitljivosti.
 
 ## Kako agent radi u ovom repo-u
 
 - Učenje je deo zadatka — vidi odeljak **Cilj učenja**.
 - Cena dostave: `start + 80 × km` (start 100/200/300/400 po razdaljini), najmanje 200 din, iz ovog fajla i `docs/featureGoogleMaps.md`. Kupovina ostaje fiksna po lancu. Ne nagađaj spisak kurira ni naselja.
 - Kad klijent promeni zahtev: ažuriraj **ovaj fajl**, pa implementiraj.
+- U ovaj fajl i u `docs/` upisuj **odluke** (šta kupac/vlasnik vidi, šta je dogovoreno i zašto), **ne unapred razrađen kod**: bez naziva fajlova, tipova, promenljivih, kolona i funkcija koji još ne postoje. Imena se biraju sa Veljkom kad se dođe do tog koraka, pa se tek tada zapisuju ako su bitna (24.10.2026).
+- Ne pravi unapred detaljan plan celog feature-a po fazama. Radi korak po korak: sledeći korak, zašto, pa kod. Sporedne detalje rešavaj najjednostavnije, bez opštih mehanizama „za budućnost”.
 - Ne širi scope „dok si već tu“ (partneri, Google, zvuk, CSV).
 - Posle UI izmene: proveri tok u browseru ako alati postoje.
 - Ne commituj osim ako vlasnik koda eksplicitno traži.

@@ -1,3 +1,5 @@
+import Image from "next/image";
+import Link from "next/link";
 import { HeroDivider } from "@/components/hero-divider";
 import { AnnouncementBar } from "@/components/announcement-bar";
 import { BrandLogo } from "@/components/brand-logo";
@@ -6,10 +8,12 @@ import { GuestOrderForm } from "@/components/guest-order-form";
 import { ServiceCards } from "@/components/service-cards";
 import {
   ArrowDownIcon,
+  ArrowRightIcon,
   BoltIcon,
   CheckCircleIcon,
   MapPinIcon,
 } from "@/components/icons";
+import { PARTNERS } from "@/lib/partners";
 import { heroButtonClass } from "@/lib/ui";
 import { SiteNav } from "@/components/site-nav";
 import { publicMetadata } from "@/lib/seo";
@@ -52,6 +56,7 @@ const BADGES = [
 const TITLE_DELAY_MS = 150;
 const DESCRIPTION_DELAY_MS = 700;
 const CTA_DELAY_MS = 1000;
+const PARTNER_DELAY_MS = 1300;
 
 /*
  * Stranica su sada ČETIRI trake jedna ispod druge, ne jedan grid:
@@ -73,12 +78,12 @@ export default function HomePage() {
     <main className="flex min-h-dvh flex-col">
       <StructuredData path="/" />
        <SiteNav />
-      <section className="hero-surface relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-4 pb-24 pt-24 text-center sm:pb-36 sm:pt-28">
-        <BrandLogo className="w-60 sm:w-80 lg:w-[26rem]" priority onColor />
+      <section className="hero-surface relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-4 pb-20 pt-20 text-center sm:pb-28 sm:pt-24">
+        <BrandLogo className="w-44 sm:w-60 lg:w-72" priority onColor />
 
         {/* Ceo naslov pada kao jedan komad — vidi potrcko-slam-in u globals.css. */}
         <h1
-          className="hero-title animate-slam-in mt-6 max-w-4xl origin-bottom font-display text-3xl font-black italic uppercase leading-[1.05] tracking-tight motion-reduce:animate-none sm:mt-8 sm:text-5xl lg:text-6xl"
+          className="hero-title animate-slam-in mt-4 max-w-4xl origin-bottom font-display text-3xl font-black italic uppercase leading-[1.05] tracking-tight motion-reduce:animate-none sm:mt-6 sm:text-5xl lg:text-6xl"
           style={{ animationDelay: `${TITLE_DELAY_MS}ms` }}
         >
           Treba ti nešto?
@@ -92,7 +97,7 @@ export default function HomePage() {
           pamti, a opis mu se pridruži bez galame.
         */}
         <p
-          className="hero-description animate-rise-in mt-5 max-w-2xl motion-reduce:animate-none"
+          className="hero-description animate-rise-in mt-3 max-w-2xl motion-reduce:animate-none sm:mt-4"
           style={{ animationDelay: `${DESCRIPTION_DELAY_MS}ms` }}
         >
           Hrana, namirnice, apoteka ili bilo šta drugo. Reci nam šta ti treba i
@@ -111,12 +116,54 @@ export default function HomePage() {
         */}
         <a
           href="#poruci"
-          className={`${heroButtonClass} animate-rise-in mt-8 motion-reduce:animate-none sm:mt-10`}
+          className={`${heroButtonClass} animate-rise-in mt-5 motion-reduce:animate-none sm:mt-6`}
           style={{ animationDelay: `${CTA_DELAY_MS}ms` }}
         >
           Poruči šta ti treba
           <ArrowDownIcon className="h-5 w-5" />
         </a>
+
+        {/*
+          Kartica ulazi poslednja: prvo poruka i glavno dugme, pa restoran.
+          Senka je na spoljnom linku jer maska na porudžbenici inače odseče
+          sve što je izvan nje, pa i senku.
+        */}
+        {PARTNERS.map((partner) => (
+          <Link
+            key={partner.slug}
+            href={`/partneri/${partner.slug}`}
+            className="group animate-rise-in mt-5 block w-full max-w-md rounded-2xl text-left drop-shadow-[0_5px_0_rgba(112,14,10,0.55)] transition-transform duration-200 hover:-translate-y-1 focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-white motion-reduce:animate-none motion-reduce:transition-none sm:mt-6"
+            style={{ animationDelay: `${PARTNER_DELAY_MS}ms` }}
+          >
+            <span className="partner-ticket flex items-stretch rounded-2xl">
+              {partner.logo ? (
+                <span className="flex w-25 shrink-0 items-center justify-center py-2.5">
+                  <span className="relative block h-20 w-20 -rotate-3 overflow-hidden rounded-xl transition-transform duration-200 group-hover:rotate-0 group-hover:scale-105 motion-reduce:transition-none">
+                    {/* Naziv je odmah pored kao tekst, pa slika nema svoj opis. */}
+                    <Image src={partner.logo} alt="" fill sizes="80px" className="scale-110 object-cover" />
+                  </span>
+                </span>
+              ) : null}
+
+              <span className="flex min-w-0 flex-1 items-center gap-2 border-l-2 border-dashed border-zinc-300 py-2.5 pl-3.5 pr-3">
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[0.7rem] font-extrabold uppercase leading-tight tracking-wide text-brand-dark">
+                    Gladan? Poruči iz restorana
+                  </span>
+                  <span className="mt-1 block font-display text-lg font-black italic uppercase leading-[1.05] tracking-tight text-ink">
+                    {partner.name}
+                  </span>
+                  <span className="mt-1 block text-sm font-semibold leading-snug text-zinc-600">
+                    {partner.tagline}
+                  </span>
+                </span>
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-dark text-white transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transition-none">
+                  <ArrowRightIcon className="h-5 w-5" />
+                </span>
+              </span>
+            </span>
+          </Link>
+        ))}
 
         <HeroDivider />
       </section>

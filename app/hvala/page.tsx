@@ -14,7 +14,7 @@ function priceFromSearch(
   value: string | string[] | undefined,
 ): number | null {
   const raw = Array.isArray(value) ? value[0] : value;
-  if (!raw || !/^\d{1,5}$/.test(raw)) return null;
+  if (!raw || !/^\d{1,7}$/.test(raw)) return null;
   return Number(raw);
 }
 
@@ -26,6 +26,8 @@ export default async function ThanksPage({
   const params = await searchParams;
   const ticket = ticketFromSearch(params.broj);
   const price = priceFromSearch(params.cena);
+  // Samo porudžbine iz restorana: hrana + dostava.
+  const total = priceFromSearch(params.ukupno);
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-1 flex-col px-4 py-10">
@@ -43,6 +45,9 @@ export default async function ThanksPage({
           ) : (
             <p className="text-zinc-700">Cenu dostave ti javljamo pozivom.</p>
           )}
+          {total !== null ? (
+            <p className="text-lg font-bold">Ukupno sa hranom: {deliveryPriceLabel(total)}.</p>
+          ) : null}
           <p>
             Tvoj broj je{" "}
             <span className="font-bold tracking-wide">{ticket}</span>. Sačuvaj
